@@ -13,29 +13,36 @@ import {
   Coins,
   Play,
   Trash2,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import styles from './content.module.css';
 
 type FilterStatus = 'all' | 'completed' | 'processing' | 'pending' | 'failed';
 
+const ITEMS_PER_PAGE = 9;
+
 export default function ContentPage() {
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchUploads = useCallback(async () => {
     try {
       setIsLoading(true);
       const status = filter === 'all' ? undefined : filter;
-      const res = await uploadService.getUploads(1, 50, status);
+      const res = await uploadService.getUploads(currentPage, ITEMS_PER_PAGE, status);
       setUploads(res.uploads || []);
+      setTotalCount(res.totalCount || 0);
     } catch (err) {
       console.error('Failed to fetch uploads:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [filter]);
+  }, [filter, currentPage]);
 
   useEffect(() => {
     fetchUploads();
@@ -47,9 +54,29 @@ export default function ContentPage() {
     try {
       await uploadService.deleteUpload(uploadId);
       setUploads(uploads.filter(u => u.id !== uploadId));
+      setTotalCount(prev => prev - 1);
     } catch (err) {
       console.error('Failed to delete upload:', err);
       alert('Failed to delete content. Please try again.');
+    }
+  };
+
+  const handleFilterChange = (newFilter: FilterStatus) => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
     }
   };
 
@@ -98,7 +125,7 @@ export default function ContentPage() {
           <button
             key={f.value}
             className={`${styles.filterBtn} ${filter === f.value ? styles.active : ''}`}
-            onClick={() => setFilter(f.value)}
+            onClick={() => handleFilterChange(f.value)}
           >
             {f.label}
           </button>
@@ -194,6 +221,33 @@ export default function ContentPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!isLoading && uploads.length > 0 && totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={styles.pageBtn}
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft size={18} />
+            Previous
+          </button>
+          <div className={styles.pageInfo}>
+            <span className={styles.pageNumber}>{currentPage}</span>
+            <span className={styles.pageDivider}>of</span>
+            <span className={styles.pageTotal}>{totalPages}</span>
+          </div>
+          <button
+            className={styles.pageBtn}
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <ChevronRight size={18} />
+          </button>
         </div>
       )}
     </div>

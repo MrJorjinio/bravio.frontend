@@ -4,8 +4,8 @@ import type {
   Upload,
   UploadsResponse,
   Flashcard,
-  SubmitAnswerRequest,
-  SubmitAnswerResponse,
+  SubmitDifficultyRequest,
+  SubmitDifficultyResponse,
   PracticeStats
 } from '@/types';
 
@@ -32,8 +32,8 @@ export const uploadService = {
   },
 
   async getFlashcards(uploadId: string): Promise<Flashcard[]> {
-    const response = await api.get<Flashcard[]>(`/uploads/${uploadId}/flashcards`);
-    return response.data;
+    const response = await api.get<{ flashcards: Flashcard[] }>(`/uploads/${uploadId}/flashcards`);
+    return response.data.flashcards;
   },
 
   async getRandomFlashcard(uploadId: string, excludeAttempted: boolean = false): Promise<Flashcard> {
@@ -43,8 +43,8 @@ export const uploadService = {
     return response.data;
   },
 
-  async submitAnswer(uploadId: string, data: SubmitAnswerRequest): Promise<SubmitAnswerResponse> {
-    const response = await api.post<SubmitAnswerResponse>(`/uploads/${uploadId}/practice/answer`, data);
+  async submitDifficulty(uploadId: string, data: SubmitDifficultyRequest): Promise<SubmitDifficultyResponse> {
+    const response = await api.post<SubmitDifficultyResponse>(`/uploads/${uploadId}/practice/difficulty`, data);
     return response.data;
   },
 

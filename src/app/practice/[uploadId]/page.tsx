@@ -8,12 +8,13 @@ import { uploadService } from '@/services';
 import type { Flashcard, Upload, PracticeStats } from '@/types';
 import {
   X,
-  Target,
   CheckCircle2,
-  HelpCircle,
-  ArrowRight,
   RotateCcw,
-  ArrowLeft
+  ArrowLeft,
+  Lightbulb,
+  Zap,
+  Check,
+  XIcon
 } from 'lucide-react';
 import styles from './practice.module.css';
 
@@ -26,16 +27,14 @@ export default function PracticePage() {
   const [upload, setUpload] = useState<Upload | null>(null);
   const [currentCard, setCurrentCard] = useState<Flashcard | null>(null);
   const [stats, setStats] = useState<PracticeStats | null>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [explanation, setExplanation] = useState('');
-  const [correctAnswerId, setCorrectAnswerId] = useState('');
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [showHint, setShowHint] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cardIndex, setCardIndex] = useState(1);
   const [completed, setCompleted] = useState(false);
-  const [attemptedCards, setAttemptedCards] = useState<Set<string>>(new Set());
+  const [totalCards, setTotalCards] = useState(0);
+  const [sessionAttemptedIds, setSessionAttemptedIds] = useState<Set<string>>(new Set());
 
   const fetchData = useCallback(async () => {
     try {
@@ -46,6 +45,7 @@ export default function PracticePage() {
       ]);
       setUpload(uploadData);
       setStats(statsData);
+      setTotalCards(uploadData.flashcardCount || 0);
 
       const flashcard = await uploadService.getRandomFlashcard(uploadId, false);
       setCurrentCard(flashcard);
@@ -66,73 +66,93 @@ export default function PracticePage() {
     }
   }, [authLoading, isAuthenticated, uploadId, router, fetchData]);
 
-  const handleSelectAnswer = (answerId: string) => {
-    if (showResult) return;
-    setSelectedAnswer(answerId);
+  // Keyboard support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !isSubmitting) {
+        e.preventDefault();
+        setIsFlipped(prev => !prev);
+      }
+      // Number keys for difficulty after flip
+      if (isFlipped && !isSubmitting) {
+        if (e.key === '1') handleDifficulty(1);
+        if (e.key === '2') handleDifficulty(2);
+        if (e.key === '3') handleDifficulty(3);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFlipped, isSubmitting]);
+
+  const handleFlip = () => {
+    if (!isSubmitting) {
+      setIsFlipped(prev => !prev);
+    }
   };
 
-  const handleSubmitAnswer = async () => {
-    if (!selectedAnswer || !currentCard) return;
+  const handleDifficulty = async (difficulty: 1 | 2 | 3) => {
+    if (!currentCard || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const result = await uploadService.submitAnswer(uploadId, {
+      await uploadService.submitDifficulty(uploadId, {
         flashcardId: currentCard.id,
-        answerId: selectedAnswer
+        difficulty
       });
 
-      setIsCorrect(result.isCorrect);
-      setExplanation(result.explanation);
-      setCorrectAnswerId(result.correctAnswerId);
-      setShowResult(true);
+      // Track this card as attempted in current session
+      const newAttemptedIds = new Set(sessionAttemptedIds);
+      newAttemptedIds.add(currentCard.id);
+      setSessionAttemptedIds(newAttemptedIds);
 
       const newStats = await uploadService.getPracticeStats(uploadId);
       setStats(newStats);
+
+      // Check if we've gone through all cards in this session
+      if (newAttemptedIds.size >= totalCards) {
+        setCompleted(true);
+        return;
+      }
+
+      setIsFlipped(false);
+      setShowHint(false);
+
+      // Get all flashcards and pick a random one we haven't seen this session
+      try {
+        const allFlashcards = await uploadService.getFlashcards(uploadId);
+        const availableCards = allFlashcards.filter(f => !newAttemptedIds.has(f.id));
+
+        if (availableCards.length === 0) {
+          setCompleted(true);
+          return;
+        }
+
+        // Pick a random card from available ones
+        const randomIndex = Math.floor(Math.random() * availableCards.length);
+        setCurrentCard(availableCards[randomIndex]);
+        setCardIndex(prev => prev + 1);
+      } catch {
+        setCompleted(true);
+      }
     } catch (err) {
-      console.error('Failed to submit answer:', err);
+      console.error('Failed to submit difficulty:', err);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleNextCard = async () => {
-    if (currentCard) {
-      setAttemptedCards(prev => new Set(prev).add(currentCard.id));
-    }
-
-    const totalCards = upload?.flashcardCount || 0;
-    if (cardIndex >= totalCards) {
-      setCompleted(true);
-      return;
-    }
-
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setIsCorrect(false);
-    setExplanation('');
-    setCorrectAnswerId('');
-    setIsLoading(true);
-
-    try {
-      const flashcard = await uploadService.getRandomFlashcard(uploadId, true);
-      setCurrentCard(flashcard);
-      setCardIndex(prev => prev + 1);
-    } catch {
-      setCompleted(true);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleRestart = () => {
     setCardIndex(1);
     setCompleted(false);
-    setAttemptedCards(new Set());
+    setIsFlipped(false);
+    setShowHint(false);
+    setSessionAttemptedIds(new Set()); // Reset session tracking
     fetchData();
   };
 
-  const progressPercent = upload?.flashcardCount
-    ? Math.round((cardIndex / upload.flashcardCount) * 100)
+  const progressPercent = totalCards > 0
+    ? Math.round((cardIndex / totalCards) * 100)
     : 0;
 
   if (authLoading || !isAuthenticated) {
@@ -157,15 +177,15 @@ export default function PracticePage() {
           <div className={styles.finalStats}>
             <div className={styles.finalStat}>
               <span className={styles.finalStatValue}>{stats?.totalAttempts || 0}</span>
-              <span className={styles.finalStatLabel}>Total Attempts</span>
+              <span className={styles.finalStatLabel}>Cards Reviewed</span>
             </div>
             <div className={styles.finalStat}>
               <span className={styles.finalStatValue}>{stats?.correctAttempts || 0}</span>
-              <span className={styles.finalStatLabel}>Correct</span>
+              <span className={styles.finalStatLabel}>Mastered</span>
             </div>
             <div className={styles.finalStat}>
-              <span className={styles.finalStatValue}>{stats?.accuracy || 0}%</span>
-              <span className={styles.finalStatLabel}>Accuracy</span>
+              <span className={styles.finalStatValue}>{Math.round(stats?.accuracy || 0)}%</span>
+              <span className={styles.finalStatLabel}>Performance</span>
             </div>
           </div>
 
@@ -199,11 +219,11 @@ export default function PracticePage() {
             ></div>
           </div>
           <span className={styles.progressText}>
-            {cardIndex} / {upload?.flashcardCount || '?'}
+            {cardIndex} / {totalCards || '?'}
           </span>
         </div>
         <div className={styles.keyboardHint}>
-          Press Enter to Submit
+          Space to Flip
         </div>
       </header>
 
@@ -216,91 +236,86 @@ export default function PracticePage() {
           </div>
         ) : currentCard ? (
           <div className={styles.flashcardContainer}>
-            <div className={styles.flashcard}>
-              <div className={styles.flashcardHeader}>
-                <span className={styles.flashcardLabel}>Question</span>
-                <button className={styles.hintBtn}>
-                  <HelpCircle size={16} />
-                  Hint
-                </button>
-              </div>
-
-              <div className={styles.questionSection}>
-                <h2 className={styles.question}>{currentCard.question}</h2>
-              </div>
-
-              <div className={styles.answersSection}>
-                {currentCard.answers.map((answer, index) => {
-                  const isSelected = selectedAnswer === answer.id;
-                  const isAnswerCorrect = answer.id === correctAnswerId;
-                  const isWrongSelected = showResult && isSelected && !isAnswerCorrect;
-                  const letters = ['A', 'B', 'C', 'D'];
-
-                  return (
+            {/* 3D Flip Card */}
+            <div
+              className={`${styles.flipCardWrapper} ${isFlipped ? styles.flipped : ''}`}
+              onClick={handleFlip}
+            >
+              <div className={styles.flipCardInner}>
+                {/* Front Side (Question/Term) */}
+                <div className={styles.flipCardFront}>
+                  <span className={styles.cardLabel}>Question</span>
+                  {currentCard.hint && (
                     <button
-                      key={answer.id}
-                      className={`${styles.answerOption}
-                        ${isSelected ? styles.selected : ''}
-                        ${showResult && isAnswerCorrect ? styles.correct : ''}
-                        ${isWrongSelected ? styles.wrong : ''}`}
-                      onClick={() => handleSelectAnswer(answer.id)}
-                      disabled={showResult}
+                      className={styles.hintBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowHint(!showHint);
+                      }}
                     >
-                      <span className={styles.answerLetter}>{letters[index]}</span>
-                      {answer.text}
+                      <Lightbulb size={16} />
+                      Hint
                     </button>
-                  );
-                })}
-              </div>
-
-              {showResult && (
-                <div className={`${styles.resultSection} ${isCorrect ? styles.correctResult : styles.wrongResult}`}>
-                  <div className={styles.resultHeader}>
-                    <span className={styles.resultIcon}>{isCorrect ? '✓' : '✗'}</span>
-                    <span className={styles.resultText}>
-                      {isCorrect ? 'Correct!' : 'Incorrect'}
-                    </span>
-                  </div>
-                  {explanation && (
-                    <p className={styles.explanation}>{explanation}</p>
                   )}
+
+                  <h2 className={styles.cardText}>{currentCard.front}</h2>
+
+                  {showHint && currentCard.hint && (
+                    <div className={styles.hintBox}>
+                      <Lightbulb size={14} />
+                      {currentCard.hint}
+                    </div>
+                  )}
+
+                  <p className={styles.flipPrompt}>Click to flip</p>
                 </div>
-              )}
+
+                {/* Back Side (Answer) */}
+                <div className={styles.flipCardBack}>
+                  <span className={styles.cardLabelBack}>Answer</span>
+
+                  <p className={styles.answerText}>{currentCard.back}</p>
+                </div>
+              </div>
             </div>
 
-            <div className={styles.actions}>
-              {!showResult ? (
+            {/* Difficulty Buttons - Show after flip */}
+            {isFlipped && (
+              <div className={styles.difficultyActions}>
                 <button
-                  className={styles.submitBtn}
-                  onClick={handleSubmitAnswer}
-                  disabled={!selectedAnswer || isSubmitting}
+                  className={`${styles.difficultyBtn} ${styles.difficultBtn}`}
+                  onClick={() => handleDifficulty(1)}
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Checking...' : 'Check Answer'}
+                  <span className={styles.difficultyLabel}>Difficult</span>
+                  <XIcon size={18} />
+                  <span className={styles.difficultyKey}>1</span>
                 </button>
-              ) : (
-                <button className={styles.nextBtn} onClick={handleNextCard}>
-                  Next Card
-                  <ArrowRight size={18} />
+                <button
+                  className={`${styles.difficultyBtn} ${styles.goodBtn}`}
+                  onClick={() => handleDifficulty(2)}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.difficultyLabel}>Good</span>
+                  <Check size={18} />
+                  <span className={styles.difficultyKey}>2</span>
                 </button>
-              )}
-            </div>
-
-            {/* Stats */}
-            <div className={styles.statsBar}>
-              <span className={styles.statItem}>
-                <Target size={16} />
-                Accuracy: {stats?.accuracy || 0}%
-              </span>
-              <span className={styles.statItem}>
-                <CheckCircle2 size={16} />
-                {stats?.correctAttempts || 0}/{stats?.totalAttempts || 0}
-              </span>
-            </div>
+                <button
+                  className={`${styles.difficultyBtn} ${styles.easyBtn}`}
+                  onClick={() => handleDifficulty(3)}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.difficultyLabel}>Easy</span>
+                  <Zap size={18} />
+                  <span className={styles.difficultyKey}>3</span>
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.errorCard}>
             <div className={styles.errorIcon}>
-              <HelpCircle size={64} />
+              <CheckCircle2 size={64} />
             </div>
             <h2>No flashcards available</h2>
             <p>This upload doesn&apos;t have any flashcards yet.</p>

@@ -105,31 +105,23 @@ export interface UploadsResponse {
 }
 
 // Flashcard Types
-export interface Answer {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-  explanation?: string;
-}
-
 export interface Flashcard {
   id: string;
-  question: string;
-  answers: Answer[];
-  uploadId: string;
-  createdAt: string;
+  front: string;
+  back: string;
+  hint?: string;
 }
 
 // Practice Types
-export interface SubmitAnswerRequest {
+export interface SubmitDifficultyRequest {
   flashcardId: string;
-  answerId: string;
+  difficulty: 1 | 2 | 3; // 1=Difficult, 2=Good, 3=Easy
 }
 
-export interface SubmitAnswerResponse {
-  isCorrect: boolean;
-  correctAnswerId: string;
-  explanation: string;
+export interface SubmitDifficultyResponse {
+  success: boolean;
+  totalReviewed: number;
+  remainingCards: number;
 }
 
 export interface PracticeStats {

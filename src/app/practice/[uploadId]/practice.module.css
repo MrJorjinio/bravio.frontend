@@ -1,4 +1,4 @@
-/* Practice Page - New Glass Design */
+/* Practice Page - 3D Flip Card Design */
 .container {
   min-height: 100vh;
   background: #0f172a;
@@ -143,25 +143,52 @@
   width: 100%;
 }
 
-.flashcard {
-  background: #1e293b;
-  border: 1px solid #334155;
+/* 3D Flip Card */
+.flipCardWrapper {
+  perspective: 1000px;
+  width: 100%;
+  height: 384px;
+  cursor: pointer;
+}
+
+.flipCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flipped .flipCardInner {
+  transform: rotateY(180deg);
+}
+
+.flipCardFront,
+.flipCardBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
   border-radius: 24px;
   padding: 32px;
-  min-height: 400px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
-.flashcardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+/* Front Side - Dark */
+.flipCardFront {
+  background: #1e293b;
+  border: 1px solid #334155;
 }
 
-.flashcardLabel {
+.cardLabel {
+  position: absolute;
+  top: 24px;
+  left: 24px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -170,6 +197,9 @@
 }
 
 .hintBtn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -185,202 +215,74 @@
   color: #f1f5f9;
 }
 
-/* Question Section */
-.questionSection {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 0;
-  margin-bottom: 24px;
-}
-
-.question {
+.cardText {
   font-size: 1.75rem;
   font-weight: 600;
   color: #f1f5f9;
-  text-align: center;
   line-height: 1.4;
   letter-spacing: -0.025em;
+  max-width: 90%;
 }
 
-/* Answer Options */
-.answersSection {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.answerOption {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid #334155;
-  border-radius: 16px;
-  padding: 16px 20px;
-  color: #cbd5e1;
-  font-size: 1rem;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.hintBox {
+  position: absolute;
+  bottom: 80px;
   display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.answerOption:hover:not(:disabled) {
-  border-color: rgba(245, 158, 11, 0.5);
-  background: rgba(245, 158, 11, 0.05);
-}
-
-.answerOption.selected {
-  border-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
-  color: #f1f5f9;
-}
-
-.answerOption.correct {
-  border-color: #34d399;
-  background: rgba(52, 211, 153, 0.1);
-  color: #34d399;
-}
-
-.answerOption.wrong {
-  border-color: #f87171;
-  background: rgba(248, 113, 113, 0.1);
-  color: #f87171;
-}
-
-.answerOption:disabled {
-  cursor: default;
-}
-
-.answerLetter {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.875rem;
-  color: #64748b;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.answerOption.selected .answerLetter {
-  background: #f59e0b;
-  border-color: #f59e0b;
-  color: #020617;
-}
-
-.answerOption.correct .answerLetter {
-  background: #34d399;
-  border-color: #34d399;
-  color: #020617;
-}
-
-.answerOption.wrong .answerLetter {
-  background: #f87171;
-  border-color: #f87171;
-  color: #020617;
-}
-
-/* Result Section */
-.resultSection {
-  border-radius: 16px;
-  padding: 20px;
-  margin-top: 24px;
-}
-
-.correctResult {
-  background: rgba(52, 211, 153, 0.1);
-  border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-.wrongResult {
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-}
-
-.resultHeader {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.resultIcon {
-  font-size: 1.25rem;
-}
-
-.resultText {
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.correctResult .resultText {
-  color: #34d399;
-}
-
-.wrongResult .resultText {
-  color: #f87171;
-}
-
-.explanation {
-  color: #94a3b8;
-  font-size: 0.875rem;
-  line-height: 1.6;
-}
-
-/* Action Buttons */
-.actions {
-  display: flex;
-  gap: 16px;
-  margin-top: 32px;
-}
-
-.submitBtn,
-.nextBtn {
-  flex: 1;
-  padding: 20px 32px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  border: none;
-  border-radius: 16px;
-  color: #020617;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 8px;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  color: #fbbf24;
+  font-size: 0.875rem;
 }
 
-.submitBtn:hover:not(:disabled),
-.nextBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.4);
+.flipPrompt {
+  position: absolute;
+  bottom: 32px;
+  color: #64748b;
+  font-size: 0.875rem;
+  animation: pulse 2s ease-in-out infinite;
 }
 
-.submitBtn:active:not(:disabled),
-.nextBtn:active {
-  transform: scale(0.98);
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
-.submitBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Back Side - Light */
+.flipCardBack {
+  background: #ffffff;
+  border: none;
+  transform: rotateY(180deg);
+  box-shadow: 0 20px 50px rgba(255, 255, 255, 0.1);
+}
+
+.cardLabelBack {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #6366f1;
+}
+
+.answerText {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #1e293b;
+  line-height: 1.6;
+  max-width: 90%;
 }
 
 /* Difficulty Buttons */
 .difficultyActions {
   display: flex;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 48px;
 }
 
 .difficultyBtn {
@@ -396,12 +298,17 @@
   gap: 4px;
 }
 
-.difficultyBtn:hover {
-  transform: translateY(-2px);
+.difficultyBtn:hover:not(:disabled) {
+  transform: translateY(-4px);
 }
 
-.difficultyBtn:active {
+.difficultyBtn:active:not(:disabled) {
   transform: scale(0.95);
+}
+
+.difficultyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .difficultyLabel {
@@ -409,6 +316,13 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.difficultyKey {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-top: 4px;
 }
 
 .difficultBtn {
@@ -417,7 +331,7 @@
   color: #fb7185;
 }
 
-.difficultBtn:hover {
+.difficultBtn:hover:not(:disabled) {
   background: rgba(244, 63, 94, 0.2);
 }
 
@@ -427,7 +341,7 @@
   color: #fbbf24;
 }
 
-.goodBtn:hover {
+.goodBtn:hover:not(:disabled) {
   background: rgba(245, 158, 11, 0.2);
 }
 
@@ -437,7 +351,7 @@
   color: #34d399;
 }
 
-.easyBtn:hover {
+.easyBtn:hover:not(:disabled) {
   background: rgba(52, 211, 153, 0.2);
 }
 
@@ -447,7 +361,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 384px;
   color: #64748b;
   gap: 16px;
 }
@@ -492,8 +406,9 @@
 }
 
 .completedIcon {
-  font-size: 4rem;
   margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
 }
 
 .completedCard h1 {
@@ -558,6 +473,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .restartBtn:hover {
@@ -575,36 +494,15 @@
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .backBtn:hover {
   border-color: #64748b;
   background: rgba(255, 255, 255, 0.05);
-}
-
-/* Stats Bar */
-.statsBar {
-  display: flex;
-  gap: 16px;
-  margin-top: 24px;
-  padding: 12px 20px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid #334155;
-  border-radius: 12px;
-}
-
-.statItem {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
-}
-
-.statItem svg {
-  color: #f59e0b;
 }
 
 /* Responsive */
@@ -626,37 +524,26 @@
     display: none;
   }
 
-  .flashcard {
-    padding: 24px 20px;
-    min-height: 350px;
+  .flipCardWrapper {
+    height: 320px;
   }
 
-  .question {
+  .flipCardFront,
+  .flipCardBack {
+    padding: 24px 20px;
+  }
+
+  .cardText {
     font-size: 1.375rem;
   }
 
-  .answerOption {
-    padding: 14px 16px;
-    font-size: 0.9375rem;
-  }
-
-  .answerLetter {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8125rem;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-
-  .submitBtn,
-  .nextBtn {
-    padding: 18px 24px;
+  .answerText {
+    font-size: 1.125rem;
   }
 
   .difficultyActions {
     gap: 8px;
+    margin-top: 32px;
   }
 
   .difficultyBtn {
@@ -692,27 +579,45 @@
     width: auto;
   }
 
-  .flashcard {
+  .flipCardWrapper {
+    height: 280px;
+  }
+
+  .flipCardFront,
+  .flipCardBack {
     padding: 20px 16px;
-    min-height: 300px;
     border-radius: 20px;
   }
 
-  .question {
+  .cardLabel,
+  .cardLabelBack {
+    top: 16px;
+    left: 16px;
+    font-size: 0.625rem;
+  }
+
+  .hintBtn {
+    top: 16px;
+    right: 16px;
+    font-size: 0.75rem;
+  }
+
+  .cardText {
     font-size: 1.25rem;
   }
 
-  .answerOption {
-    padding: 12px 14px;
-    font-size: 0.875rem;
-    border-radius: 12px;
-    gap: 12px;
+  .answerText {
+    font-size: 1rem;
   }
 
-  .answerLetter {
-    width: 24px;
-    height: 24px;
+  .flipPrompt {
+    bottom: 20px;
     font-size: 0.75rem;
-    border-radius: 6px;
+  }
+
+  .hintBox {
+    bottom: 60px;
+    font-size: 0.75rem;
+    padding: 10px 12px;
   }
 }

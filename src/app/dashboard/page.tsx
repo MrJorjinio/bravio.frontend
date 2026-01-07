@@ -33,7 +33,7 @@ export default function DashboardPage() {
     try {
       setIsLoading(true);
       const [uploadsRes, balanceRes, statsRes] = await Promise.all([
-        uploadService.getUploads(1, 6),
+        uploadService.getUploads(1, 3),
         walletService.getBalance(),
         uploadService.getGlobalPracticeStats().catch(() => null)
       ]);
@@ -195,7 +195,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className={styles.contentGrid}>
-            {uploads.slice(0, 6).map((upload) => (
+            {uploads.slice(0, 3).map((upload) => (
               <div key={upload.id} className={styles.contentCard}>
                 <div className={styles.cardGlow}></div>
                 <div className={styles.cardInner}>
