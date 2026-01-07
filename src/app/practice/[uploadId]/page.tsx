@@ -1,12 +1,20 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { uploadService } from '@/services';
 import type { Flashcard, Upload, PracticeStats } from '@/types';
+import {
+  X,
+  Target,
+  CheckCircle2,
+  HelpCircle,
+  ArrowRight,
+  RotateCcw,
+  ArrowLeft
+} from 'lucide-react';
 import styles from './practice.module.css';
 
 export default function PracticePage() {
@@ -39,7 +47,6 @@ export default function PracticePage() {
       setUpload(uploadData);
       setStats(statsData);
 
-      // Get first flashcard
       const flashcard = await uploadService.getRandomFlashcard(uploadId, false);
       setCurrentCard(flashcard);
     } catch (err) {
@@ -79,7 +86,6 @@ export default function PracticePage() {
       setCorrectAnswerId(result.correctAnswerId);
       setShowResult(true);
 
-      // Update stats
       const newStats = await uploadService.getPracticeStats(uploadId);
       setStats(newStats);
     } catch (err) {
@@ -90,12 +96,10 @@ export default function PracticePage() {
   };
 
   const handleNextCard = async () => {
-    // Mark current card as attempted
     if (currentCard) {
       setAttemptedCards(prev => new Set(prev).add(currentCard.id));
     }
 
-    // Check if we've completed all flashcards
     const totalCards = upload?.flashcardCount || 0;
     if (cardIndex >= totalCards) {
       setCompleted(true);
@@ -110,12 +114,10 @@ export default function PracticePage() {
     setIsLoading(true);
 
     try {
-      // Use excludeAttempted: true to get only unattempted cards
       const flashcard = await uploadService.getRandomFlashcard(uploadId, true);
       setCurrentCard(flashcard);
       setCardIndex(prev => prev + 1);
-    } catch (err) {
-      // No more cards available
+    } catch {
       setCompleted(true);
     } finally {
       setIsLoading(false);
@@ -128,6 +130,10 @@ export default function PracticePage() {
     setAttemptedCards(new Set());
     fetchData();
   };
+
+  const progressPercent = upload?.flashcardCount
+    ? Math.round((cardIndex / upload.flashcardCount) * 100)
+    : 0;
 
   if (authLoading || !isAuthenticated) {
     return (
@@ -142,7 +148,9 @@ export default function PracticePage() {
     return (
       <div className={styles.container}>
         <div className={styles.completedCard}>
-          <div className={styles.completedIcon}>🎉</div>
+          <div className={styles.completedIcon}>
+            <CheckCircle2 size={64} color="#34d399" />
+          </div>
           <h1>Practice Complete!</h1>
           <p>Great job! Here are your results:</p>
 
@@ -163,9 +171,11 @@ export default function PracticePage() {
 
           <div className={styles.completedActions}>
             <button onClick={handleRestart} className={styles.restartBtn}>
+              <RotateCcw size={18} />
               Practice Again
             </button>
             <Link href="/dashboard" className={styles.backBtn}>
+              <ArrowLeft size={18} />
               Back to Dashboard
             </Link>
           </div>
@@ -178,22 +188,22 @@ export default function PracticePage() {
     <div className={styles.container}>
       {/* Header */}
       <header className={styles.header}>
-        <Link href="/dashboard" className={styles.backLink}>
-          <span>←</span> Back to Dashboard
-        </Link>
-        <div className={styles.headerInfo}>
-          <h1>{upload?.title || 'Practice Mode'}</h1>
-          <div className={styles.progress}>
-            Card {cardIndex} of {upload?.flashcardCount || '?'}
+        <div className={styles.progressSection}>
+          <Link href="/dashboard" className={styles.exitBtn}>
+            <X size={24} />
+          </Link>
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${progressPercent}%` }}
+            ></div>
           </div>
+          <span className={styles.progressText}>
+            {cardIndex} / {upload?.flashcardCount || '?'}
+          </span>
         </div>
-        <div className={styles.statsBar}>
-          <span className={styles.statItem}>
-            🎯 Accuracy: {stats?.accuracy || 0}%
-          </span>
-          <span className={styles.statItem}>
-            ✅ {stats?.correctAttempts || 0}/{stats?.totalAttempts || 0}
-          </span>
+        <div className={styles.keyboardHint}>
+          Press Enter to Submit
         </div>
       </header>
 
@@ -208,12 +218,11 @@ export default function PracticePage() {
           <div className={styles.flashcardContainer}>
             <div className={styles.flashcard}>
               <div className={styles.flashcardHeader}>
-                <span className={styles.flashcardLabel}>Flashcard {cardIndex}</span>
-                <div className={styles.dots}>
-                  <span className={styles.dot}></span>
-                  <span className={styles.dot}></span>
-                  <span className={styles.dot}></span>
-                </div>
+                <span className={styles.flashcardLabel}>Question</span>
+                <button className={styles.hintBtn}>
+                  <HelpCircle size={16} />
+                  Hint
+                </button>
               </div>
 
               <div className={styles.questionSection}>
@@ -237,7 +246,7 @@ export default function PracticePage() {
                       onClick={() => handleSelectAnswer(answer.id)}
                       disabled={showResult}
                     >
-                      <span className={styles.answerLetter}>{letters[index]}.</span>
+                      <span className={styles.answerLetter}>{letters[index]}</span>
                       {answer.text}
                     </button>
                   );
@@ -247,7 +256,7 @@ export default function PracticePage() {
               {showResult && (
                 <div className={`${styles.resultSection} ${isCorrect ? styles.correctResult : styles.wrongResult}`}>
                   <div className={styles.resultHeader}>
-                    <span className={styles.resultIcon}>{isCorrect ? '✅' : '❌'}</span>
+                    <span className={styles.resultIcon}>{isCorrect ? '✓' : '✗'}</span>
                     <span className={styles.resultText}>
                       {isCorrect ? 'Correct!' : 'Incorrect'}
                     </span>
@@ -257,31 +266,46 @@ export default function PracticePage() {
                   )}
                 </div>
               )}
+            </div>
 
-              <div className={styles.actions}>
-                {!showResult ? (
-                  <button
-                    className={styles.submitBtn}
-                    onClick={handleSubmitAnswer}
-                    disabled={!selectedAnswer || isSubmitting}
-                  >
-                    {isSubmitting ? 'Checking...' : 'Check Answer'}
-                  </button>
-                ) : (
-                  <button className={styles.nextBtn} onClick={handleNextCard}>
-                    Next Card
-                    <span>→</span>
-                  </button>
-                )}
-              </div>
+            <div className={styles.actions}>
+              {!showResult ? (
+                <button
+                  className={styles.submitBtn}
+                  onClick={handleSubmitAnswer}
+                  disabled={!selectedAnswer || isSubmitting}
+                >
+                  {isSubmitting ? 'Checking...' : 'Check Answer'}
+                </button>
+              ) : (
+                <button className={styles.nextBtn} onClick={handleNextCard}>
+                  Next Card
+                  <ArrowRight size={18} />
+                </button>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className={styles.statsBar}>
+              <span className={styles.statItem}>
+                <Target size={16} />
+                Accuracy: {stats?.accuracy || 0}%
+              </span>
+              <span className={styles.statItem}>
+                <CheckCircle2 size={16} />
+                {stats?.correctAttempts || 0}/{stats?.totalAttempts || 0}
+              </span>
             </div>
           </div>
         ) : (
           <div className={styles.errorCard}>
-            <div className={styles.errorIcon}>❓</div>
+            <div className={styles.errorIcon}>
+              <HelpCircle size={64} />
+            </div>
             <h2>No flashcards available</h2>
             <p>This upload doesn&apos;t have any flashcards yet.</p>
             <Link href="/dashboard" className={styles.backBtn}>
+              <ArrowLeft size={18} />
               Back to Dashboard
             </Link>
           </div>

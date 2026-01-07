@@ -1,47 +1,78 @@
-/* Wallet Page */
+/* Wallet Page - New Glass Design */
 .container {
-  max-width: 1000px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 40px;
+  min-height: 100%;
 }
 
 /* Header */
 .header {
-  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+}
+
+.headerLeft {
+  flex: 1;
 }
 
 .title {
-  font-family: var(--font-cormorant), serif;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #F1F5F9;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  letter-spacing: -0.025em;
   margin-bottom: 4px;
 }
 
 .subtitle {
-  color: #64748B;
-  font-size: 0.95rem;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.settingsBtn {
+  width: 48px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settingsBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
 }
 
 /* Balance Card */
 .balanceCard {
-  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-  border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 32px;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px;
+  padding: 40px;
+  margin-bottom: 40px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
 
-.balanceCard::before {
-  content: '';
+.balanceGlow {
   position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+  right: -40px;
+  bottom: -40px;
+  width: 160px;
+  height: 160px;
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 50%;
+  filter: blur(48px);
   pointer-events: none;
 }
 
@@ -50,324 +81,415 @@
   z-index: 1;
 }
 
+.accountBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
 .balanceLabel {
-  font-size: 0.9rem;
-  color: #94A3B8;
-  margin-bottom: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94a3b8;
+  margin-bottom: 4px;
 }
 
 .balanceValue {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.balanceValue img {
-  width: 48px;
-  height: 48px;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .balanceAmount {
-  font-size: 3rem;
+  font-size: 3.75rem;
+  font-weight: 900;
+  color: #f1f5f9;
+  letter-spacing: -0.025em;
+}
+
+.balanceCurrency {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #F59E0B;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.balanceFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .balanceUsd {
-  font-size: 1rem;
-  color: #64748B;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.balanceUsd span {
+  color: #475569;
+}
+
+.historyLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #818cf8;
+  font-size: 0.875rem;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.historyLink:hover {
+  color: #a5b4fc;
 }
 
 /* Purchase Section */
-.section {
-  background: #1E293B;
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(100, 116, 139, 0.2);
+.purchaseSection {
+  margin-bottom: 40px;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
-.sectionIcon {
-  font-size: 1.3rem;
+.sectionIndicator {
+  width: 6px;
+  height: 24px;
+  background: #6366f1;
+  border-radius: 50px;
 }
 
 .sectionTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #F1F5F9;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f1f5f9;
 }
 
-/* Purchase Options */
+/* Purchase Grid */
 .purchaseGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .purchaseOption {
-  background: #0F172A;
-  border: 2px solid rgba(100, 116, 139, 0.3);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 24px;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.purchaseOption:hover {
-  border-color: rgba(245, 158, 11, 0.5);
-}
-
-.purchaseOption.selected {
-  border-color: #F59E0B;
-  background: rgba(245, 158, 11, 0.1);
-}
-
-.purchaseOption.popular {
   position: relative;
 }
 
-.purchaseOption.popular::before {
-  content: 'Popular';
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #F59E0B;
-  color: #0F172A;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 10px;
+.purchaseOption:hover {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.purchasePrice {
+.purchaseOption.selected {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.purchaseOption.popular {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.05);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2);
+}
+
+.bestValueBadge {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  background: #f59e0b;
+  color: #020617;
+  font-size: 0.5625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.optionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.purchaseOption.popular .optionLabel {
+  color: rgba(251, 191, 36, 0.5);
+}
+
+.optionPrice {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #F1F5F9;
+  color: #f1f5f9;
   margin-bottom: 4px;
 }
 
-.purchaseBroins {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 1rem;
-  color: #F59E0B;
+.optionBroins {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
 }
 
-/* Custom Amount */
-.customAmount {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+/* Custom Amount Input */
+.customInputWrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.dollarSign {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 .customInput {
-  flex: 1;
-  padding: 14px 16px;
-  background: #0F172A;
-  border: 1px solid rgba(100, 116, 139, 0.3);
-  border-radius: 12px;
-  color: #F1F5F9;
-  font-family: var(--font-outfit), sans-serif;
+  width: 100%;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 0 24px 0 40px;
+  color: #f1f5f9;
   font-size: 1rem;
+  font-weight: 700;
   outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.customInput::placeholder {
-  color: #64748B;
-}
-
-.customInput:focus {
-  border-color: #F59E0B;
-}
-
-.applyBtn {
-  padding: 14px 24px;
-  background: rgba(100, 116, 139, 0.2);
-  border: 1px solid rgba(100, 116, 139, 0.3);
-  border-radius: 12px;
-  color: #F1F5F9;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.applyBtn:hover {
-  background: rgba(100, 116, 139, 0.3);
+.customInput::placeholder {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.customInput:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* Purchase Button */
 .purchaseBtn {
   width: 100%;
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  height: 64px;
+  background: #6366f1;
   border: none;
-  border-radius: 12px;
-  color: #0F172A;
-  font-family: var(--font-outfit), sans-serif;
+  border-radius: 16px;
+  color: #f1f5f9;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease;
 }
 
 .purchaseBtn:hover:not(:disabled) {
+  background: #818cf8;
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+}
+
+.purchaseBtn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .purchaseBtn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Exchange Rate */
-.exchangeRate {
-  text-align: center;
-  padding: 16px;
-  background: rgba(59, 130, 246, 0.1);
-  border-radius: 12px;
-  margin-top: 20px;
+/* Activity Section */
+.activitySection {
+  padding-bottom: 40px;
 }
 
-.exchangeText {
-  color: #60A5FA;
-  font-size: 0.9rem;
+.activityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
-.exchangeValue {
-  font-weight: 600;
+.activityTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f1f5f9;
 }
 
-/* Transaction History */
+.viewAllBtn {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.viewAllBtn:hover {
+  color: #f1f5f9;
+}
+
+/* Transaction List */
 .transactionList {
   display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
 .transaction {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(100, 116, 139, 0.15);
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  transition: all 0.2s ease;
 }
 
-.transaction:last-child {
-  border-bottom: none;
+.transaction:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .transactionLeft {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .transactionIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
 }
 
-.transactionIcon.purchase {
-  background: rgba(34, 197, 94, 0.15);
+.transactionIcon.spent {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  color: #f87171;
 }
 
-.transactionIcon.usage {
-  background: rgba(239, 68, 68, 0.15);
+.transactionIcon.received {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  color: #34d399;
 }
 
 .transactionIcon.bonus {
-  background: rgba(168, 85, 247, 0.15);
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  color: #a855f7;
 }
 
-.transactionIcon.refund {
-  background: rgba(59, 130, 246, 0.15);
+.transactionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .transactionInfo h4 {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #F1F5F9;
-  margin-bottom: 2px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
 }
 
 .transactionInfo p {
-  font-size: 0.8rem;
-  color: #64748B;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0;
 }
 
 .transactionAmount {
-  text-align: right;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
-.transactionBroins {
-  font-size: 1rem;
-  font-weight: 600;
+.transactionAmount.negative {
+  color: #f87171;
 }
 
-.transactionBroins.positive {
-  color: #22C55E;
+.transactionAmount.positive {
+  color: #34d399;
 }
 
-.transactionBroins.negative {
-  color: #EF4444;
-}
-
-.transactionDate {
-  font-size: 0.75rem;
-  color: #64748B;
-  margin-top: 2px;
-}
-
-/* Empty Transactions */
-.emptyTransactions {
+/* Empty State */
+.emptyState {
   text-align: center;
-  padding: 40px 20px;
-  color: #64748B;
+  padding: 48px 24px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px dashed rgba(100, 116, 139, 0.3);
+  border-radius: 24px;
 }
 
 .emptyIcon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  color: #64748b;
+  font-size: 0.875rem;
 }
 
 /* Loading */
 .loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  color: #64748B;
-  gap: 12px;
+  padding: 80px 24px;
+  color: #64748b;
+  gap: 16px;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(245, 158, 11, 0.2);
-  border-top-color: #F59E0B;
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(245, 158, 11, 0.2);
+  border-top-color: #f59e0b;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -382,34 +504,61 @@
     padding: 24px 16px;
   }
 
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
   .title {
-    font-size: 1.5rem;
+    font-size: 2rem;
+  }
+
+  .settingsBtn {
+    display: none;
   }
 
   .balanceCard {
-    padding: 24px;
+    padding: 32px 24px;
+    border-radius: 32px;
   }
 
   .balanceAmount {
-    font-size: 2.25rem;
+    font-size: 3rem;
+  }
+
+  .balanceCurrency {
+    font-size: 1.25rem;
+  }
+
+  .balanceFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .purchaseGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .customAmount {
-    flex-direction: column;
+  .purchaseOption {
+    padding: 20px;
+    border-radius: 20px;
   }
 
-  .transactionLeft {
-    gap: 10px;
+  .bestValueBadge {
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
   }
 
-  .transactionIcon {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
+  .customInput {
+    height: 56px;
+  }
+
+  .purchaseBtn {
+    height: 56px;
   }
 }
 
@@ -418,34 +567,33 @@
     padding: 16px 12px;
   }
 
+  .title {
+    font-size: 1.75rem;
+  }
+
   .balanceCard {
-    padding: 20px;
+    padding: 24px 20px;
+    border-radius: 24px;
   }
 
   .balanceAmount {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
 
-  .balanceValue img {
-    width: 36px;
-    height: 36px;
-  }
-
-  .section {
-    padding: 16px;
-  }
-
-  .purchaseOption {
-    padding: 16px;
+  .balanceCurrency {
+    font-size: 1rem;
   }
 
   .transaction {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    padding: 12px;
   }
 
-  .transactionAmount {
-    text-align: left;
+  .transactionIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .transactionInfo h4 {
+    font-size: 0.875rem;
   }
 }

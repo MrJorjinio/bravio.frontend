@@ -1,8 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import {
+  Sparkles,
+  ArrowRight,
+  Play,
+  FileText,
+  Bot,
+  GraduationCap,
+  ClipboardList,
+  Target,
+  Brain,
+  Coins,
+  Star,
+  Gift
+} from 'lucide-react';
 import styles from './landing.module.css';
 
 export default function LandingPage() {
@@ -52,11 +65,9 @@ export default function LandingPage() {
     <>
       {/* Navigation */}
       <nav className={styles.nav}>
-        <div className={styles.container} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={`${styles.container} ${styles.navInner}`}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>
-              <Image src="/images/bravio-logo.png" alt="Bravio" width={36} height={36} style={{ objectFit: 'contain' }} />
-            </span>
+            <span className={styles.logoIcon}>B</span>
             Bravio
           </Link>
 
@@ -93,10 +104,10 @@ export default function LandingPage() {
           <div className={`${styles.heroOrb} ${styles.heroOrb2}`}></div>
           <div className={styles.heroGrid}></div>
         </div>
-        <div className={styles.container} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <div className={`${styles.container} ${styles.heroInner}`}>
           <div className={styles.heroContent}>
             <span className={styles.heroBadge}>
-              <span className={styles.badgeStar}>✦</span>
+              <Sparkles size={14} className={styles.badgeStar} />
               AI-Powered Learning Platform
             </span>
             <h1>Master Any Content <span className={styles.highlight}>10x Faster</span></h1>
@@ -104,10 +115,10 @@ export default function LandingPage() {
             <div className={styles.heroButtons}>
               <Link href="/register" className={styles.btnPrimary}>
                 Start Learning Free
-                <span>→</span>
+                <ArrowRight size={18} />
               </Link>
               <a href="#how-it-works" className={styles.btnSecondary}>
-                <span>▶</span>
+                <Play size={16} />
                 See How It Works
               </a>
             </div>
@@ -149,13 +160,15 @@ export default function LandingPage() {
               </div>
             </div>
             <div className={`${styles.floatingCard} ${styles.floatingCard1}`}>
-              <div className={styles.floatingIcon}>🎯</div>
+              <div className={styles.floatingIcon}>
+                <Target size={24} />
+              </div>
               <div className={styles.floatingText}>Accuracy</div>
               <div className={styles.floatingValue}>94%</div>
             </div>
             <div className={`${styles.floatingCard} ${styles.floatingCard2}`}>
               <div className={styles.floatingIcon}>
-                <Image src="/images/broin-coin.png" alt="Broin" width={32} height={32} />
+                <Coins size={24} />
               </div>
               <div className={styles.floatingText}>Balance</div>
               <div className={styles.floatingValue}>150 Broins</div>
@@ -175,7 +188,7 @@ export default function LandingPage() {
           <div className={styles.stepsGrid}>
             <div className={`${styles.step} ${styles.revealOnScroll}`}>
               <div className={styles.stepIcon}>
-                📝
+                <FileText size={48} />
                 <span className={styles.stepNumber}>1</span>
               </div>
               <h3>Upload Your Content</h3>
@@ -183,7 +196,7 @@ export default function LandingPage() {
             </div>
             <div className={`${styles.step} ${styles.revealOnScroll}`}>
               <div className={styles.stepIcon}>
-                🤖
+                <Bot size={48} />
                 <span className={styles.stepNumber}>2</span>
               </div>
               <h3>AI Breaks It Down</h3>
@@ -191,7 +204,7 @@ export default function LandingPage() {
             </div>
             <div className={`${styles.step} ${styles.revealOnScroll}`}>
               <div className={styles.stepIcon}>
-                🎓
+                <GraduationCap size={48} />
                 <span className={styles.stepNumber}>3</span>
               </div>
               <h3>Understand & Remember</h3>
@@ -211,22 +224,30 @@ export default function LandingPage() {
           </div>
           <div className={styles.featuresGrid}>
             <div className={`${styles.featureCard} ${styles.revealOnScroll}`}>
-              <div className={styles.featureIcon}>📋</div>
+              <div className={styles.featureIcon}>
+                <ClipboardList size={28} />
+              </div>
               <h3>Smart Summaries</h3>
               <p>Get concise, well-structured summaries that capture the essence of any content. Understand complex topics at a glance without reading walls of text.</p>
             </div>
             <div className={`${styles.featureCard} ${styles.revealOnScroll}`}>
-              <div className={styles.featureIcon}>🎯</div>
+              <div className={styles.featureIcon}>
+                <Target size={28} />
+              </div>
               <h3>Key Points Extraction</h3>
               <p>AI identifies and highlights the most important concepts, facts, and takeaways. Perfect for quick reviews and exam preparation.</p>
             </div>
             <div className={`${styles.featureCard} ${styles.revealOnScroll}`}>
-              <div className={styles.featureIcon}>🧠</div>
+              <div className={styles.featureIcon}>
+                <Brain size={28} />
+              </div>
               <h3>Interactive Flashcards</h3>
               <p>Test your understanding with AI-generated multiple-choice questions. Each answer includes detailed explanations to deepen your knowledge.</p>
             </div>
             <div className={`${styles.featureCard} ${styles.revealOnScroll}`}>
-              <div className={styles.featureIcon}>💎</div>
+              <div className={styles.featureIcon}>
+                <Coins size={28} />
+              </div>
               <h3>Affordable Pay-As-You-Go</h3>
               <p>Start with 150 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
             </div>
@@ -245,7 +266,7 @@ export default function LandingPage() {
               <div className={styles.broinInfo}>
                 <div className={styles.broinHeader}>
                   <div className={styles.broinIcon}>
-                    <Image src="/images/broin-coin.png" alt="Broin" width={40} height={40} />
+                    <Coins size={28} />
                   </div>
                   <div>
                     <div className={styles.broinTitle}>Broin Credits</div>
@@ -273,7 +294,13 @@ export default function LandingPage() {
           </div>
           <div className={styles.testimonialsGrid}>
             <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>★★★★★</div>
+              <div className={styles.testimonialStars}>
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+              </div>
               <p className={styles.testimonialText}>&ldquo;I used to spend hours reading dense research papers. Now I paste them into Bravio and get a clear summary with the key points highlighted. Game changer!&rdquo;</p>
               <div className={styles.testimonialAuthor}>
                 <div className={styles.testimonialAvatar}>SK</div>
@@ -284,7 +311,13 @@ export default function LandingPage() {
               </div>
             </div>
             <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>★★★★★</div>
+              <div className={styles.testimonialStars}>
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+              </div>
               <p className={styles.testimonialText}>&ldquo;The summaries help me understand concepts quickly, and the flashcards help me remember them. It&apos;s like having a study buddy that does the hard work for you.&rdquo;</p>
               <div className={styles.testimonialAuthor}>
                 <div className={styles.testimonialAvatar}>MJ</div>
@@ -295,7 +328,13 @@ export default function LandingPage() {
               </div>
             </div>
             <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>★★★★★</div>
+              <div className={styles.testimonialStars}>
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+                <Star size={16} fill="#f59e0b" />
+              </div>
               <p className={styles.testimonialText}>&ldquo;Complex engineering concepts broken down into digestible key points? Yes please! Bravio makes studying so much more efficient.&rdquo;</p>
               <div className={styles.testimonialAuthor}>
                 <div className={styles.testimonialAvatar}>EL</div>
@@ -312,37 +351,36 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className={styles.cta}>
         <div className={styles.ctaBg}></div>
-        <div className={styles.container} style={{ position: 'relative', zIndex: 1 }}>
-          <h2>Start Learning <span style={{ color: 'var(--primary)' }}>Smarter</span> Today</h2>
+        <div className={`${styles.container} ${styles.ctaInner}`}>
+          <h2>Start Learning <span className={styles.highlight}>Smarter</span> Today</h2>
           <p>Join thousands of students who are already turning complex content into clear summaries, key insights, and interactive flashcards. No credit card required.</p>
           <div className={styles.ctaButtons}>
             <Link href="/register" className={styles.btnPrimary}>
               Create Free Account
-              <span>→</span>
+              <ArrowRight size={18} />
             </Link>
-            <a href="#" className={styles.btnSecondary}>
+            <a href="#how-it-works" className={styles.btnSecondary}>
               Watch Demo
             </a>
           </div>
           <div className={styles.ctaBonus}>
-            🎁 Get <strong>150 free Broins</strong> when you sign up today
+            <Gift size={18} />
+            Get <strong>150 free Broins</strong> when you sign up today
           </div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <div className={styles.container} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={`${styles.container} ${styles.footerInner}`}>
           <Link href="/" className={styles.logo}>
-            <span className={styles.logoIcon}>
-              <Image src="/images/bravio-logo.png" alt="Bravio" width={36} height={36} style={{ objectFit: 'contain' }} />
-            </span>
+            <span className={styles.logoIcon}>B</span>
             Bravio
           </Link>
           <ul className={styles.footerLinks}>
             <li><a href="#">About</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">Pricing</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#pricing">Pricing</a></li>
             <li><a href="#">Privacy</a></li>
             <li><a href="#">Terms</a></li>
             <li><a href="#">Contact</a></li>

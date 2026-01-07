@@ -4,6 +4,17 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { uploadService } from '@/services';
 import type { Upload } from '@/types';
+import {
+  Plus,
+  UploadCloud,
+  CheckCircle2,
+  Target,
+  Layers,
+  Coins,
+  Play,
+  Trash2,
+  Eye
+} from 'lucide-react';
 import styles from './content.module.css';
 
 type FilterStatus = 'all' | 'completed' | 'processing' | 'pending' | 'failed';
@@ -51,6 +62,14 @@ export default function ContentPage() {
     });
   };
 
+  const getStatusClass = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === 'completed') return styles.completed;
+    if (s === 'processing') return styles.processing;
+    if (s === 'pending') return styles.pending;
+    return styles.failed;
+  };
+
   const filters: { value: FilterStatus; label: string }[] = [
     { value: 'all', label: 'All' },
     { value: 'completed', label: 'Completed' },
@@ -64,11 +83,11 @@ export default function ContentPage() {
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.titleSection}>
-          <h1>My Content</h1>
-          <p>View and manage all your processed content</p>
+          <h1 className={styles.pageTitle}>My Content</h1>
+          <p className={styles.pageSubtitle}>View and manage all your processed content</p>
         </div>
         <Link href="/dashboard/upload" className={styles.uploadBtn}>
-          <span>📤</span>
+          <Plus size={18} />
           Upload New
         </Link>
       </div>
@@ -94,7 +113,9 @@ export default function ContentPage() {
         </div>
       ) : uploads.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>📚</div>
+          <div className={styles.emptyIcon}>
+            <UploadCloud size={64} />
+          </div>
           <h2 className={styles.emptyTitle}>
             {filter === 'all' ? 'No content yet' : `No ${filter} content`}
           </h2>
@@ -106,7 +127,7 @@ export default function ContentPage() {
           </p>
           {filter === 'all' && (
             <Link href="/dashboard/upload" className={styles.emptyBtn}>
-              <span>📤</span>
+              <Plus size={18} />
               Upload Content
             </Link>
           )}
@@ -115,64 +136,61 @@ export default function ContentPage() {
         <div className={styles.contentGrid}>
           {uploads.map((upload) => (
             <div key={upload.id} className={styles.contentCard}>
-              <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>{upload.title || 'Untitled'}</h3>
-                <span className={`${styles.statusBadge} ${styles[upload.status.toLowerCase()]}`}>
-                  {upload.status}
-                </span>
-              </div>
-
-              {/* Show summary if available, otherwise content preview */}
-              {upload.summaryPreview ? (
-                <div className={styles.summaryPreview}>
-                  <span className={styles.summaryLabel}>📋 Summary</span>
-                  <p className={styles.cardSummary}>{upload.summaryPreview}</p>
+              <div className={styles.cardGlow}></div>
+              <div className={styles.cardInner}>
+                <div className={styles.cardHeader}>
+                  <span className={styles.cardDate}>{formatDate(upload.createdAt)}</span>
+                  <div className={`${styles.statusBadge} ${getStatusClass(upload.status)}`}>
+                    {upload.status.toLowerCase() === 'completed' && <CheckCircle2 size={12} />}
+                    {upload.status}
+                  </div>
                 </div>
-              ) : (
-                <p className={styles.cardPreview}>
-                  {upload.contentPreview || 'Processing...'}
-                </p>
-              )}
 
-              <div className={styles.cardMeta}>
-                {upload.keyPointsCount !== undefined && upload.keyPointsCount > 0 && (
-                  <span className={styles.metaItem}>
-                    🎯 {upload.keyPointsCount} key points
-                  </span>
-                )}
-                <span className={styles.metaItem}>
-                  🧠 {upload.flashcardCount} flashcards
-                </span>
-                <span className={styles.metaItem}>
-                  💰 {upload.broinsCost} Broins
-                </span>
-                <span className={styles.metaItem}>
-                  📅 {formatDate(upload.createdAt)}
-                </span>
-              </div>
+                <div className={styles.cardBody}>
+                  <h3 className={styles.cardTitle}>{upload.title || 'Untitled'}</h3>
+                  <p className={styles.cardPreview}>
+                    {upload.summaryPreview || upload.contentPreview || 'Processing...'}
+                  </p>
+                </div>
 
-              <div className={styles.cardActions}>
-                <Link
-                  href={`/dashboard/content/${upload.id}`}
-                  className={`${styles.cardBtn} ${styles.view}`}
-                >
-                  View Details
-                </Link>
-                {upload.status.toLowerCase() === 'completed' && (
-                  <Link
-                    href={`/practice/${upload.id}`}
-                    className={`${styles.cardBtn} ${styles.practice}`}
-                  >
-                    Practice
-                  </Link>
-                )}
-                <button
-                  className={`${styles.cardBtn} ${styles.delete}`}
-                  onClick={() => handleDelete(upload.id)}
-                  title="Delete"
-                >
-                  🗑️
-                </button>
+                <div className={styles.cardFooter}>
+                  <div className={styles.cardMeta}>
+                    {upload.keyPointsCount !== undefined && upload.keyPointsCount > 0 && (
+                      <span className={styles.metaItem} title="Key Points">
+                        <Target size={14} className={styles.pinkIcon} />
+                        {upload.keyPointsCount}
+                      </span>
+                    )}
+                    <span className={styles.metaItem} title="Flashcards">
+                      <Layers size={14} className={styles.purpleIcon} />
+                      {upload.flashcardCount}
+                    </span>
+                    <span className={styles.metaItem} title="Broins">
+                      <Coins size={14} className={styles.yellowIcon} />
+                      {upload.broinsCost}
+                    </span>
+                  </div>
+
+                  <div className={styles.cardActions}>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => handleDelete(upload.id)}
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
+                      <Eye size={14} />
+                      View
+                    </Link>
+                    {upload.status.toLowerCase() === 'completed' && (
+                      <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
+                        <Play size={12} />
+                        Practice
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ))}

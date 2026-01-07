@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { walletService } from '@/services';
+import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -17,7 +18,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const { user, logout, isLoading: authLoading, isAuthenticated } = useAuth();
   const [balance, setBalance] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -44,8 +44,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     router.push('/');
   };
 
-  const closeSidebar = () => setSidebarOpen(false);
-
   const isActive = (path: string) => {
     if (path === '/dashboard') {
       return pathname === '/dashboard';
@@ -56,11 +54,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const getUserInitials = () => {
     if (!user?.email) return 'U';
     return user.email.charAt(0).toUpperCase();
-  };
-
-  const getUserName = () => {
-    if (!user?.email) return 'User';
-    return user.email.split('@')[0];
   };
 
   if (authLoading || !isAuthenticated) {
@@ -74,103 +67,111 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className={styles.dashboardLayout}>
-      {/* Sidebar */}
-      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.open : ''}`}>
+      {/* Sidebar - Desktop Only */}
+      <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <Link href="/" className={styles.logo}>
-            <Image src="/images/bravio-logo.png" alt="Bravio" width={40} height={40} />
+            <div className={styles.logoIcon}>B</div>
+            <span className={styles.logoText}>Bravio</span>
           </Link>
-          <button className={styles.closeSidebar} onClick={closeSidebar}>
-            &times;
-          </button>
         </div>
 
         <nav className={styles.nav}>
-          <div className={styles.navSection}>
-            <div className={styles.navLabel}>Menu</div>
-            <Link
-              href="/dashboard"
-              className={`${styles.navItem} ${isActive('/dashboard') && pathname === '/dashboard' ? styles.active : ''}`}
-              onClick={closeSidebar}
-            >
-              <span className={styles.navIcon}>📊</span>
-              Overview
-            </Link>
-            <Link
-              href="/dashboard/upload"
-              className={`${styles.navItem} ${isActive('/dashboard/upload') ? styles.active : ''}`}
-              onClick={closeSidebar}
-            >
-              <span className={styles.navIcon}>📤</span>
-              Upload Content
-            </Link>
-            <Link
-              href="/dashboard/content"
-              className={`${styles.navItem} ${isActive('/dashboard/content') ? styles.active : ''}`}
-              onClick={closeSidebar}
-            >
-              <span className={styles.navIcon}>📚</span>
-              My Content
-            </Link>
-          </div>
+          <p className={styles.navLabel}>Menu</p>
 
-          <div className={styles.navSection}>
-            <div className={styles.navLabel}>Account</div>
-            <Link
-              href="/dashboard/wallet"
-              className={`${styles.navItem} ${isActive('/dashboard/wallet') ? styles.active : ''}`}
-              onClick={closeSidebar}
-            >
-              <span className={styles.navIcon}>💰</span>
-              Wallet
-            </Link>
-          </div>
+          <Link
+            href="/dashboard"
+            className={`${styles.navItem} ${isActive('/dashboard') && pathname === '/dashboard' ? styles.active : ''}`}
+          >
+            <LayoutGrid className={styles.navIcon} />
+            <span>Overview</span>
+          </Link>
+          <Link
+            href="/dashboard/upload"
+            className={`${styles.navItem} ${isActive('/dashboard/upload') ? styles.active : ''}`}
+          >
+            <UploadCloud className={styles.navIcon} />
+            <span>Upload Content</span>
+          </Link>
+          <Link
+            href="/dashboard/content"
+            className={`${styles.navItem} ${isActive('/dashboard/content') ? styles.active : ''}`}
+          >
+            <Folder className={styles.navIcon} />
+            <span>My Content</span>
+          </Link>
+          <Link
+            href="/dashboard/wallet"
+            className={`${styles.navItem} ${isActive('/dashboard/wallet') ? styles.active : ''}`}
+          >
+            <Wallet className={styles.navIcon} />
+            <span>Wallet</span>
+          </Link>
         </nav>
 
         <div className={styles.sidebarFooter}>
           <div className={styles.balanceCard}>
-            <div className={styles.balanceLabel}>Your Balance</div>
+            <p className={styles.balanceLabel}>Your Balance</p>
             <div className={styles.balanceValue}>
-              <Image src="/images/broin-coin.png" alt="Broins" width={24} height={24} />
-              {balance} Broins
+              <Coins className={styles.balanceIcon} />
+              <span>{balance}</span>
             </div>
-          </div>
-
-          <div className={styles.userSection}>
-            <div className={styles.userAvatar}>{getUserInitials()}</div>
-            <div className={styles.userInfo}>
-              <div className={styles.userName}>{getUserName()}</div>
-            </div>
-            <button className={styles.logoutBtn} onClick={handleLogout} title="Sign out">
-              🚪
-            </button>
           </div>
         </div>
       </aside>
 
       {/* Mobile Header */}
       <header className={styles.mobileHeader}>
-        <button className={styles.menuBtn} onClick={() => setSidebarOpen(true)}>
-          ☰
-        </button>
         <Link href="/" className={styles.mobileLogo}>
-          <Image src="/images/bravio-logo.png" alt="Bravio" width={32} height={32} />
+          <div className={styles.mobileLogoIcon}>B</div>
+          <span>Bravio</span>
         </Link>
         <div className={styles.mobileBalance}>
           <Image src="/images/broin-coin.png" alt="Broins" width={18} height={18} />
-          {balance}
+          <span>{balance}</span>
         </div>
       </header>
-
-      {/* Overlay */}
-      {sidebarOpen && (
-        <div className={`${styles.overlay} ${styles.active}`} onClick={closeSidebar}></div>
-      )}
 
       {/* Main Content */}
       <main className={styles.mainContent}>
         {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className={styles.bottomNav}>
+        <Link
+          href="/dashboard"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard') && pathname === '/dashboard' ? styles.active : ''}`}
+        >
+          <LayoutGrid size={20} />
+          <span>Home</span>
+        </Link>
+        <Link
+          href="/dashboard/upload"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/upload') ? styles.active : ''}`}
+        >
+          <UploadCloud size={20} />
+          <span>Upload</span>
+        </Link>
+        <Link
+          href="/dashboard/content"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/content') ? styles.active : ''}`}
+        >
+          <Folder size={20} />
+          <span>Content</span>
+        </Link>
+        <Link
+          href="/dashboard/wallet"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/wallet') ? styles.active : ''}`}
+        >
+          <Wallet size={20} />
+          <span>Wallet</span>
+        </Link>
+        <button className={styles.bottomNavItem} onClick={handleLogout}>
+          <LogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </nav>
     </div>
   );
 }

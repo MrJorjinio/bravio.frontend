@@ -1,21 +1,30 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { walletService } from '@/services';
 import type { Transaction } from '@/types';
+import {
+  Settings,
+  ChevronRight,
+  CreditCard,
+  ArrowDownRight,
+  ArrowUpRight,
+  Gift,
+  Inbox
+} from 'lucide-react';
 import styles from './wallet.module.css';
 
 interface PurchaseOption {
   usd: number;
   broins: number;
+  label: string;
   popular?: boolean;
 }
 
 const purchaseOptions: PurchaseOption[] = [
-  { usd: 5, broins: 75 },
-  { usd: 10, broins: 150, popular: true },
-  { usd: 20, broins: 300 },
+  { usd: 5, broins: 75, label: 'Starter' },
+  { usd: 10, broins: 150, label: 'Popular', popular: true },
+  { usd: 20, broins: 300, label: 'Pro' },
 ];
 
 export default function WalletPage() {
@@ -85,11 +94,7 @@ export default function WalletPage() {
 
     setIsPurchasing(true);
     try {
-      // In a real app, this would integrate with Stripe or another payment processor
-      // For now, we'll just show a message
       alert(`Payment processing for $${usd} is not yet implemented. This would add ${getSelectedBroins()} Broins to your account.`);
-      // await walletService.purchase({ amount: usd });
-      // await fetchData();
     } catch (err) {
       console.error('Purchase failed:', err);
       alert('Purchase failed. Please try again.');
@@ -98,31 +103,12 @@ export default function WalletPage() {
     }
   };
 
-  const getTransactionIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'purchase': return '💰';
-      case 'usage': return '📤';
-      case 'signupbonus': return '🎁';
-      case 'refund': return '↩️';
-      default: return '💎';
-    }
-  };
-
-  const getTransactionIconClass = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'purchase': return styles.purchase;
-      case 'usage': return styles.usage;
-      case 'signupbonus': return styles.bonus;
-      case 'refund': return styles.refund;
-      default: return '';
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric',
+      day: 'numeric'
+    }) + ' \u2022 ' + date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -134,42 +120,80 @@ export default function WalletPage() {
 
   const getTransactionLabel = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'purchase': return 'Broins Purchase';
-      case 'usage': return 'Content Processing';
+      case 'purchase': return 'Broins Top-up';
+      case 'usage': return 'Spent Broins';
       case 'signupbonus': return 'Welcome Bonus';
       case 'refund': return 'Refund';
       default: return type;
     }
   };
 
+  const getTransactionIconClass = (type: string) => {
+    const t = type.toLowerCase();
+    if (t === 'usage') return styles.spent;
+    if (t === 'signupbonus') return styles.bonus;
+    return styles.received;
+  };
+
+  const renderTransactionIcon = (type: string) => {
+    const t = type.toLowerCase();
+    if (t === 'usage') return <ArrowDownRight size={20} />;
+    if (t === 'signupbonus') return <Gift size={20} />;
+    return <ArrowUpRight size={20} />;
+  };
+
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <div className={styles.spinner}></div>
+          <p>Loading wallet...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Wallet</h1>
-        <p className={styles.subtitle}>Manage your Broins and view transaction history</p>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.title}>Wallet</h1>
+          <p className={styles.subtitle}>Manage your digital assets</p>
+        </div>
+        <button className={styles.settingsBtn}>
+          <Settings size={20} />
+        </button>
       </div>
 
       {/* Balance Card */}
       <div className={styles.balanceCard}>
+        <div className={styles.balanceGlow}></div>
         <div className={styles.balanceContent}>
-          <div className={styles.balanceLabel}>Current Balance</div>
+          <span className={styles.accountBadge}>Personal Account</span>
+
+          <p className={styles.balanceLabel}>Current Balance</p>
           <div className={styles.balanceValue}>
-            <Image src="/images/broin-coin.png" alt="Broins" width={48} height={48} />
             <span className={styles.balanceAmount}>{balance}</span>
-            <span className={styles.balanceUsd}>Broins</span>
+            <span className={styles.balanceCurrency}>Broins</span>
           </div>
-          <div className={styles.balanceUsd}>
-            ≈ ${(balance / 15).toFixed(2)} USD value
+
+          <div className={styles.balanceFooter}>
+            <p className={styles.balanceUsd}>
+              ≈ ${(balance / 15).toFixed(2)} <span>USD</span>
+            </p>
+            <button className={styles.historyLink}>
+              Top up History <ChevronRight size={16} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Purchase Section */}
-      <div className={styles.section}>
+      <div className={styles.purchaseSection}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>💳</span>
-          <h2 className={styles.sectionTitle}>Buy Broins</h2>
+          <span className={styles.sectionIndicator}></span>
+          <h2 className={styles.sectionTitle}>Purchase Broins</h2>
         </div>
 
         <div className={styles.purchaseGrid}>
@@ -179,30 +203,25 @@ export default function WalletPage() {
               className={`${styles.purchaseOption} ${selectedOption === option.usd ? styles.selected : ''} ${option.popular ? styles.popular : ''}`}
               onClick={() => handleOptionSelect(option.usd)}
             >
-              <div className={styles.purchasePrice}>${option.usd}</div>
-              <div className={styles.purchaseBroins}>
-                <Image src="/images/broin-coin.png" alt="Broins" width={18} height={18} />
-                {option.broins} Broins
-              </div>
+              {option.popular && <span className={styles.bestValueBadge}>Best Value</span>}
+              <p className={styles.optionLabel}>{option.label}</p>
+              <p className={styles.optionPrice}>${option.usd}</p>
+              <p className={styles.optionBroins}>{option.broins} Broins</p>
             </div>
           ))}
         </div>
 
-        <div className={styles.customAmount}>
+        <div className={styles.customInputWrapper}>
+          <span className={styles.dollarSign}>$</span>
           <input
             type="number"
             className={styles.customInput}
-            placeholder="Custom amount (USD)"
+            placeholder="Custom amount"
             value={customAmount}
             onChange={(e) => handleCustomAmountChange(e.target.value)}
             min="1"
             step="1"
           />
-          {customAmount && (
-            <div className={styles.applyBtn}>
-              = {getSelectedBroins()} Broins
-            </div>
-          )}
         </div>
 
         <button
@@ -210,39 +229,24 @@ export default function WalletPage() {
           onClick={handlePurchase}
           disabled={isPurchasing || getSelectedUsd() <= 0}
         >
-          {isPurchasing ? (
-            'Processing...'
-          ) : (
-            <>
-              <span>💳</span>
-              Purchase {getSelectedBroins()} Broins for ${getSelectedUsd()}
-            </>
-          )}
+          <CreditCard size={20} strokeWidth={3} />
+          {isPurchasing ? 'Processing...' : 'Confirm Purchase'}
         </button>
-
-        <div className={styles.exchangeRate}>
-          <span className={styles.exchangeText}>
-            Exchange Rate: <span className={styles.exchangeValue}>$1 = 15 Broins</span>
-          </span>
-        </div>
       </div>
 
-      {/* Transaction History */}
-      <div className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>📜</span>
-          <h2 className={styles.sectionTitle}>Transaction History</h2>
+      {/* Activity Section */}
+      <div className={styles.activitySection}>
+        <div className={styles.activityHeader}>
+          <h3 className={styles.activityTitle}>Recent Activity</h3>
+          <button className={styles.viewAllBtn}>View All</button>
         </div>
 
-        {isLoading ? (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <span>Loading transactions...</span>
-          </div>
-        ) : transactions.length === 0 ? (
-          <div className={styles.emptyTransactions}>
-            <div className={styles.emptyIcon}>📭</div>
-            <p>No transactions yet</p>
+        {transactions.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyIcon}>
+              <Inbox size={48} />
+            </div>
+            <p className={styles.emptyText}>No transactions yet</p>
           </div>
         ) : (
           <div className={styles.transactionList}>
@@ -250,19 +254,16 @@ export default function WalletPage() {
               <div key={tx.id} className={styles.transaction}>
                 <div className={styles.transactionLeft}>
                   <div className={`${styles.transactionIcon} ${getTransactionIconClass(tx.type)}`}>
-                    {getTransactionIcon(tx.type)}
+                    {renderTransactionIcon(tx.type)}
                   </div>
                   <div className={styles.transactionInfo}>
                     <h4>{getTransactionLabel(tx.type)}</h4>
-                    <p>{tx.type}</p>
+                    <p>{formatDate(tx.createdAt)}</p>
                   </div>
                 </div>
-                <div className={styles.transactionAmount}>
-                  <div className={`${styles.transactionBroins} ${isPositiveTransaction(tx.type) ? styles.positive : styles.negative}`}>
-                    {isPositiveTransaction(tx.type) ? '+' : '-'}{Math.abs(tx.amountBroins)} Broins
-                  </div>
-                  <div className={styles.transactionDate}>{formatDate(tx.createdAt)}</div>
-                </div>
+                <span className={`${styles.transactionAmount} ${isPositiveTransaction(tx.type) ? styles.positive : styles.negative}`}>
+                  {isPositiveTransaction(tx.type) ? '+' : '-'}{Math.abs(tx.amountBroins)} B
+                </span>
               </div>
             ))}
           </div>
