@@ -428,26 +428,15 @@
   margin-bottom: 32px;
 }
 
-.processingIcon {
+.processingAnimation {
   display: flex;
   justify-content: center;
-  color: #f59e0b;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
-.pulseIcon {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.1);
-  }
+.loadingLottie {
+  width: 120px;
+  height: 120px;
 }
 
 .processingTitle {

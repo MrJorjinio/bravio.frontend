@@ -3,11 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { uploadService, walletService } from '@/services';
-import type { Upload, PracticeStats } from '@/types';
+import { uploadService, walletService, userService } from '@/services';
+import type { Upload, PracticeStats, StreakResponse } from '@/types';
 import {
   Plus,
-  Flame,
   TrendingUp,
   Target,
   Layers,
@@ -20,6 +19,7 @@ import {
   Coins,
   Eye
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './page.module.css';
 
 export default function DashboardPage() {
@@ -27,19 +27,22 @@ export default function DashboardPage() {
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [balance, setBalance] = useState(0);
   const [stats, setStats] = useState<PracticeStats | null>(null);
+  const [streak, setStreak] = useState<StreakResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [uploadsRes, balanceRes, statsRes] = await Promise.all([
+      const [uploadsRes, balanceRes, statsRes, streakRes] = await Promise.all([
         uploadService.getUploads(1, 3),
         walletService.getBalance(),
-        uploadService.getGlobalPracticeStats().catch(() => null)
+        uploadService.getGlobalPracticeStats().catch(() => null),
+        userService.getStreak().catch(() => null)
       ]);
       setUploads(uploadsRes.uploads || []);
       setBalance(balanceRes.balance);
       setStats(statsRes);
+      setStreak(streakRes);
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
@@ -97,18 +100,36 @@ export default function DashboardPage() {
             You've mastered <span className={styles.percentUp}>+12%</span> more topics this week.
           </p>
         </div>
-        <div className={styles.streakBadge}>
-          <Flame size={16} className={styles.flameIcon} />
-          <span>3 Day Streak</span>
-        </div>
+        {(streak?.currentStreak ?? 0) > 0 && (
+          <div className={styles.streakBadge}>
+            <div className={styles.fireAnimation}>
+              <DotLottieReact
+                src="/animations/fire.lottie"
+                autoplay
+                loop
+                className={styles.fireLottie}
+              />
+            </div>
+            <span>{streak?.currentStreak} Day Streak</span>
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         {/* Overall Accuracy - Large Card */}
-        <div className={styles.accuracyCard}>
-          <div className={styles.accuracyGlow}></div>
-          <div className={styles.accuracyContent}>
+        <div className={styles.accuracyCardWrapper}>
+          <div className={styles.sittingCat}>
+            <DotLottieReact
+              src="/animations/cat-sleeping.lottie"
+              autoplay
+              loop
+              className={styles.catLottie}
+            />
+          </div>
+          <div className={styles.accuracyCard}>
+            <div className={styles.accuracyGlow}></div>
+            <div className={styles.accuracyContent}>
             <p className={styles.accuracyLabel}>Overall Accuracy</p>
             <h3 className={styles.accuracyValue}>{accuracy}%</h3>
             <p className={styles.accuracyMeta}>
@@ -131,6 +152,7 @@ export default function DashboardPage() {
             <div className={styles.ringIcon}>
               <Target size={32} />
             </div>
+          </div>
           </div>
         </div>
 

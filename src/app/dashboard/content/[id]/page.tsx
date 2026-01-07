@@ -10,9 +10,9 @@ import {
   Layers,
   FileText,
   Play,
-  Trash2,
-  Bot
+  Trash2
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { uploadService } from '@/services';
 import type { Upload, Flashcard } from '@/types';
 import styles from './detail.module.css';
@@ -184,8 +184,13 @@ export default function ContentDetailPage() {
       {/* Processing State */}
       {isProcessing && (
         <div className={styles.processingCard}>
-          <div className={styles.processingIcon}>
-            <Bot size={48} className={styles.pulseIcon} />
+          <div className={styles.processingAnimation}>
+            <DotLottieReact
+              src="/animations/loading.lottie"
+              autoplay
+              loop
+              className={styles.loadingLottie}
+            />
           </div>
           <h3 className={styles.processingTitle}>Processing Your Content</h3>
           <p className={styles.processingText}>

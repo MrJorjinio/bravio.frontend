@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { walletService } from '@/services';
 import type { Transaction } from '@/types';
 import {
-  Settings,
   ChevronRight,
   CreditCard,
   ArrowDownRight,
@@ -31,7 +30,7 @@ export default function WalletPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<number | null>(10);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [isPurchasing, setIsPurchasing] = useState(false);
 
@@ -121,6 +120,7 @@ export default function WalletPage() {
   const getTransactionLabel = (type: string) => {
     switch (type.toLowerCase()) {
       case 'purchase': return 'Broins Top-up';
+      case 'spend': return 'Spent on Upload';
       case 'usage': return 'Spent Broins';
       case 'signupbonus': return 'Welcome Bonus';
       case 'refund': return 'Refund';
@@ -130,14 +130,14 @@ export default function WalletPage() {
 
   const getTransactionIconClass = (type: string) => {
     const t = type.toLowerCase();
-    if (t === 'usage') return styles.spent;
+    if (t === 'spend' || t === 'usage') return styles.spent;
     if (t === 'signupbonus') return styles.bonus;
     return styles.received;
   };
 
   const renderTransactionIcon = (type: string) => {
     const t = type.toLowerCase();
-    if (t === 'usage') return <ArrowDownRight size={20} />;
+    if (t === 'spend' || t === 'usage') return <ArrowDownRight size={20} />;
     if (t === 'signupbonus') return <Gift size={20} />;
     return <ArrowUpRight size={20} />;
   };
@@ -161,9 +161,6 @@ export default function WalletPage() {
           <h1 className={styles.title}>Wallet</h1>
           <p className={styles.subtitle}>Manage your digital assets</p>
         </div>
-        <button className={styles.settingsBtn}>
-          <Settings size={20} />
-        </button>
       </div>
 
       {/* Balance Card */}
@@ -197,18 +194,22 @@ export default function WalletPage() {
         </div>
 
         <div className={styles.purchaseGrid}>
-          {purchaseOptions.map((option) => (
-            <div
-              key={option.usd}
-              className={`${styles.purchaseOption} ${selectedOption === option.usd ? styles.selected : ''} ${option.popular ? styles.popular : ''}`}
-              onClick={() => handleOptionSelect(option.usd)}
-            >
-              {option.popular && <span className={styles.bestValueBadge}>Best Value</span>}
-              <p className={styles.optionLabel}>{option.label}</p>
-              <p className={styles.optionPrice}>${option.usd}</p>
-              <p className={styles.optionBroins}>{option.broins} Broins</p>
-            </div>
-          ))}
+          {purchaseOptions.map((option) => {
+            const isSelected = selectedOption === option.usd;
+            const showPopularHighlight = option.popular && selectedOption === null && !customAmount;
+            return (
+              <div
+                key={option.usd}
+                className={`${styles.purchaseOption} ${isSelected ? styles.selected : ''} ${showPopularHighlight ? styles.popular : ''}`}
+                onClick={() => handleOptionSelect(option.usd)}
+              >
+                {option.popular && <span className={styles.bestValueBadge}>Best Value</span>}
+                <p className={styles.optionLabel}>{option.label}</p>
+                <p className={styles.optionPrice}>${option.usd}</p>
+                <p className={styles.optionBroins}>{option.broins} Broins</p>
+              </div>
+            );
+          })}
         </div>
 
         <div className={styles.customInputWrapper}>

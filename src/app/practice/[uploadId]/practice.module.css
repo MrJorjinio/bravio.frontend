@@ -141,6 +141,7 @@
 
 .flashcardContainer {
   width: 100%;
+  position: relative;
 }
 
 /* 3D Flip Card */
@@ -619,5 +620,76 @@
     bottom: 60px;
     font-size: 0.75rem;
     padding: 10px 12px;
+  }
+}
+
+/* ========================================
+   LOTTIE FEEDBACK ANIMATIONS
+   ======================================== */
+
+.feedbackOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 16, 24, 0.92);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: feedbackFadeIn 0.2s ease-out;
+}
+
+@keyframes feedbackFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lottieContainer {
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lottieScaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lottieAnimation {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes lottieScaleIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.feedbackText {
+  margin-top: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  animation: feedbackPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes feedbackPopIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.difficultText { color: #f87171; }
+.goodText { color: #fbbf24; }
+.easyText { color: #4ade80; }
+
+/* Responsive for Lottie Animations */
+@media (max-width: 480px) {
+  .lottieContainer {
+    width: 140px;
+    height: 140px;
+  }
+
+  .feedbackText {
+    font-size: 22px;
   }
 }

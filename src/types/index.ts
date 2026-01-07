@@ -38,6 +38,13 @@ export interface User {
   createdAt: string;
 }
 
+export interface StreakResponse {
+  currentStreak: number;
+  longestStreak: number;
+  lastActivityDate?: string;
+  isActiveToday: boolean;
+}
+
 export interface UpdateUserRequest {
   avatarUrl?: string;
 }
@@ -58,7 +65,7 @@ export interface PurchaseResponse {
 
 export interface Transaction {
   id: string;
-  type: 'Purchase' | 'Usage' | 'SignupBonus' | 'Refund';
+  type: 'Purchase' | 'Spend';
   amountUSD?: number;
   amountBroins: number;
   relatedUploadId?: string;

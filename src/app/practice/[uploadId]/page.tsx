@@ -16,6 +16,7 @@ import {
   Check,
   XIcon
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './practice.module.css';
 
 export default function PracticePage() {
@@ -35,6 +36,7 @@ export default function PracticePage() {
   const [completed, setCompleted] = useState(false);
   const [totalCards, setTotalCards] = useState(0);
   const [sessionAttemptedIds, setSessionAttemptedIds] = useState<Set<string>>(new Set());
+  const [feedbackType, setFeedbackType] = useState<'difficult' | 'good' | 'easy' | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -92,7 +94,18 @@ export default function PracticePage() {
   };
 
   const handleDifficulty = async (difficulty: 1 | 2 | 3) => {
-    if (!currentCard || isSubmitting) return;
+    if (!currentCard || isSubmitting || feedbackType) return;
+
+    // Show feedback animation
+    const feedbackMap: Record<number, 'difficult' | 'good' | 'easy'> = {
+      1: 'difficult',
+      2: 'good',
+      3: 'easy'
+    };
+    setFeedbackType(feedbackMap[difficulty]);
+
+    // Animation duration: Fast for all (1.2s for easy, 1.5s for others)
+    const animationDuration = difficulty === 3 ? 1200 : 1500;
 
     setIsSubmitting(true);
     try {
@@ -108,6 +121,10 @@ export default function PracticePage() {
 
       const newStats = await uploadService.getPracticeStats(uploadId);
       setStats(newStats);
+
+      // Wait for animation to complete before moving to next card
+      await new Promise(resolve => setTimeout(resolve, animationDuration));
+      setFeedbackType(null);
 
       // Check if we've gone through all cards in this session
       if (newAttemptedIds.size >= totalCards) {
@@ -137,6 +154,7 @@ export default function PracticePage() {
       }
     } catch (err) {
       console.error('Failed to submit difficulty:', err);
+      setFeedbackType(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -280,7 +298,7 @@ export default function PracticePage() {
             </div>
 
             {/* Difficulty Buttons - Show after flip */}
-            {isFlipped && (
+            {isFlipped && !feedbackType && (
               <div className={styles.difficultyActions}>
                 <button
                   className={`${styles.difficultyBtn} ${styles.difficultBtn}`}
@@ -309,6 +327,62 @@ export default function PracticePage() {
                   <Zap size={18} />
                   <span className={styles.difficultyKey}>3</span>
                 </button>
+              </div>
+            )}
+
+            {/* Lottie Feedback Animation Overlay */}
+            {feedbackType && (
+              <div className={styles.feedbackOverlay}>
+                {/* DIFFICULT: Kicking Cat */}
+                {feedbackType === 'difficult' && (
+                  <>
+                    <div className={styles.lottieContainer}>
+                      <DotLottieReact
+                        src="/animations/cat-difficult.lottie"
+                        autoplay
+                        loop
+                        className={styles.lottieAnimation}
+                      />
+                    </div>
+                    <div className={`${styles.feedbackText} ${styles.difficultText}`}>
+                      Keep Going!
+                    </div>
+                  </>
+                )}
+
+                {/* GOOD: Cat Hero */}
+                {feedbackType === 'good' && (
+                  <>
+                    <div className={styles.lottieContainer}>
+                      <DotLottieReact
+                        src="/animations/cat-hero.lottie"
+                        autoplay
+                        loop
+                        className={styles.lottieAnimation}
+                      />
+                    </div>
+                    <div className={`${styles.feedbackText} ${styles.goodText}`}>
+                      Great Job!
+                    </div>
+                  </>
+                )}
+
+                {/* EASY: Dancing Cat */}
+                {feedbackType === 'easy' && (
+                  <>
+                    <div className={styles.lottieContainer}>
+                      <DotLottieReact
+                        src="/animations/cat-easy.lottie"
+                        autoplay
+                        loop
+                        className={styles.lottieAnimation}
+                      />
+                    </div>
+                    <div className={`${styles.feedbackText} ${styles.easyText}`}>
+                      Too Easy!
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
