@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { uploadService, walletService, userService } from '@/services';
-import type { Upload, PracticeStats, StreakResponse } from '@/types';
+import type { Upload, PracticeStats, StreakResponse, LevelResponse } from '@/types';
 import {
   Plus,
   TrendingUp,
@@ -17,7 +17,10 @@ import {
   Play,
   Trash2,
   Coins,
-  Eye
+  Eye,
+  Star,
+  Gift,
+  Zap
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './page.module.css';
@@ -28,27 +31,50 @@ export default function DashboardPage() {
   const [balance, setBalance] = useState(0);
   const [stats, setStats] = useState<PracticeStats | null>(null);
   const [streak, setStreak] = useState<StreakResponse | null>(null);
+  const [level, setLevel] = useState<LevelResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showBonusModal, setShowBonusModal] = useState(false);
+  const [bonusMessage, setBonusMessage] = useState('');
+  const [isClaiming, setIsClaiming] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [uploadsRes, balanceRes, statsRes, streakRes] = await Promise.all([
+      const [uploadsRes, balanceRes, statsRes, streakRes, levelRes] = await Promise.all([
         uploadService.getUploads(1, 3),
         walletService.getBalance(),
         uploadService.getGlobalPracticeStats().catch(() => null),
-        userService.getStreak().catch(() => null)
+        userService.getStreak().catch(() => null),
+        userService.getLevel().catch(() => null)
       ]);
       setUploads(uploadsRes.uploads || []);
       setBalance(balanceRes.balance);
       setStats(statsRes);
       setStreak(streakRes);
+      setLevel(levelRes);
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const handleClaimDailyBonus = async () => {
+    setIsClaiming(true);
+    try {
+      const result = await userService.claimDailyBonus();
+      setBonusMessage(result.message);
+      setShowBonusModal(true);
+      if (result.claimed) {
+        setBalance(result.newBalance);
+      }
+    } catch (err) {
+      setBonusMessage('Failed to claim bonus. Try again later.');
+      setShowBonusModal(true);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -100,20 +126,64 @@ export default function DashboardPage() {
             You've mastered <span className={styles.percentUp}>+12%</span> more topics this week.
           </p>
         </div>
-        {(streak?.currentStreak ?? 0) > 0 && (
-          <div className={styles.streakBadge}>
-            <div className={styles.fireAnimation}>
-              <DotLottieReact
-                src="/animations/fire.lottie"
-                autoplay
-                loop
-                className={styles.fireLottie}
-              />
+        <div className={styles.welcomeBadges}>
+          {/* Level Badge */}
+          {level && (
+            <div className={styles.levelBadge}>
+              <Star size={16} className={styles.levelIcon} />
+              <span>Level {level.level}</span>
+              <div className={styles.xpBar}>
+                <div
+                  className={styles.xpFill}
+                  style={{ width: `${level.progressPercent}%` }}
+                />
+              </div>
+              <span className={styles.xpText}>{level.experience} XP</span>
             </div>
-            <span>{streak?.currentStreak} Day Streak</span>
-          </div>
-        )}
+          )}
+          {/* Daily Bonus Button */}
+          <button
+            className={styles.dailyBonusBtn}
+            onClick={handleClaimDailyBonus}
+            disabled={isClaiming}
+          >
+            <Gift size={16} />
+            <span>{isClaiming ? 'Claiming...' : 'Daily Bonus'}</span>
+          </button>
+          {/* Streak Badge */}
+          {(streak?.currentStreak ?? 0) > 0 && (
+            <div className={styles.streakBadge}>
+              <div className={styles.fireAnimation}>
+                <DotLottieReact
+                  src="/animations/fire.lottie"
+                  autoplay
+                  loop
+                  className={styles.fireLottie}
+                />
+              </div>
+              <span>{streak?.currentStreak} Day Streak</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Daily Bonus Modal */}
+      {showBonusModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowBonusModal(false)}>
+          <div className={styles.bonusModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.bonusIcon}>
+              <Gift size={48} />
+            </div>
+            <p className={styles.bonusMessage}>{bonusMessage}</p>
+            <button
+              className={styles.bonusCloseBtn}
+              onClick={() => setShowBonusModal(false)}
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className={styles.statsGrid}>

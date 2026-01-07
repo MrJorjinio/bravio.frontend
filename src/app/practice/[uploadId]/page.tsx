@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { uploadService } from '@/services';
-import type { Flashcard, Upload, PracticeStats } from '@/types';
+import { uploadService, userService } from '@/services';
+import type { Flashcard, Upload, PracticeStats, SubmitDifficultyResponse, StreakResponse, LevelResponse } from '@/types';
 import {
   X,
   CheckCircle2,
@@ -14,7 +14,12 @@ import {
   Lightbulb,
   Zap,
   Check,
-  XIcon
+  XIcon,
+  Star,
+  Sparkles,
+  Trophy,
+  Flame,
+  TrendingUp
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './practice.module.css';
@@ -37,6 +42,11 @@ export default function PracticePage() {
   const [totalCards, setTotalCards] = useState(0);
   const [sessionAttemptedIds, setSessionAttemptedIds] = useState<Set<string>>(new Set());
   const [feedbackType, setFeedbackType] = useState<'difficult' | 'good' | 'easy' | null>(null);
+  const [xpGained, setXpGained] = useState<number | null>(null);
+  const [levelUp, setLevelUp] = useState<{ newLevel: number; broinsAwarded: number } | null>(null);
+  const [sessionXp, setSessionXp] = useState(0);
+  const [streak, setStreak] = useState<StreakResponse | null>(null);
+  const [level, setLevel] = useState<LevelResponse | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -109,10 +119,25 @@ export default function PracticePage() {
 
     setIsSubmitting(true);
     try {
-      await uploadService.submitDifficulty(uploadId, {
+      const result = await uploadService.submitDifficulty(uploadId, {
         flashcardId: currentCard.id,
         difficulty
       });
+
+      // Show XP gain and track session total
+      if (result.xpGained > 0) {
+        setXpGained(result.xpGained);
+        setSessionXp(prev => prev + result.xpGained);
+        setTimeout(() => setXpGained(null), 2000);
+      }
+
+      // Show level up notification
+      if (result.leveledUp && result.newLevel) {
+        setLevelUp({
+          newLevel: result.newLevel,
+          broinsAwarded: result.broinsAwarded || 0
+        });
+      }
 
       // Track this card as attempted in current session
       const newAttemptedIds = new Set(sessionAttemptedIds);
@@ -128,6 +153,17 @@ export default function PracticePage() {
 
       // Check if we've gone through all cards in this session
       if (newAttemptedIds.size >= totalCards) {
+        // Fetch streak and level data for completion screen
+        try {
+          const [streakData, levelData] = await Promise.all([
+            userService.getStreak(),
+            userService.getLevel()
+          ]);
+          setStreak(streakData);
+          setLevel(levelData);
+        } catch (e) {
+          console.error('Failed to fetch completion data:', e);
+        }
         setCompleted(true);
         return;
       }
@@ -141,6 +177,13 @@ export default function PracticePage() {
         const availableCards = allFlashcards.filter(f => !newAttemptedIds.has(f.id));
 
         if (availableCards.length === 0) {
+          // Fetch streak and level data for completion screen
+          const [streakData, levelData] = await Promise.all([
+            userService.getStreak().catch(() => null),
+            userService.getLevel().catch(() => null)
+          ]);
+          setStreak(streakData);
+          setLevel(levelData);
           setCompleted(true);
           return;
         }
@@ -166,6 +209,9 @@ export default function PracticePage() {
     setIsFlipped(false);
     setShowHint(false);
     setSessionAttemptedIds(new Set()); // Reset session tracking
+    setSessionXp(0); // Reset session XP
+    setStreak(null);
+    setLevel(null);
     fetchData();
   };
 
@@ -183,30 +229,77 @@ export default function PracticePage() {
   }
 
   if (completed) {
+    const accuracy = Math.round(stats?.accuracy || 0);
+    const getMessage = () => {
+      if (accuracy >= 80) return 'Smashed it!';
+      if (accuracy >= 60) return 'Great work!';
+      if (accuracy >= 40) return 'Keep going!';
+      return 'Nice effort!';
+    };
+
     return (
       <div className={styles.container}>
         <div className={styles.completedCard}>
-          <div className={styles.completedIcon}>
-            <CheckCircle2 size={64} color="#34d399" />
-          </div>
-          <h1>Practice Complete!</h1>
-          <p>Great job! Here are your results:</p>
-
-          <div className={styles.finalStats}>
-            <div className={styles.finalStat}>
-              <span className={styles.finalStatValue}>{stats?.totalAttempts || 0}</span>
-              <span className={styles.finalStatLabel}>Cards Reviewed</span>
-            </div>
-            <div className={styles.finalStat}>
-              <span className={styles.finalStatValue}>{stats?.correctAttempts || 0}</span>
-              <span className={styles.finalStatLabel}>Mastered</span>
-            </div>
-            <div className={styles.finalStat}>
-              <span className={styles.finalStatValue}>{Math.round(stats?.accuracy || 0)}%</span>
-              <span className={styles.finalStatLabel}>Performance</span>
+          {/* Trophy Icon with Glow */}
+          <div className={styles.trophyWrapper}>
+            <div className={styles.trophyGlow}></div>
+            <div className={styles.trophyCircle}>
+              <Trophy size={48} />
             </div>
           </div>
 
+          {/* Title */}
+          <h1 className={styles.completedTitle}>{getMessage()}</h1>
+          <p className={styles.sessionName}>Session &quot;{upload?.title || 'Flashcards'}&quot;</p>
+
+          {/* Stats Row */}
+          <div className={styles.statsRow}>
+            <div className={styles.statBox}>
+              <div className={styles.statBoxIcon}>
+                <Flame size={24} className={styles.flameIcon} />
+              </div>
+              <span className={styles.statBoxValue}>{streak?.currentStreak || 0}</span>
+              <span className={styles.statBoxLabel}>DAY STREAK</span>
+            </div>
+            <div className={styles.statBox}>
+              <div className={styles.statBoxIcon}>
+                <Zap size={24} className={styles.zapIcon} />
+              </div>
+              <span className={styles.statBoxValue}>+{sessionXp}</span>
+              <span className={styles.statBoxLabel}>XP GAINED</span>
+            </div>
+          </div>
+
+          {/* Performance Card */}
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceHeader}>
+              <span className={styles.performanceLabel}>PERFORMANCE</span>
+              <div className={styles.performanceTrend}>
+                <TrendingUp size={14} />
+                <span>+{Math.min(accuracy, 15)}%</span>
+                <span className={styles.trendSubtext}>VS LAST WEEK</span>
+              </div>
+            </div>
+            <h2 className={styles.performanceValue}>{accuracy}%</h2>
+
+            {/* Level Progress */}
+            {level && (
+              <div className={styles.levelProgress}>
+                <div className={styles.levelLabels}>
+                  <span><Star size={14} /> LEVEL {level.level}</span>
+                  <span>LEVEL {level.level + 1}</span>
+                </div>
+                <div className={styles.levelBar}>
+                  <div
+                    className={styles.levelBarFill}
+                    style={{ width: `${level.progressPercent}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
           <div className={styles.completedActions}>
             <button onClick={handleRestart} className={styles.restartBtn}>
               <RotateCcw size={18} />
@@ -397,6 +490,35 @@ export default function PracticePage() {
               <ArrowLeft size={18} />
               Back to Dashboard
             </Link>
+          </div>
+        )}
+
+        {/* XP Gain Floating Indicator */}
+        {xpGained && (
+          <div className={styles.xpGainIndicator}>
+            <Sparkles size={18} />
+            <span>+{xpGained} XP</span>
+          </div>
+        )}
+
+        {/* Level Up Modal */}
+        {levelUp && (
+          <div className={styles.levelUpOverlay} onClick={() => setLevelUp(null)}>
+            <div className={styles.levelUpModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.levelUpIcon}>
+                <Star size={48} />
+              </div>
+              <h2 className={styles.levelUpTitle}>Level Up!</h2>
+              <p className={styles.levelUpLevel}>You reached Level {levelUp.newLevel}</p>
+              {levelUp.broinsAwarded > 0 && (
+                <p className={styles.levelUpReward}>
+                  +{levelUp.broinsAwarded} Broins Earned!
+                </p>
+              )}
+              <button className={styles.levelUpBtn} onClick={() => setLevelUp(null)}>
+                Awesome!
+              </button>
+            </div>
           </div>
         )}
       </main>

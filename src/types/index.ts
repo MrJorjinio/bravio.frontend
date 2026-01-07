@@ -45,6 +45,30 @@ export interface StreakResponse {
   isActiveToday: boolean;
 }
 
+export interface LevelResponse {
+  level: number;
+  experience: number;
+  experienceToNextLevel: number;
+  totalExperienceForNextLevel: number;
+  progressPercent: number;
+}
+
+export interface DailyBonusResponse {
+  claimed: boolean;
+  broinsAwarded: number;
+  newBalance: number;
+  message: string;
+}
+
+export interface XpGainResponse {
+  xpGained: number;
+  totalExperience: number;
+  level: number;
+  leveledUp: boolean;
+  newLevel?: number;
+  broinsAwarded?: number;
+}
+
 export interface UpdateUserRequest {
   avatarUrl?: string;
 }
@@ -129,6 +153,13 @@ export interface SubmitDifficultyResponse {
   success: boolean;
   totalReviewed: number;
   remainingCards: number;
+  // XP Gain Info
+  xpGained: number;
+  totalExperience: number;
+  level: number;
+  leveledUp: boolean;
+  newLevel?: number;
+  broinsAwarded?: number;
 }
 
 export interface PracticeStats {
