@@ -124,7 +124,7 @@ export default function LandingPage() {
             </div>
             <div className={styles.heroStats}>
               <div className={styles.stat}>
-                <div className={styles.statValue}>150</div>
+                <div className={styles.statValue}>200</div>
                 <div className={styles.statLabel}>Free Broins to Start</div>
               </div>
               <div className={styles.stat}>
@@ -171,7 +171,7 @@ export default function LandingPage() {
                 <Coins size={24} />
               </div>
               <div className={styles.floatingText}>Balance</div>
-              <div className={styles.floatingValue}>150 Broins</div>
+              <div className={styles.floatingValue}>200 Broins</div>
             </div>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 <Coins size={28} />
               </div>
               <h3>Affordable Pay-As-You-Go</h3>
-              <p>Start with 150 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
+              <p>Start with 200 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
             </div>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function LandingPage() {
             <div className={styles.pricingContent}>
               <span className={styles.sectionLabel}>Simple Pricing</span>
               <h2>Pay Only for What You Use</h2>
-              <p>Bravio uses a credit system called Broins. You start with 150 free Broins - enough to process multiple uploads and experience the full power of AI-generated summaries, key points, and flashcards.</p>
+              <p>Bravio uses a credit system called Broins. You start with 200 free Broins - enough to process multiple uploads and experience the full power of AI-generated summaries, key points, and flashcards.</p>
               <div className={styles.broinInfo}>
                 <div className={styles.broinHeader}>
                   <div className={styles.broinIcon}>
@@ -276,7 +276,7 @@ export default function LandingPage() {
                 <div className={styles.broinConversion}>
                   <span className={styles.broinRate}>$1</span>
                   <span className={styles.broinEquals}>=</span>
-                  <span className={styles.broinRate}>15 Broins</span>
+                  <span className={styles.broinRate}>200 Broins</span>
                 </div>
               </div>
             </div>
@@ -365,7 +365,7 @@ export default function LandingPage() {
           </div>
           <div className={styles.ctaBonus}>
             <Gift size={18} />
-            Get <strong>150 free Broins</strong> when you sign up today
+            Get <strong>200 free Broins</strong> when you sign up today
           </div>
         </div>
       </section>

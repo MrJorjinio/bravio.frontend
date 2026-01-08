@@ -11,16 +11,11 @@ import {
   Target,
   Layers,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   UploadCloud,
-  Play,
   Trash2,
   Coins,
-  Eye,
   Star,
-  Gift,
-  Zap
+  Gift
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './page.module.css';
@@ -256,14 +251,6 @@ export default function DashboardPage() {
             <span className={styles.titleBar}></span>
             Continue Learning
           </h3>
-          <div className={styles.navButtons}>
-            <button className={styles.navBtn}>
-              <ChevronLeft size={20} />
-            </button>
-            <button className={styles.navBtn}>
-              <ChevronRight size={20} />
-            </button>
-          </div>
         </div>
 
         {isLoading ? (
@@ -332,15 +319,13 @@ export default function DashboardPage() {
                         }}
                         title="Delete"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                       </button>
                       <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
-                        <Eye size={14} />
                         View
                       </Link>
                       {upload.status.toLowerCase() === 'completed' && (
                         <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
-                          <Play size={12} />
                           Practice
                         </Link>
                       )}

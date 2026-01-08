@@ -1,16 +1,21 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { walletService } from '@/services';
 import type { Transaction } from '@/types';
 import {
-  ChevronRight,
   CreditCard,
   ArrowDownRight,
   ArrowUpRight,
   Gift,
-  Inbox
+  Inbox,
+  CheckCircle,
+  XCircle,
+  Clock
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import PremiumBravioCard from '@/components/PremiumBravioCard';
 import styles from './wallet.module.css';
 
 interface PurchaseOption {
@@ -21,18 +26,20 @@ interface PurchaseOption {
 }
 
 const purchaseOptions: PurchaseOption[] = [
-  { usd: 5, broins: 75, label: 'Starter' },
-  { usd: 10, broins: 150, label: 'Popular', popular: true },
-  { usd: 20, broins: 300, label: 'Pro' },
+  { usd: 5, broins: 1000, label: 'Starter' },
+  { usd: 10, broins: 2000, label: 'Popular', popular: true },
+  { usd: 20, broins: 4000, label: 'Pro' },
 ];
 
 export default function WalletPage() {
+  const searchParams = useSearchParams();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'cancelled' | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -54,6 +61,35 @@ export default function WalletPage() {
     fetchData();
   }, [fetchData]);
 
+  // Handle payment status from URL params
+  useEffect(() => {
+    const payment = searchParams.get('payment');
+    if (payment === 'success') {
+      // Verify and complete the pending payment
+      walletService.verifyPayment()
+        .then((result) => {
+          if (result.completed) {
+            setPaymentStatus('success');
+            // Refetch data to get updated balance
+            fetchData();
+          }
+        })
+        .catch((err) => {
+          console.error('Payment verification failed:', err);
+        })
+        .finally(() => {
+          // Clear status after 5 seconds
+          setTimeout(() => setPaymentStatus(null), 5000);
+          // Clean URL
+          window.history.replaceState({}, '', '/dashboard/wallet');
+        });
+    } else if (payment === 'cancelled') {
+      setPaymentStatus('cancelled');
+      setTimeout(() => setPaymentStatus(null), 5000);
+      window.history.replaceState({}, '', '/dashboard/wallet');
+    }
+  }, [searchParams, fetchData]);
+
   const handleOptionSelect = (usd: number) => {
     setSelectedOption(usd);
     setCustomAmount('');
@@ -73,7 +109,7 @@ export default function WalletPage() {
     }
     if (customAmount) {
       const amount = parseFloat(customAmount);
-      return isNaN(amount) ? 0 : Math.floor(amount * 15);
+      return isNaN(amount) ? 0 : Math.floor(amount * 200);
     }
     return 0;
   };
@@ -89,14 +125,22 @@ export default function WalletPage() {
 
   const handlePurchase = async () => {
     const usd = getSelectedUsd();
-    if (usd <= 0) return;
+    const broins = getSelectedBroins();
+    if (usd <= 0 || broins <= 0) return;
 
     setIsPurchasing(true);
     try {
-      alert(`Payment processing for $${usd} is not yet implemented. This would add ${getSelectedBroins()} Broins to your account.`);
+      const response = await walletService.createCheckout({
+        amountUsd: usd,
+        broins: broins
+      });
+
+      // Redirect to Dodo checkout
+      window.location.href = response.checkoutUrl;
     } catch (err) {
       console.error('Purchase failed:', err);
-      alert('Purchase failed. Please try again.');
+      setPaymentStatus('cancelled');
+      setTimeout(() => setPaymentStatus(null), 5000);
     } finally {
       setIsPurchasing(false);
     }
@@ -114,15 +158,21 @@ export default function WalletPage() {
   };
 
   const isPositiveTransaction = (type: string) => {
-    return ['purchase', 'signupbonus', 'refund'].includes(type.toLowerCase());
+    return ['purchase', 'signupbonus', 'refund', 'levelup'].includes(type.toLowerCase());
+  };
+
+  const isPendingTransaction = (type: string) => {
+    return type.toLowerCase() === 'pendingpurchase';
   };
 
   const getTransactionLabel = (type: string) => {
     switch (type.toLowerCase()) {
       case 'purchase': return 'Broins Top-up';
+      case 'pendingpurchase': return 'Processing Payment';
       case 'spend': return 'Spent on Upload';
       case 'usage': return 'Spent Broins';
       case 'signupbonus': return 'Welcome Bonus';
+      case 'levelup': return 'Level Up Reward';
       case 'refund': return 'Refund';
       default: return type;
     }
@@ -130,6 +180,7 @@ export default function WalletPage() {
 
   const getTransactionIconClass = (type: string) => {
     const t = type.toLowerCase();
+    if (t === 'pendingpurchase') return styles.pending;
     if (t === 'spend' || t === 'usage') return styles.spent;
     if (t === 'signupbonus') return styles.bonus;
     return styles.received;
@@ -137,6 +188,7 @@ export default function WalletPage() {
 
   const renderTransactionIcon = (type: string) => {
     const t = type.toLowerCase();
+    if (t === 'pendingpurchase') return <Clock size={20} />;
     if (t === 'spend' || t === 'usage') return <ArrowDownRight size={20} />;
     if (t === 'signupbonus') return <Gift size={20} />;
     return <ArrowUpRight size={20} />;
@@ -155,6 +207,39 @@ export default function WalletPage() {
 
   return (
     <div className={styles.container}>
+      {/* Purchasing Overlay with Wallet Animation */}
+      {isPurchasing && (
+        <div className={styles.purchasingOverlay}>
+          <div className={styles.purchasingModal}>
+            <DotLottieReact
+              src="/animations/wallet.lottie"
+              autoplay
+              loop
+              className={styles.walletLottie}
+            />
+            <h3 className={styles.purchasingTitle}>Opening Wallet...</h3>
+            <p className={styles.purchasingText}>Redirecting to secure checkout</p>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Status Banner */}
+      {paymentStatus && (
+        <div className={`${styles.paymentBanner} ${paymentStatus === 'success' ? styles.successBanner : styles.cancelledBanner}`}>
+          {paymentStatus === 'success' ? (
+            <>
+              <CheckCircle size={20} />
+              <span>Payment successful! Your Broins have been added.</span>
+            </>
+          ) : (
+            <>
+              <XCircle size={20} />
+              <span>Payment was cancelled. Try again when you&apos;re ready.</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
@@ -164,26 +249,8 @@ export default function WalletPage() {
       </div>
 
       {/* Balance Card */}
-      <div className={styles.balanceCard}>
-        <div className={styles.balanceGlow}></div>
-        <div className={styles.balanceContent}>
-          <span className={styles.accountBadge}>Personal Account</span>
-
-          <p className={styles.balanceLabel}>Current Balance</p>
-          <div className={styles.balanceValue}>
-            <span className={styles.balanceAmount}>{balance}</span>
-            <span className={styles.balanceCurrency}>Broins</span>
-          </div>
-
-          <div className={styles.balanceFooter}>
-            <p className={styles.balanceUsd}>
-              ≈ ${(balance / 15).toFixed(2)} <span>USD</span>
-            </p>
-            <button className={styles.historyLink}>
-              Top up History <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
+      <div className={styles.cardWrapper}>
+        <PremiumBravioCard balance={balance} />
       </div>
 
       {/* Purchase Section */}
@@ -262,8 +329,8 @@ export default function WalletPage() {
                     <p>{formatDate(tx.createdAt)}</p>
                   </div>
                 </div>
-                <span className={`${styles.transactionAmount} ${isPositiveTransaction(tx.type) ? styles.positive : styles.negative}`}>
-                  {isPositiveTransaction(tx.type) ? '+' : '-'}{Math.abs(tx.amountBroins)} B
+                <span className={`${styles.transactionAmount} ${isPendingTransaction(tx.type) ? styles.pendingAmount : isPositiveTransaction(tx.type) ? styles.positive : styles.negative}`}>
+                  {isPendingTransaction(tx.type) ? '' : isPositiveTransaction(tx.type) ? '+' : '-'}{Math.abs(tx.amountBroins)} B
                 </span>
               </div>
             ))}

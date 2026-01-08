@@ -923,19 +923,20 @@
 }
 
 /* ========================================
-   LEVEL UP MODAL
+   LEVEL UP MODAL - DOPAMINE EDITION
    ======================================== */
 
 .levelUpOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
+  background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.15) 0%, rgba(0, 0, 0, 0.95) 70%);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  animation: levelUpFadeIn 0.3s ease;
+  animation: levelUpFadeIn 0.4s ease;
+  overflow: hidden;
 }
 
 @keyframes levelUpFadeIn {
@@ -943,97 +944,351 @@
   to { opacity: 1; }
 }
 
+/* Confetti */
+.confettiContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -20px;
+  animation: confettiFall 3s ease-in-out infinite;
+}
+
+.confetti0 {
+  left: 10%;
+  background: #fbbf24;
+  animation-delay: 0s;
+  border-radius: 2px;
+}
+
+.confetti1 {
+  left: 25%;
+  background: #a855f7;
+  animation-delay: 0.3s;
+  border-radius: 50%;
+}
+
+.confetti2 {
+  left: 45%;
+  background: #34d399;
+  animation-delay: 0.6s;
+  border-radius: 2px;
+}
+
+.confetti3 {
+  left: 65%;
+  background: #f472b6;
+  animation-delay: 0.9s;
+  border-radius: 50%;
+}
+
+.confetti4 {
+  left: 85%;
+  background: #60a5fa;
+  animation-delay: 1.2s;
+  border-radius: 2px;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
 .levelUpModal {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid rgba(251, 191, 36, 0.3);
+  position: relative;
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border: 2px solid transparent;
   border-radius: 32px;
-  padding: 48px;
+  padding: 32px 40px 40px;
   text-align: center;
-  max-width: 380px;
+  max-width: 420px;
   width: 90%;
   box-shadow:
-    0 0 60px rgba(251, 191, 36, 0.3),
-    0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: levelUpModalIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    0 0 80px rgba(251, 191, 36, 0.4),
+    0 0 120px rgba(139, 92, 246, 0.2),
+    0 25px 60px rgba(0, 0, 0, 0.6);
+  animation: levelUpModalIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background-clip: padding-box;
+  overflow: hidden;
+}
+
+.levelUpModal::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #fbbf24, #a855f7, #f472b6, #fbbf24);
+  border-radius: 34px;
+  z-index: -1;
+  animation: borderGlow 3s linear infinite;
+  background-size: 300% 300%;
+}
+
+@keyframes borderGlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @keyframes levelUpModalIn {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.8) translateY(20px);
+    transform: scale(0.5) translateY(50px) rotate(-5deg);
   }
-  to {
+  60% {
+    transform: scale(1.05) translateY(-10px) rotate(2deg);
+  }
+  100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) rotate(0deg);
   }
 }
 
-.levelUpIcon {
+/* Glow Rings */
+.glowRings {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.glowRing1,
+.glowRing2,
+.glowRing3 {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  animation: ringExpand 2s ease-out infinite;
+}
+
+.glowRing1 {
   width: 100px;
   height: 100px;
-  margin: 0 auto 24px;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.glowRing2 {
+  width: 150px;
+  height: 150px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0.3s;
+}
+
+.glowRing3 {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0.6s;
+}
+
+@keyframes ringExpand {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* Combined Animation + Badge Container */
+.levelUpAnimation {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 8px;
+}
+
+.moneyLottie {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
+}
+
+/* Level Badge - Positioned at bottom of animation */
+.levelBadge {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fbbf24;
-  animation: levelUpIconPulse 1.5s ease-in-out infinite;
+  box-shadow:
+    0 8px 32px rgba(251, 191, 36, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  animation: badgeBounce 0.6s ease 0.3s both, badgePulse 2s ease-in-out 0.9s infinite;
+  z-index: 10;
+  border: 3px solid rgba(15, 23, 42, 0.8);
 }
 
-@keyframes levelUpIconPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.2); }
+@keyframes badgeBounce {
+  0% { transform: translateX(-50%) scale(0); }
+  50% { transform: translateX(-50%) scale(1.3); }
+  70% { transform: translateX(-50%) scale(0.9); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(251, 191, 36, 0.5); }
+  50% { box-shadow: 0 8px 48px rgba(251, 191, 36, 0.8), 0 0 60px rgba(251, 191, 36, 0.4); }
+}
+
+.levelBadgeNumber {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #020617;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .levelUpTitle {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #fde68a, #f59e0b);
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.levelUpTitleGlow {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 30%, #f59e0b 60%, #fde68a 100%);
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 8px;
-  letter-spacing: -0.025em;
+  letter-spacing: 0.05em;
+  animation: titleShine 2s linear infinite;
+  text-shadow: none;
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5));
+}
+
+@keyframes titleShine {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .levelUpLevel {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.levelHighlight {
   color: #f1f5f9;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-weight: 700;
 }
 
 .levelUpReward {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(34, 197, 94, 0.15);
-  border: 1px solid rgba(34, 197, 94, 0.3);
-  padding: 8px 16px;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(52, 211, 153, 0.15));
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  padding: 12px 24px;
   border-radius: 50px;
   color: #4ade80;
-  font-size: 1rem;
-  font-weight: 700;
-  margin-bottom: 24px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 28px;
+  animation: rewardPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both;
+  overflow: hidden;
+}
+
+@keyframes rewardPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.rewardGlow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.3), transparent);
+  animation: rewardShimmer 2s ease-in-out infinite;
+}
+
+@keyframes rewardShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.rewardIcon {
+  animation: sparkle 1s ease infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(15deg); }
 }
 
 .levelUpBtn {
-  padding: 16px 48px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  position: relative;
+  padding: 18px 56px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   border: none;
   border-radius: 16px;
   color: #020617;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4);
-  transition: all 0.2s ease;
+  box-shadow:
+    0 8px 32px rgba(245, 158, 11, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  animation: btnAppear 0.5s ease 0.7s both;
+}
+
+@keyframes btnAppear {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.btnShine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: btnShine 3s ease-in-out infinite;
+}
+
+@keyframes btnShine {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
 }
 
 .levelUpBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 12px 48px rgba(245, 158, 11, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.levelUpBtn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 /* Responsive XP/Level */
@@ -1046,19 +1301,96 @@
   }
 
   .levelUpModal {
-    padding: 36px 24px;
+    padding: 24px 28px 32px;
+    max-width: 320px;
   }
 
-  .levelUpIcon {
-    width: 80px;
-    height: 80px;
+  .levelUpAnimation {
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 16px;
   }
 
-  .levelUpTitle {
+  .levelBadge {
+    width: 50px;
+    height: 50px;
+    bottom: -8px;
+  }
+
+  .levelBadgeNumber {
+    font-size: 1.5rem;
+  }
+
+  .levelUpTitleGlow {
     font-size: 1.75rem;
   }
 
   .levelUpLevel {
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
+    margin-bottom: 16px;
+  }
+
+  .levelUpReward {
+    padding: 10px 18px;
+    font-size: 0.9375rem;
+    margin-bottom: 20px;
+  }
+
+  .levelUpBtn {
+    padding: 14px 36px;
+    font-size: 1rem;
+  }
+
+  .confetti {
+    width: 8px;
+    height: 8px;
+  }
+
+  .glowRings {
+    display: none;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
+  .levelUpModal {
+    padding: 20px 24px 28px;
+    max-width: 290px;
+  }
+
+  .levelUpAnimation {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 12px;
+  }
+
+  .levelBadge {
+    width: 44px;
+    height: 44px;
+    bottom: -6px;
+  }
+
+  .levelBadgeNumber {
+    font-size: 1.25rem;
+  }
+
+  .levelUpTitleGlow {
+    font-size: 1.5rem;
+  }
+
+  .levelUpLevel {
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+  }
+
+  .levelUpReward {
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+  }
+
+  .levelUpBtn {
+    padding: 12px 28px;
+    font-size: 0.9375rem;
   }
 }

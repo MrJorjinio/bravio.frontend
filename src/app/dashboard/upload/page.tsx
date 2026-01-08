@@ -11,18 +11,19 @@ import {
   FileText,
   ListChecks,
   Layers,
-  Cpu,
-  CheckCircle
+  Cpu
 } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './upload.module.css';
+
+type UploadState = 'idle' | 'processing' | 'transitioning' | 'success';
 
 export default function UploadPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [error, setError] = useState('');
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadedId, setUploadedId] = useState<string | null>(null);
 
   const charCount = content.length;
@@ -38,7 +39,8 @@ export default function UploadPage() {
       return;
     }
 
-    setIsLoading(true);
+    setUploadState('processing');
+    const startTime = Date.now();
 
     try {
       const result = await uploadService.createUpload({
@@ -46,25 +48,67 @@ export default function UploadPage() {
         title: title || undefined
       });
       setUploadedId(result.id);
-      setUploadSuccess(true);
+
+      // Ensure minimum 2 seconds of processing animation
+      const elapsed = Date.now() - startTime;
+      const minDisplayTime = 2000;
+      const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+      // Transition phase - fade out processing
+      setTimeout(() => {
+        setUploadState('transitioning');
+        // After fade out, show success
+        setTimeout(() => {
+          setUploadState('success');
+        }, 400);
+      }, remainingTime);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process content. Please try again.';
       setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+      setUploadState('idle');
     }
   };
 
-  if (uploadSuccess) {
+  // Processing state - show money floating animation with blur overlay
+  if (uploadState === 'processing' || uploadState === 'transitioning') {
     return (
       <div className={styles.container}>
-        <div className={styles.successCard}>
-          <div className={styles.successIcon}>
-            <CheckCircle size={64} />
+        <div className={styles.processingOverlay}>
+          <div className={`${styles.processingCard} ${uploadState === 'transitioning' ? styles.fadeOut : ''}`}>
+            <div className={styles.processingAnimation}>
+              <DotLottieReact
+                src="/animations/money-floating.lottie"
+                autoplay
+                loop
+                className={styles.moneyLottie}
+              />
+            </div>
+            <h2 className={styles.processingTitle}>Spending Broins...</h2>
+            <p className={styles.processingText}>
+              Your broins are being used to generate amazing learning materials!
+            </p>
           </div>
-          <h2 className={styles.successTitle}>Content Uploaded!</h2>
+        </div>
+      </div>
+    );
+  }
+
+  // Success state - show businessman rocket animation
+  if (uploadState === 'success') {
+    return (
+      <div className={styles.container}>
+        <div className={`${styles.successCard} ${styles.fadeIn}`}>
+          <div className={styles.successAnimation}>
+            <DotLottieReact
+              src="/animations/businessman-rocket.lottie"
+              autoplay
+              loop
+              className={styles.rocketLottie}
+            />
+          </div>
+          <h2 className={styles.successTitle}>Blast Off! Content Uploaded!</h2>
           <p className={styles.successText}>
-            Your content is being processed. We're generating a summary, key points, and flashcards for you.
+            Your content is being processed. We&apos;re generating a summary, key points, and flashcards for you.
           </p>
           <Link href={`/dashboard/content/${uploadedId}`} className={styles.successBtn}>
             <Sparkles size={18} />
@@ -144,10 +188,10 @@ export default function UploadPage() {
               <button
                 type="submit"
                 className={styles.submitBtn}
-                disabled={isLoading || !isValidLength}
+                disabled={uploadState !== 'idle' || !isValidLength}
               >
                 <Sparkles size={18} />
-                {isLoading ? 'Processing...' : 'Generate Summary & Flashcards'}
+                {uploadState === 'processing' ? 'Processing...' : 'Generate Summary & Flashcards'}
               </button>
             </form>
           </div>

@@ -3,6 +3,8 @@ import type {
   BalanceResponse,
   PurchaseRequest,
   PurchaseResponse,
+  CheckoutRequest,
+  CheckoutResponse,
   Transaction,
   TransactionsResponse
 } from '@/types';
@@ -15,6 +17,16 @@ export const walletService = {
 
   async purchaseBroins(data: PurchaseRequest): Promise<PurchaseResponse> {
     const response = await api.post<PurchaseResponse>('/wallet/purchase', data);
+    return response.data;
+  },
+
+  async createCheckout(data: CheckoutRequest): Promise<CheckoutResponse> {
+    const response = await api.post<CheckoutResponse>('/payments/checkout', data);
+    return response.data;
+  },
+
+  async verifyPayment(): Promise<{ completed: boolean }> {
+    const response = await api.post<{ completed: boolean }>('/payments/verify');
     return response.data;
   },
 

@@ -523,7 +523,7 @@
 /* Content Card */
 .contentCard {
   position: relative;
-  border-radius: 16px;
+  border-radius: 20px;
   transition: transform 0.3s ease;
 }
 
@@ -532,50 +532,56 @@
 }
 
 .cardGlow {
-  position: absolute;
-  inset: -2px;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.6), rgba(139, 92, 246, 0.6));
-  border-radius: 18px;
-  opacity: 0.3;
-  filter: blur(8px);
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-.contentCard:hover .cardGlow {
-  opacity: 0.75;
+  display: none;
 }
 
 .cardInner {
   position: relative;
-  background: #1e293b;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid rgba(51, 65, 85, 0.5);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+    linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contentCard:hover .cardInner {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    -8px -8px 25px rgba(236, 72, 153, 0.08),
+    8px -8px 25px rgba(168, 85, 247, 0.08),
+    8px 8px 25px rgba(59, 130, 246, 0.08),
+    -8px 8px 25px rgba(245, 158, 11, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .cardDate {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #94a3b8;
-  background: rgba(51, 65, 85, 0.5);
-  padding: 4px 8px;
-  border-radius: 4px;
+  color: #e2e8f0;
+  background: rgba(51, 65, 85, 0.6);
+  padding: 6px 14px;
+  border-radius: 20px;
 }
 
 .statusBadge {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.7rem;
+  gap: 6px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -585,38 +591,34 @@
   color: #4ade80;
 }
 
-.statusBadge.inProgress {
+.statusBadge.processing,
+.statusBadge.pending {
   color: #fbbf24;
 }
 
-.statusBadge.notStarted {
-  color: #94a3b8;
+.statusBadge.failed {
+  color: #f87171;
 }
 
 /* Card Body */
 .cardBody {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .cardTitle {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #f1f5f9;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  transition: color 0.2s ease;
+  line-height: 1.3;
+  margin-bottom: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.contentCard:hover .cardTitle {
-  color: #f59e0b;
-}
-
 .cardPreview {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.6;
   display: -webkit-box;
@@ -630,28 +632,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .cardMeta {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
 }
 
 .metaItem {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: #94a3b8;
-  transition: color 0.2s ease;
   cursor: default;
-}
-
-.metaItem:hover {
-  color: #f1f5f9;
 }
 
 .pinkIcon {
@@ -670,7 +668,7 @@
 .cardActions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .deleteBtn {
@@ -680,7 +678,7 @@
   color: #64748b;
   cursor: pointer;
   transition: color 0.2s ease;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .deleteBtn:hover {
@@ -691,12 +689,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  background: #334155;
-  border: none;
-  border-radius: 10px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   color: #f1f5f9;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -704,29 +702,29 @@
 }
 
 .viewBtn:hover {
-  background: #475569;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .practiceBtn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
-  background: #ca8a04;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   border: none;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  border-radius: 12px;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(202, 138, 4, 0.2);
   transition: all 0.2s ease;
 }
 
 .practiceBtn:hover {
-  background: #eab308;
-  transform: scale(0.98);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  transform: translateY(-1px);
 }
 
 /* Empty State */
@@ -740,6 +738,8 @@
 }
 
 .emptyIcon {
+  display: flex;
+  justify-content: center;
   color: #64748b;
   margin-bottom: 16px;
 }
@@ -816,7 +816,64 @@
 
 @media (max-width: 1024px) {
   .contentGrid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .contentCard {
+    max-width: 400px;
+  }
+
+  .cardInner {
+    padding: 18px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cardBody {
+    flex: 1;
+  }
+
+  .cardHeader {
+    margin-bottom: 12px;
+  }
+
+  .cardDate {
+    font-size: 0.8125rem;
+    padding: 5px 12px;
+  }
+
+  .statusBadge {
+    font-size: 0.6875rem;
+  }
+
+  .cardBody {
+    margin-bottom: 16px;
+  }
+
+  .cardTitle {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+  }
+
+  .cardPreview {
+    font-size: 0.85rem;
+  }
+
+  .cardFooter {
+    padding-top: 16px;
+  }
+
+  .metaItem {
+    font-size: 0.75rem;
+  }
+
+  .viewBtn,
+  .practiceBtn {
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+    border-radius: 10px;
   }
 }
 
@@ -889,18 +946,71 @@
 
   .contentGrid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .cardInner {
+    padding: 16px;
+  }
+
+  .cardHeader {
+    margin-bottom: 10px;
+  }
+
+  .cardDate {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+
+  .statusBadge {
+    font-size: 0.625rem;
+  }
+
+  .cardBody {
+    margin-bottom: 12px;
+  }
+
+  .cardTitle {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    -webkit-line-clamp: 1;
+  }
+
+  .cardPreview {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 1;
   }
 
   .cardFooter {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
+    padding-top: 12px;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .cardMeta {
+    gap: 10px;
+  }
+
+  .metaItem {
+    font-size: 0.7rem;
+    gap: 3px;
   }
 
   .cardActions {
-    width: 100%;
-    justify-content: flex-end;
+    display: flex;
+    gap: 6px;
+  }
+
+  .deleteBtn {
+    padding: 6px;
+  }
+
+  .viewBtn,
+  .practiceBtn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    border-radius: 8px;
   }
 }
 
@@ -921,21 +1031,49 @@
     font-size: 1.5rem;
   }
 
+  .contentGrid {
+    gap: 10px;
+  }
+
   .cardInner {
-    padding: 16px;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .cardHeader {
+    margin-bottom: 8px;
+  }
+
+  .cardDate {
+    font-size: 0.6875rem;
+    padding: 3px 8px;
+  }
+
+  .cardBody {
+    margin-bottom: 10px;
   }
 
   .cardTitle {
-    font-size: 1rem;
+    font-size: 0.9375rem;
+    margin-bottom: 4px;
   }
 
   .cardPreview {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .cardFooter {
+    padding-top: 10px;
+  }
+
+  .metaItem {
+    font-size: 0.65rem;
   }
 
   .viewBtn,
   .practiceBtn {
-    padding: 6px 12px;
-    font-size: 0.75rem;
+    padding: 6px 10px;
+    font-size: 0.6875rem;
   }
 }

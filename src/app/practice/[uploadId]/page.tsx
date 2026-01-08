@@ -501,22 +501,56 @@ export default function PracticePage() {
           </div>
         )}
 
-        {/* Level Up Modal */}
+        {/* Level Up Modal - Dopamine Edition */}
         {levelUp && (
           <div className={styles.levelUpOverlay} onClick={() => setLevelUp(null)}>
+            {/* Confetti particles */}
+            <div className={styles.confettiContainer}>
+              {[...Array(20)].map((_, i) => (
+                <div key={i} className={`${styles.confetti} ${styles[`confetti${i % 5}`]}`} />
+              ))}
+            </div>
+
             <div className={styles.levelUpModal} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.levelUpIcon}>
-                <Star size={48} />
+              {/* Glow rings */}
+              <div className={styles.glowRings}>
+                <div className={styles.glowRing1}></div>
+                <div className={styles.glowRing2}></div>
+                <div className={styles.glowRing3}></div>
               </div>
-              <h2 className={styles.levelUpTitle}>Level Up!</h2>
-              <p className={styles.levelUpLevel}>You reached Level {levelUp.newLevel}</p>
+
+              {/* Money Animation with Badge */}
+              <div className={styles.levelUpAnimation}>
+                <DotLottieReact
+                  src="/animations/making-money.lottie"
+                  autoplay
+                  loop
+                  className={styles.moneyLottie}
+                />
+                {/* Level Badge - Inside animation container */}
+                <div className={styles.levelBadge}>
+                  <span className={styles.levelBadgeNumber}>{levelUp.newLevel}</span>
+                </div>
+              </div>
+
+              <h2 className={styles.levelUpTitle}>
+                <span className={styles.levelUpTitleGlow}>LEVEL UP!</span>
+              </h2>
+              <p className={styles.levelUpLevel}>
+                You&apos;ve ascended to <span className={styles.levelHighlight}>Level {levelUp.newLevel}</span>
+              </p>
+
               {levelUp.broinsAwarded > 0 && (
-                <p className={styles.levelUpReward}>
-                  +{levelUp.broinsAwarded} Broins Earned!
-                </p>
+                <div className={styles.levelUpReward}>
+                  <div className={styles.rewardGlow}></div>
+                  <Sparkles size={20} className={styles.rewardIcon} />
+                  <span>+{levelUp.broinsAwarded} Broins</span>
+                </div>
               )}
+
               <button className={styles.levelUpBtn} onClick={() => setLevelUp(null)}>
-                Awesome!
+                <span className={styles.btnShine}></span>
+                Claim Reward
               </button>
             </div>
           </div>

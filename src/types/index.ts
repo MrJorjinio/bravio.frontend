@@ -87,6 +87,16 @@ export interface PurchaseResponse {
   transactionId: string;
 }
 
+export interface CheckoutRequest {
+  amountUsd: number;
+  broins: number;
+}
+
+export interface CheckoutResponse {
+  checkoutUrl: string;
+  sessionId: string;
+}
+
 export interface Transaction {
   id: string;
   type: 'Purchase' | 'Spend';

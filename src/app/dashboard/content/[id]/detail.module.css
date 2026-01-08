@@ -228,6 +228,10 @@
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
+.summaryContent {
+  position: relative;
+}
+
 .summaryText {
   font-size: 1.125rem;
   color: #cbd5e1;
@@ -238,6 +242,10 @@
 .summaryText strong {
   color: #f1f5f9;
   font-weight: 600;
+}
+
+.expandBtn {
+  display: none;
 }
 
 .summaryStats {
@@ -538,6 +546,84 @@
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  /* Ensure proper order on tablet/mobile: AI Summary, Key Takeaways, Source Content */
+  .grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leftColumn {
+    display: contents;
+  }
+
+  .rightColumn {
+    display: contents;
+  }
+
+  .summaryCard {
+    order: 1;
+  }
+
+  .takeawaysCard {
+    order: 2;
+  }
+
+  .sourceCard {
+    order: 3;
+  }
+
+  /* Collapsible summary on tablet/mobile */
+  .summaryContent {
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+
+  .summaryCard.expanded .summaryContent {
+    max-height: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .expandBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    background: transparent;
+    border: 1px dashed rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+    color: #f59e0b;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .expandBtn:hover {
+    background: rgba(245, 158, 11, 0.1);
+    border-style: solid;
+  }
+
+  .expandBtn svg {
+    transition: transform 0.2s ease;
+  }
+
+  .expandBtn svg.rotated {
+    transform: rotate(180deg);
+  }
+
+  .summaryText {
+    font-size: 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 24px 16px;

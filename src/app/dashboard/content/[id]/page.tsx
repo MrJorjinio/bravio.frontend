@@ -10,7 +10,8 @@ import {
   Layers,
   FileText,
   Play,
-  Trash2
+  Trash2,
+  ChevronDown
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { uploadService } from '@/services';
@@ -26,6 +27,7 @@ export default function ContentDetailPage() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
 
   const fetchData = useCallback(async (showLoading = true) => {
     try {
@@ -217,14 +219,23 @@ export default function ContentDetailPage() {
           <div className={styles.leftColumn}>
             {/* AI Summary Card */}
             {upload.summary && (
-              <div className={styles.summaryCard}>
+              <div className={`${styles.summaryCard} ${summaryExpanded ? styles.expanded : ''}`}>
                 <h2 className={styles.summaryHeader}>
                   <span className={styles.summaryIcon}>
                     <Sparkles size={16} />
                   </span>
                   AI Summary
                 </h2>
-                <p className={styles.summaryText}>{upload.summary}</p>
+                <div className={styles.summaryContent}>
+                  <p className={styles.summaryText}>{upload.summary}</p>
+                </div>
+                <button
+                  className={styles.expandBtn}
+                  onClick={() => setSummaryExpanded(!summaryExpanded)}
+                >
+                  <span>{summaryExpanded ? 'Show Less' : 'Read More'}</span>
+                  <ChevronDown size={16} className={summaryExpanded ? styles.rotated : ''} />
+                </button>
                 <div className={styles.summaryStats}>
                   <div className={styles.stat}>
                     <span className={styles.statLabel}>Total Words</span>
