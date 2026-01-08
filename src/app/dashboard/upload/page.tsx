@@ -27,15 +27,15 @@ export default function UploadPage() {
   const [uploadedId, setUploadedId] = useState<string | null>(null);
 
   const charCount = content.length;
-  const isValidLength = charCount >= 200 && charCount <= 2000;
-  const progressPercent = Math.min((charCount / 2000) * 100, 100);
+  const isValidLength = charCount >= 200 && charCount <= 10000;
+  const progressPercent = Math.min((charCount / 10000) * 100, 100);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (!isValidLength) {
-      setError('Content must be between 200 and 2,000 characters');
+      setError('Content must be between 200 and 10,000 characters');
       return;
     }
 
@@ -179,7 +179,7 @@ export default function UploadPage() {
                       ></div>
                     </div>
                     <span className={styles.charCount}>
-                      {charCount.toLocaleString()} / 2,000
+                      {charCount.toLocaleString()} / 10,000
                     </span>
                   </div>
                 </div>

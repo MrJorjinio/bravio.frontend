@@ -25,8 +25,8 @@ export const walletService = {
     return response.data;
   },
 
-  async verifyPayment(): Promise<{ completed: boolean }> {
-    const response = await api.post<{ completed: boolean }>('/payments/verify');
+  async verifyPayment(): Promise<{ completed: boolean; newBalance?: number }> {
+    const response = await api.post<{ completed: boolean; newBalance?: number }>('/payments/verify');
     return response.data;
   },
 

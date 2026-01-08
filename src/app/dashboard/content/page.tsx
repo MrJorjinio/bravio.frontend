@@ -11,9 +11,7 @@ import {
   Target,
   Layers,
   Coins,
-  Play,
   Trash2,
-  Eye,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -204,15 +202,13 @@ export default function ContentPage() {
                       onClick={() => handleDelete(upload.id)}
                       title="Delete"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={18} />
                     </button>
                     <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
-                      <Eye size={14} />
                       View
                     </Link>
                     {upload.status.toLowerCase() === 'completed' && (
                       <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
-                        <Play size={12} />
                         Practice
                       </Link>
                     )}

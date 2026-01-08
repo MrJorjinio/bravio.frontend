@@ -67,15 +67,24 @@ export default function WalletPage() {
     if (payment === 'success') {
       // Verify and complete the pending payment
       walletService.verifyPayment()
-        .then((result) => {
+        .then(async (result) => {
           if (result.completed) {
             setPaymentStatus('success');
-            // Refetch data to get updated balance
-            fetchData();
+
+            // If the result includes the new balance, update it immediately
+            if (result.newBalance !== undefined) {
+              setBalance(result.newBalance);
+            }
+
+            // Wait a moment for backend to process, then refetch all data
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await fetchData();
           }
         })
         .catch((err) => {
           console.error('Payment verification failed:', err);
+          // Still try to fetch data in case payment went through
+          fetchData();
         })
         .finally(() => {
           // Clear status after 5 seconds

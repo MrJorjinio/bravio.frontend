@@ -209,7 +209,7 @@ export default function LandingPage() {
                 <span className={styles.stepNumber}>1</span>
               </div>
               <h3>Upload Your Content</h3>
-              <p>Paste any complex text - lecture notes, research papers, articles, or textbooks. Our platform handles content from 200 to 2,000 characters.</p>
+              <p>Paste any complex text - lecture notes, research papers, articles, or textbooks. Our platform handles content from 200 to 10,000 characters.</p>
             </div>
             <div className={`${styles.step} ${styles.revealOnScroll}`}>
               <div className={styles.stepIcon}>
