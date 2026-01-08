@@ -22,6 +22,13 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    const elements = document.querySelectorAll(`.${styles.revealOnScroll}`);
+
+    // Set initial hidden state via data attribute
+    elements.forEach(el => {
+      (el as HTMLElement).dataset.reveal = 'pending';
+    });
+
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -50px 0px'
@@ -30,13 +37,15 @@ export default function LandingPage() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          (entry.target as HTMLElement).style.opacity = '1';
-          (entry.target as HTMLElement).style.transform = 'translateY(0)';
+          const el = entry.target as HTMLElement;
+          el.dataset.reveal = 'visible';
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
         }
       });
     }, observerOptions);
 
-    document.querySelectorAll(`.${styles.revealOnScroll}`).forEach(el => {
+    elements.forEach(el => {
       observer.observe(el);
     });
 
@@ -74,7 +83,6 @@ export default function LandingPage() {
           <ul className={styles.navLinks}>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#features">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
             <li><a href="#testimonials">Reviews</a></li>
           </ul>
 
@@ -92,7 +100,6 @@ export default function LandingPage() {
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.active : ''}`}>
         <a href="#how-it-works" onClick={closeMobileMenu}>How It Works</a>
         <a href="#features" onClick={closeMobileMenu}>Features</a>
-        <a href="#pricing" onClick={closeMobileMenu}>Pricing</a>
         <a href="#testimonials" onClick={closeMobileMenu}>Reviews</a>
         <Link href="/register" className={styles.navCta}>Get Started Free</Link>
       </div>
@@ -124,7 +131,7 @@ export default function LandingPage() {
             </div>
             <div className={styles.heroStats}>
               <div className={styles.stat}>
-                <div className={styles.statValue}>200</div>
+                <div className={styles.statValue}>150</div>
                 <div className={styles.statLabel}>Free Broins to Start</div>
               </div>
               <div className={styles.stat}>
@@ -149,13 +156,23 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className={styles.flashcardPreview}>
-                <div className={styles.flashcardLabel}>Flashcard 1 of 5</div>
-                <div className={styles.flashcardQuestion}>What is the primary function of mitochondria in a cell?</div>
-                <div className={styles.flashcardOptions}>
-                  <div className={styles.flashcardOption}>A. Protein synthesis</div>
-                  <div className={`${styles.flashcardOption} ${styles.selected}`}>B. Energy production (ATP)</div>
-                  <div className={styles.flashcardOption}>C. DNA replication</div>
-                  <div className={styles.flashcardOption}>D. Cell division</div>
+                <div className={styles.flashcardProgress}>
+                  <div className={styles.progressBarLanding}>
+                    <div className={styles.progressFillLanding}></div>
+                  </div>
+                  <span className={styles.progressTextLanding}>3 / 5</span>
+                </div>
+                <div className={styles.flipCard}>
+                  <div className={styles.flipCardFront}>
+                    <span className={styles.cardLabelLanding}>Question</span>
+                    <p className={styles.cardTextLanding}>What is the primary function of mitochondria in a cell?</p>
+                    <span className={styles.flipHint}>Tap to reveal answer</span>
+                  </div>
+                </div>
+                <div className={styles.difficultyButtons}>
+                  <button className={`${styles.diffBtn} ${styles.hardBtn}`}>Hard</button>
+                  <button className={`${styles.diffBtn} ${styles.goodBtn}`}>Good</button>
+                  <button className={`${styles.diffBtn} ${styles.easyBtn}`}>Easy</button>
                 </div>
               </div>
             </div>
@@ -171,7 +188,7 @@ export default function LandingPage() {
                 <Coins size={24} />
               </div>
               <div className={styles.floatingText}>Balance</div>
-              <div className={styles.floatingValue}>200 Broins</div>
+              <div className={styles.floatingValue}>150 Broins</div>
             </div>
           </div>
         </div>
@@ -249,36 +266,7 @@ export default function LandingPage() {
                 <Coins size={28} />
               </div>
               <h3>Affordable Pay-As-You-Go</h3>
-              <p>Start with 200 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className={styles.pricing} id="pricing">
-        <div className={styles.container}>
-          <div className={styles.pricingContainer}>
-            <div className={styles.pricingContent}>
-              <span className={styles.sectionLabel}>Simple Pricing</span>
-              <h2>Pay Only for What You Use</h2>
-              <p>Bravio uses a credit system called Broins. You start with 200 free Broins - enough to process multiple uploads and experience the full power of AI-generated summaries, key points, and flashcards.</p>
-              <div className={styles.broinInfo}>
-                <div className={styles.broinHeader}>
-                  <div className={styles.broinIcon}>
-                    <Coins size={28} />
-                  </div>
-                  <div>
-                    <div className={styles.broinTitle}>Broin Credits</div>
-                    <div className={styles.broinSubtitle}>Our in-app currency</div>
-                  </div>
-                </div>
-                <div className={styles.broinConversion}>
-                  <span className={styles.broinRate}>$1</span>
-                  <span className={styles.broinEquals}>=</span>
-                  <span className={styles.broinRate}>200 Broins</span>
-                </div>
-              </div>
+              <p>Start with 150 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
             </div>
           </div>
         </div>
@@ -365,7 +353,7 @@ export default function LandingPage() {
           </div>
           <div className={styles.ctaBonus}>
             <Gift size={18} />
-            Get <strong>200 free Broins</strong> when you sign up today
+            Get <strong>150 free Broins</strong> when you sign up today
           </div>
         </div>
       </section>
@@ -380,7 +368,6 @@ export default function LandingPage() {
           <ul className={styles.footerLinks}>
             <li><a href="#">About</a></li>
             <li><a href="#features">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
             <li><a href="#">Privacy</a></li>
             <li><a href="#">Terms</a></li>
             <li><a href="#">Contact</a></li>

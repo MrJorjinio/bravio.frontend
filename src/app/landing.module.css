@@ -425,54 +425,119 @@
 .appDot:last-child { background: #22c55e; opacity: 1; }
 
 .flashcardPreview {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(30, 41, 59, 0.6) 100%);
-  border-radius: 16px;
-  padding: 28px;
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  background: transparent;
+  padding: 0;
 }
 
-.flashcardLabel {
+/* Progress bar for flashcard */
+.flashcardProgress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.progressBarLanding {
+  flex: 1;
+  height: 6px;
+  background: #334155;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.progressFillLanding {
+  width: 60%;
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 50px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.progressTextLanding {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* Flip card design */
+.flipCard {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 32px 28px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  margin-bottom: 20px;
+}
+
+.flipCardFront {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  flex: 1;
+}
+
+.cardLabelLanding {
   font-size: 0.6875rem;
   font-weight: 700;
   color: #f59e0b;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
-.flashcardQuestion {
+.cardTextLanding {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.5;
-  margin-bottom: 20px;
   color: #f1f5f9;
+  margin-bottom: 24px;
 }
 
-.flashcardOptions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.flashcardOption {
-  background: rgba(2, 6, 23, 0.5);
-  padding: 14px 18px;
-  border-radius: 12px;
+.flipHint {
+  color: #64748b;
   font-size: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.2s ease;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Difficulty buttons */
+.difficultyButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.diffBtn {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.875rem;
   cursor: pointer;
-  color: #f1f5f9;
+  transition: all 0.2s ease;
+  border: 1px solid;
 }
 
-.flashcardOption:hover {
-  border-color: rgba(245, 158, 11, 0.3);
-  background: rgba(245, 158, 11, 0.05);
+.hardBtn {
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.5);
+  color: #fb7185;
 }
 
-.flashcardOption.selected {
-  border-color: #f59e0b;
+.goodBtn {
   background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fbbf24;
+}
+
+.easyBtn {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #34d399;
 }
 
 .floatingCard {
@@ -997,11 +1062,17 @@
   font-size: 0.8125rem;
 }
 
-/* Reveal Animation */
+/* Reveal Animation - Cards visible by default, animation as enhancement */
 .revealOnScroll {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Only apply initial hidden state when JS is ready */
+.revealOnScroll[data-reveal="pending"] {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
 /* Responsive */

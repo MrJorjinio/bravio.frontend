@@ -178,7 +178,7 @@ export default function RegisterPage() {
 
           <div className={styles.bonusBadge}>
             <span className={styles.bonusBadgeIcon}><Gift size={18} /></span>
-            <span className={styles.bonusBadgeText}>Get <strong>200 free Broins</strong> when you sign up!</span>
+            <span className={styles.bonusBadgeText}>Get <strong>150 free Broins</strong> when you sign up!</span>
           </div>
 
           {error && (
