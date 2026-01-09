@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { walletService } from '@/services';
-import type { Transaction } from '@/types';
+import type { Transaction, Package } from '@/types';
 import {
   CreditCard,
   ArrowDownRight,
@@ -12,44 +12,36 @@ import {
   Inbox,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Flame,
+  TrendingUp,
+  Users
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import PremiumBravioCard from '@/components/PremiumBravioCard';
 import styles from './wallet.module.css';
 
-interface PurchaseOption {
-  usd: number;
-  broins: number;
-  label: string;
-  popular?: boolean;
-}
-
-const purchaseOptions: PurchaseOption[] = [
-  { usd: 5, broins: 1000, label: 'Starter' },
-  { usd: 10, broins: 2000, label: 'Popular', popular: true },
-  { usd: 20, broins: 4000, label: 'Pro' },
-];
-
 export default function WalletPage() {
   const searchParams = useSearchParams();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [packages, setPackages] = useState<Package[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [customAmount, setCustomAmount] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'cancelled' | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [balanceRes, transactionsRes] = await Promise.all([
+      const [balanceRes, transactionsRes, packagesRes] = await Promise.all([
         walletService.getBalance(),
-        walletService.getTransactions(1, 20)
+        walletService.getTransactions(1, 20),
+        walletService.getPackages()
       ]);
       setBalance(balanceRes.balance);
       setTransactions(transactionsRes.transactions || []);
+      setPackages(packagesRes.packages || []);
     } catch (err) {
       console.error('Failed to fetch wallet data:', err);
     } finally {
@@ -74,6 +66,8 @@ export default function WalletPage() {
             // If the result includes the new balance, update it immediately
             if (result.newBalance !== undefined) {
               setBalance(result.newBalance);
+              // Dispatch event to refresh balance in sidebar
+              window.dispatchEvent(new CustomEvent('balanceUpdated'));
             }
 
             // Wait a moment for backend to process, then refetch all data
@@ -99,49 +93,24 @@ export default function WalletPage() {
     }
   }, [searchParams, fetchData]);
 
-  const handleOptionSelect = (usd: number) => {
-    setSelectedOption(usd);
-    setCustomAmount('');
+  const handlePackageSelect = (packageName: string) => {
+    setSelectedPackage(packageName);
   };
 
-  const handleCustomAmountChange = (value: string) => {
-    setCustomAmount(value);
-    if (value) {
-      setSelectedOption(null);
-    }
-  };
-
-  const getSelectedBroins = () => {
-    if (selectedOption) {
-      const option = purchaseOptions.find(o => o.usd === selectedOption);
-      return option ? option.broins : 0;
-    }
-    if (customAmount) {
-      const amount = parseFloat(customAmount);
-      return isNaN(amount) ? 0 : Math.floor(amount * 200);
-    }
-    return 0;
-  };
-
-  const getSelectedUsd = () => {
-    if (selectedOption) return selectedOption;
-    if (customAmount) {
-      const amount = parseFloat(customAmount);
-      return isNaN(amount) ? 0 : amount;
-    }
-    return 0;
+  const getSelectedPackageInfo = () => {
+    if (!selectedPackage) return null;
+    return packages.find(p => p.name === selectedPackage);
   };
 
   const handlePurchase = async () => {
-    const usd = getSelectedUsd();
-    const broins = getSelectedBroins();
-    if (usd <= 0 || broins <= 0) return;
+    const pkg = getSelectedPackageInfo();
+    if (!pkg) return;
 
     setIsPurchasing(true);
     try {
       const response = await walletService.createCheckout({
-        amountUsd: usd,
-        broins: broins
+        amountUsd: pkg.priceUSD,
+        broins: pkg.broins
       });
 
       // Redirect to Dodo checkout
@@ -167,7 +136,7 @@ export default function WalletPage() {
   };
 
   const isPositiveTransaction = (type: string) => {
-    return ['purchase', 'signupbonus', 'refund', 'levelup'].includes(type.toLowerCase());
+    return ['purchase', 'signupbonus', 'refund', 'levelup', 'dailybonus', 'streakbonus', 'referralbonus', 'referredbonus'].includes(type.toLowerCase());
   };
 
   const isPendingTransaction = (type: string) => {
@@ -182,6 +151,10 @@ export default function WalletPage() {
       case 'usage': return 'Spent Broins';
       case 'signupbonus': return 'Welcome Bonus';
       case 'levelup': return 'Level Up Reward';
+      case 'dailybonus': return 'Daily Login Bonus';
+      case 'streakbonus': return 'Streak Bonus';
+      case 'referralbonus': return 'Referral Reward';
+      case 'referredbonus': return 'Welcome Referral Bonus';
       case 'refund': return 'Refund';
       default: return type;
     }
@@ -191,7 +164,9 @@ export default function WalletPage() {
     const t = type.toLowerCase();
     if (t === 'pendingpurchase') return styles.pending;
     if (t === 'spend' || t === 'usage') return styles.spent;
-    if (t === 'signupbonus') return styles.bonus;
+    if (t === 'signupbonus' || t === 'referredbonus') return styles.bonus;
+    if (t === 'streakbonus') return styles.streak;
+    if (t === 'referralbonus') return styles.referral;
     return styles.received;
   };
 
@@ -199,7 +174,10 @@ export default function WalletPage() {
     const t = type.toLowerCase();
     if (t === 'pendingpurchase') return <Clock size={20} />;
     if (t === 'spend' || t === 'usage') return <ArrowDownRight size={20} />;
-    if (t === 'signupbonus') return <Gift size={20} />;
+    if (t === 'signupbonus' || t === 'referredbonus') return <Gift size={20} />;
+    if (t === 'streakbonus') return <Flame size={20} />;
+    if (t === 'dailybonus') return <TrendingUp size={20} />;
+    if (t === 'referralbonus') return <Users size={20} />;
     return <ArrowUpRight size={20} />;
   };
 
@@ -270,41 +248,28 @@ export default function WalletPage() {
         </div>
 
         <div className={styles.purchaseGrid}>
-          {purchaseOptions.map((option) => {
-            const isSelected = selectedOption === option.usd;
-            const showPopularHighlight = option.popular && selectedOption === null && !customAmount;
+          {packages.map((pkg, index) => {
+            const isSelected = selectedPackage === pkg.name;
+            const isBestValue = pkg.name === 'Value';
             return (
               <div
-                key={option.usd}
-                className={`${styles.purchaseOption} ${isSelected ? styles.selected : ''} ${showPopularHighlight ? styles.popular : ''}`}
-                onClick={() => handleOptionSelect(option.usd)}
+                key={pkg.name}
+                className={`${styles.purchaseOption} ${isSelected ? styles.selected : ''} ${isBestValue && !selectedPackage ? styles.popular : ''}`}
+                onClick={() => handlePackageSelect(pkg.name)}
               >
-                {option.popular && <span className={styles.bestValueBadge}>Best Value</span>}
-                <p className={styles.optionLabel}>{option.label}</p>
-                <p className={styles.optionPrice}>${option.usd}</p>
-                <p className={styles.optionBroins}>{option.broins} Broins</p>
+                {isBestValue && <span className={styles.bestValueBadge}>Best Value</span>}
+                <p className={styles.optionLabel}>{pkg.name}</p>
+                <p className={styles.optionPrice}>${pkg.priceUSD.toFixed(2)}</p>
+                <p className={styles.optionBroins}>{pkg.broins.toLocaleString()} Broins</p>
               </div>
             );
           })}
         </div>
 
-        <div className={styles.customInputWrapper}>
-          <span className={styles.dollarSign}>$</span>
-          <input
-            type="number"
-            className={styles.customInput}
-            placeholder="Custom amount"
-            value={customAmount}
-            onChange={(e) => handleCustomAmountChange(e.target.value)}
-            min="1"
-            step="1"
-          />
-        </div>
-
         <button
           className={styles.purchaseBtn}
           onClick={handlePurchase}
-          disabled={isPurchasing || getSelectedUsd() <= 0}
+          disabled={isPurchasing || !selectedPackage}
         >
           <CreditCard size={20} strokeWidth={3} />
           {isPurchasing ? 'Processing...' : 'Confirm Purchase'}

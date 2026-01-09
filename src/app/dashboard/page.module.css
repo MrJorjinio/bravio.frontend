@@ -107,6 +107,18 @@
   box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
 }
 
+.streakInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.streakBonus {
+  font-size: 0.625rem;
+  color: #34d399;
+  font-weight: 600;
+}
+
 .fireAnimation {
   width: 32px;
   height: 32px;

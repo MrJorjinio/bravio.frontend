@@ -1,4 +1,5 @@
-import api from '@/lib/api';
+import api, { getTokens } from '@/lib/api';
+import axios from 'axios';
 import type {
   CreateUploadRequest,
   CreatePdfUploadRequest,
@@ -28,8 +29,17 @@ export const uploadService = {
     if (data.title) {
       formData.append('title', data.title);
     }
-    // Don't set Content-Type header manually - axios will set it with correct boundary
-    const response = await api.post<Upload>('/uploads/pdf', formData);
+
+    // Use raw axios for file upload to avoid default Content-Type: application/json header
+    const { accessToken } = getTokens();
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+    const response = await axios.post<Upload>(`${baseUrl}/uploads/pdf`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        // Don't set Content-Type - let browser set multipart/form-data with boundary
+      },
+    });
     return response.data;
   },
 

@@ -62,6 +62,8 @@ export default function DashboardPage() {
       setShowBonusModal(true);
       if (result.claimed) {
         setBalance(result.newBalance);
+        // Dispatch event to refresh balance in sidebar
+        window.dispatchEvent(new CustomEvent('balanceUpdated'));
       }
     } catch (err) {
       setBonusMessage('Failed to claim bonus. Try again later.');
@@ -156,7 +158,12 @@ export default function DashboardPage() {
                   className={styles.fireLottie}
                 />
               </div>
-              <span>{streak?.currentStreak} Day Streak</span>
+              <div className={styles.streakInfo}>
+                <span>{streak?.currentStreak} Day Streak</span>
+                {streak?.daysUntilNextBonus !== undefined && streak.daysUntilNextBonus > 0 && (
+                  <span className={styles.streakBonus}>+50 in {streak.daysUntilNextBonus}d</span>
+                )}
+              </div>
             </div>
           )}
         </div>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { walletService } from '@/services';
-import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X } from 'lucide-react';
+import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -38,6 +38,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       fetchBalance();
     }
   }, [authLoading, isAuthenticated, router, fetchBalance]);
+
+  // Listen for balance update events from other components
+  useEffect(() => {
+    const handleBalanceUpdate = () => {
+      fetchBalance();
+    };
+    window.addEventListener('balanceUpdated', handleBalanceUpdate);
+    return () => {
+      window.removeEventListener('balanceUpdated', handleBalanceUpdate);
+    };
+  }, [fetchBalance]);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -116,6 +127,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Wallet className={styles.navIcon} />
             <span>Wallet</span>
           </Link>
+          <Link
+            href="/dashboard/referral"
+            className={`${styles.navItem} ${isActive('/dashboard/referral') ? styles.active : ''}`}
+          >
+            <Gift className={styles.navIcon} />
+            <span>Referrals</span>
+          </Link>
         </nav>
 
         <div className={styles.sidebarFooter}>
@@ -180,10 +198,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Wallet size={20} />
           <span>Wallet</span>
         </Link>
-        <button className={styles.bottomNavItem} onClick={handleLogoutClick}>
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
+        <Link
+          href="/dashboard/referral"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/referral') ? styles.active : ''}`}
+        >
+          <Gift size={20} />
+          <span>Referral</span>
+        </Link>
       </nav>
 
       {/* Logout Confirmation Modal */}

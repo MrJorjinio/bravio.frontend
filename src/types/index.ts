@@ -43,6 +43,9 @@ export interface StreakResponse {
   longestStreak: number;
   lastActivityDate?: string;
   isActiveToday: boolean;
+  streakBonusAwarded?: boolean;
+  streakBonusAmount?: number;
+  daysUntilNextBonus?: number;
 }
 
 export interface LevelResponse {
@@ -99,10 +102,11 @@ export interface CheckoutResponse {
 
 export interface Transaction {
   id: string;
-  type: 'Purchase' | 'Spend';
+  type: 'Purchase' | 'Spend' | 'DailyBonus' | 'LevelUp' | 'StreakBonus' | 'ReferralBonus' | 'ReferredBonus';
   amountUSD?: number;
   amountBroins: number;
   relatedUploadId?: string;
+  description?: string;
   createdAt: string;
 }
 
@@ -307,4 +311,52 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// Referral Types
+export interface ReferralResponse {
+  referralCode: string;
+  totalReferrals: number;
+  totalEarned: number;
+}
+
+export interface ReferralApplyRequest {
+  referralCode: string;
+}
+
+export interface ReferralApplyResponse {
+  success: boolean;
+  message: string;
+  bonusAwarded: number;
+  newBalance: number;
+}
+
+export interface ReferralValidateResponse {
+  isValid: boolean;
+}
+
+// Package Types (for purchasing broins)
+export interface Package {
+  name: string;
+  priceUSD: number;
+  priceCents: number;
+  broins: number;
+}
+
+export interface PackagesResponse {
+  packages: Package[];
+}
+
+export interface PackagePurchaseRequest {
+  packageName: string;
+  paymentMethodId?: string;
+}
+
+export interface PackagePurchaseResponse {
+  transactionId: string;
+  type: string;
+  packageName: string;
+  amountUSD: number;
+  amountBroins: number;
+  newBalance: number;
 }

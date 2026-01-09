@@ -6,7 +6,10 @@ import type {
   CheckoutRequest,
   CheckoutResponse,
   Transaction,
-  TransactionsResponse
+  TransactionsResponse,
+  PackagesResponse,
+  PackagePurchaseRequest,
+  PackagePurchaseResponse
 } from '@/types';
 
 export const walletService = {
@@ -34,6 +37,16 @@ export const walletService = {
     const response = await api.get<TransactionsResponse>('/wallet/transactions', {
       params: { page, limit },
     });
+    return response.data;
+  },
+
+  async getPackages(): Promise<PackagesResponse> {
+    const response = await api.get<PackagesResponse>('/wallet/packages');
+    return response.data;
+  },
+
+  async purchasePackage(data: PackagePurchaseRequest): Promise<PackagePurchaseResponse> {
+    const response = await api.post<PackagePurchaseResponse>('/wallet/purchase', data);
     return response.data;
   },
 };
