@@ -121,6 +121,11 @@ export interface CreateUploadRequest {
   title?: string;
 }
 
+export interface CreatePdfUploadRequest {
+  file: File;
+  title?: string;
+}
+
 export interface UploadChunk {
   id: string;
   chunkIndex: number;
@@ -152,6 +157,10 @@ export interface Upload {
   totalChunks?: number;
   completedChunks?: number;
   chunks?: UploadChunk[];
+  // PDF support
+  sourceType?: 'Text' | 'Pdf';
+  originalFileName?: string;
+  pageCount?: number;
 }
 
 // Lightweight upload summary (doesn't include all chunks/flashcards)
@@ -170,6 +179,10 @@ export interface UploadSummary {
   totalChunks: number;
   completedChunks: number;
   createdAt: string;
+  // PDF support
+  sourceType?: 'Text' | 'Pdf';
+  originalFileName?: string;
+  pageCount?: number;
 }
 
 export interface UploadsResponse {

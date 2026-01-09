@@ -23,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${plusJakarta.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${plusJakarta.variable} antialiased`} suppressHydrationWarning>
         <GoogleOAuthWrapper>
           <AuthProvider>
             {children}

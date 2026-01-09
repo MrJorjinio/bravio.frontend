@@ -13,7 +13,8 @@ import {
   Coins,
   Trash2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
 import styles from './content.module.css';
 
@@ -27,6 +28,9 @@ export default function ContentPage() {
   const [filter, setFilter] = useState<FilterStatus>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUploads = useCallback(async () => {
     try {
@@ -46,16 +50,31 @@ export default function ContentPage() {
     fetchUploads();
   }, [fetchUploads]);
 
-  const handleDelete = async (uploadId: string) => {
-    if (!confirm('Are you sure you want to delete this content?')) return;
+  const handleDeleteClick = (uploadId: string) => {
+    setSelectedUploadId(uploadId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setSelectedUploadId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedUploadId) return;
 
     try {
-      await uploadService.deleteUpload(uploadId);
-      setUploads(uploads.filter(u => u.id !== uploadId));
+      setIsDeleting(true);
+      await uploadService.deleteUpload(selectedUploadId);
+      setUploads(uploads.filter(u => u.id !== selectedUploadId));
       setTotalCount(prev => prev - 1);
+      setShowDeleteModal(false);
+      setSelectedUploadId(null);
     } catch (err) {
       console.error('Failed to delete upload:', err);
       alert('Failed to delete content. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -199,7 +218,7 @@ export default function ContentPage() {
                   <div className={styles.cardActions}>
                     <button
                       className={styles.deleteBtn}
-                      onClick={() => handleDelete(upload.id)}
+                      onClick={() => handleDeleteClick(upload.id)}
                       title="Delete"
                     >
                       <Trash2 size={18} />
@@ -244,6 +263,45 @@ export default function ContentPage() {
             Next
             <ChevronRight size={18} />
           </button>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay} onClick={handleDeleteCancel}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalIcon}>
+              <Trash2 size={28} />
+            </div>
+            <h3 className={styles.modalTitle}>Delete Content</h3>
+            <p className={styles.modalDescription}>
+              Are you sure you want to delete this content? This will permanently remove
+              all summaries, key points, and flashcards. This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalCancelBtn}
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.modalDeleteBtn}
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 size={18} className={styles.spinnerSmall} />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

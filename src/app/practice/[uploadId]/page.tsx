@@ -58,10 +58,11 @@ export default function PracticePage() {
   const hasFetchedRef = useRef(false);
   const CARDS_PER_PAGE = 10;
 
-  // Load more flashcards when running low (only for non-chunked uploads in normal mode)
+  // Load more flashcards when running low
   const loadMoreCards = useCallback(async (page: number) => {
-    // Don't load more for key mode or chunked uploads (they use key flashcards)
-    if (isLoadingMore || practiceMode === 'key' || upload?.isChunked) return;
+    // Don't load more for key mode or chunked uploads without specific chunk
+    // (they use key flashcards which are loaded all at once)
+    if (isLoadingMore || practiceMode === 'key' || (upload?.isChunked && chunkIndex === null)) return;
 
     try {
       setIsLoadingMore(true);
@@ -96,18 +97,14 @@ export default function PracticePage() {
 
       // Determine if we should use key flashcards:
       // - Explicitly requested via mode=key
-      // - OR it's a chunked upload (automatically use key flashcards for better UX)
-      const useKeyFlashcards = practiceMode === 'key' || uploadData.isChunked;
+      // - OR it's a chunked upload WITHOUT a specific chunk selected (overview mode)
+      // When a specific chunk is selected, load ALL flashcards for that chunk
+      const useKeyFlashcards = practiceMode === 'key' || (uploadData.isChunked && chunkIndex === null);
 
       if (useKeyFlashcards) {
         // Key mode: get curated key flashcards (1-2 per chunk) - load all at once
         const keyFlashcardsRes = await uploadService.getKeyFlashcards(uploadId, 2);
-        let filteredFlashcards = keyFlashcardsRes.flashcards;
-
-        // Filter by chunk if specified
-        if (chunkIndex !== null) {
-          filteredFlashcards = filteredFlashcards.filter(f => f.chunkIndex === chunkIndex);
-        }
+        const filteredFlashcards = keyFlashcardsRes.flashcards;
 
         setLoadedFlashcards(filteredFlashcards);
         setTotalCards(filteredFlashcards.length);
@@ -118,7 +115,7 @@ export default function PracticePage() {
           setCurrentCard(filteredFlashcards[randomIndex]);
         }
       } else {
-        // Normal mode (non-chunked): use paginated loading
+        // Normal mode OR specific chunk selected: use paginated loading for ALL flashcards
         const paginatedRes = await uploadService.getPaginatedFlashcards(
           uploadId,
           1,
@@ -412,8 +409,17 @@ export default function PracticePage() {
               <RotateCcw size={18} />
               Practice Again
             </button>
-            <Link href="/dashboard" className={styles.backBtn}>
+            <Link
+              href={chunkIndex !== null
+                ? `/dashboard/content/${uploadId}/chunk/${chunkIndex}`
+                : `/dashboard/content/${uploadId}`
+              }
+              className={styles.backBtn}
+            >
               <ArrowLeft size={18} />
+              {chunkIndex !== null ? `Back to Part ${chunkIndex + 1}` : 'Back to Content'}
+            </Link>
+            <Link href="/dashboard" className={styles.dashboardBtn}>
               Back to Dashboard
             </Link>
           </div>
@@ -427,7 +433,13 @@ export default function PracticePage() {
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.progressSection}>
-          <Link href="/dashboard" className={styles.exitBtn}>
+          <Link
+            href={chunkIndex !== null
+              ? `/dashboard/content/${uploadId}/chunk/${chunkIndex}`
+              : `/dashboard/content/${uploadId}`
+            }
+            className={styles.exitBtn}
+          >
             <X size={24} />
           </Link>
           <div className={styles.progressBar}>

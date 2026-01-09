@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { uploadService } from '@/services';
 import { useUploadProgress, ChunkProgress, UploadCompleted } from '@/hooks';
@@ -15,12 +15,15 @@ import {
   Check,
   X,
   Loader2,
-  Clock
+  Clock,
+  Upload,
+  File
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './upload.module.css';
 
 type UploadState = 'idle' | 'spending' | 'processing' | 'chunking' | 'transitioning' | 'success';
+type UploadMode = 'text' | 'pdf';
 
 interface ChunkStatus {
   index: number;
@@ -36,6 +39,12 @@ export default function UploadPage() {
   const [error, setError] = useState('');
   const [uploadedId, setUploadedId] = useState<string | null>(null);
 
+  // Upload mode state
+  const [uploadMode, setUploadMode] = useState<UploadMode>('text');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Chunk progress state
   const [totalChunks, setTotalChunks] = useState(0);
   const [completedChunks, setCompletedChunks] = useState(0);
@@ -43,12 +52,61 @@ export default function UploadPage() {
   const [chunkStatuses, setChunkStatuses] = useState<ChunkStatus[]>([]);
 
   const charCount = content.length;
-  const isValidLength = charCount >= 200; // No max limit anymore
+  const isValidLength = uploadMode === 'text' ? charCount >= 200 : pdfFile !== null;
   const chunkSize = 4000;
   const estimatedChunks = Math.ceil(charCount / (chunkSize - 350)); // Account for overlap
 
   // Calculate cost: 1 broin per 500 chars
   const estimatedCost = Math.ceil(charCount / 500);
+
+  // PDF file handlers
+  const handleFileSelect = (file: File) => {
+    if (file.type !== 'application/pdf') {
+      setError('Please select a PDF file');
+      return;
+    }
+    setPdfFile(file);
+    setError('');
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setPdfFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   // SignalR handlers
   const handleChunkProgress = useCallback((data: ChunkProgress) => {
@@ -96,68 +154,130 @@ export default function UploadPage() {
     e.preventDefault();
     setError('');
 
-    if (!isValidLength) {
-      setError('Content must be at least 200 characters');
-      return;
-    }
-
-    // Determine if this will be chunked (> 4000 chars)
-    const willBeChunked = charCount > chunkSize;
-
-    if (willBeChunked) {
-      // Initialize chunk statuses
-      const chunks = Math.ceil(charCount / (chunkSize - 350));
-      setTotalChunks(chunks);
-      setCompletedChunks(0);
-      setTotalFlashcards(0);
-      setChunkStatuses(
-        Array.from({ length: chunks }, (_, i) => ({
-          index: i,
-          status: i === 0 ? 'processing' : 'pending'
-        }))
-      );
-      // Show spending animation first, then transition to chunking
-      setUploadState('spending');
-    } else {
-      setUploadState('processing');
-    }
-
-    const startTime = Date.now();
-
-    try {
-      const result = await uploadService.createUpload({
-        content,
-        title: title || undefined
-      });
-      setUploadedId(result.id);
-
-      // For non-chunked uploads, handle completion directly
-      if (!willBeChunked) {
-        const elapsed = Date.now() - startTime;
-        const minDisplayTime = 2000;
-        const remainingTime = Math.max(0, minDisplayTime - elapsed);
-
-        setTimeout(() => {
-          setUploadState('transitioning');
-          setTimeout(() => {
-            setUploadState('success');
-          }, 400);
-        }, remainingTime);
-      } else {
-        // For chunked uploads, show spending animation for longer, then show chunking progress
-        const elapsed = Date.now() - startTime;
-        const minSpendingTime = 3000; // 3 seconds for spending animation
-        const remainingTime = Math.max(0, minSpendingTime - elapsed);
-
-        setTimeout(() => {
-          setUploadState('chunking');
-        }, remainingTime);
+    if (uploadMode === 'text') {
+      if (!isValidLength) {
+        setError('Content must be at least 200 characters');
+        return;
       }
-      // SignalR will handle the progress and completion for chunked uploads
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to process content. Please try again.';
-      setError(errorMessage);
-      setUploadState('idle');
+
+      // Determine if this will be chunked (> 4000 chars)
+      const willBeChunked = charCount > chunkSize;
+
+      if (willBeChunked) {
+        // Initialize chunk statuses
+        const chunks = Math.ceil(charCount / (chunkSize - 350));
+        setTotalChunks(chunks);
+        setCompletedChunks(0);
+        setTotalFlashcards(0);
+        setChunkStatuses(
+          Array.from({ length: chunks }, (_, i) => ({
+            index: i,
+            status: i === 0 ? 'processing' : 'pending'
+          }))
+        );
+        // Show spending animation first, then transition to chunking
+        setUploadState('spending');
+      } else {
+        setUploadState('processing');
+      }
+
+      const startTime = Date.now();
+
+      try {
+        const result = await uploadService.createUpload({
+          content,
+          title: title || undefined
+        });
+        setUploadedId(result.id);
+
+        // For non-chunked uploads, handle completion directly
+        if (!willBeChunked) {
+          const elapsed = Date.now() - startTime;
+          const minDisplayTime = 2000;
+          const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('transitioning');
+            setTimeout(() => {
+              setUploadState('success');
+            }, 400);
+          }, remainingTime);
+        } else {
+          // For chunked uploads, show spending animation for longer, then show chunking progress
+          const elapsed = Date.now() - startTime;
+          const minSpendingTime = 3000; // 3 seconds for spending animation
+          const remainingTime = Math.max(0, minSpendingTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('chunking');
+          }, remainingTime);
+        }
+        // SignalR will handle the progress and completion for chunked uploads
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to process content. Please try again.';
+        setError(errorMessage);
+        setUploadState('idle');
+      }
+    } else {
+      // PDF upload
+      if (!pdfFile) {
+        setError('Please select a PDF file');
+        return;
+      }
+
+      // For PDF uploads, we don't know the char count yet, so show spending animation
+      setUploadState('spending');
+
+      const startTime = Date.now();
+
+      try {
+        const result = await uploadService.createPdfUpload({
+          file: pdfFile,
+          title: title || undefined
+        });
+        setUploadedId(result.id);
+
+        // Check if PDF will be chunked based on response
+        const isChunked = result.isChunked && (result.totalChunks || 0) > 1;
+
+        if (isChunked) {
+          // Initialize chunk statuses for PDF
+          const chunks = result.totalChunks || 1;
+          setTotalChunks(chunks);
+          setCompletedChunks(0);
+          setTotalFlashcards(0);
+          setChunkStatuses(
+            Array.from({ length: chunks }, (_, i) => ({
+              index: i,
+              status: i === 0 ? 'processing' : 'pending'
+            }))
+          );
+
+          const elapsed = Date.now() - startTime;
+          const minSpendingTime = 3000;
+          const remainingTime = Math.max(0, minSpendingTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('chunking');
+          }, remainingTime);
+        } else {
+          // Non-chunked PDF
+          const elapsed = Date.now() - startTime;
+          const minDisplayTime = 2000;
+          const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('transitioning');
+            setTimeout(() => {
+              setUploadState('success');
+            }, 400);
+          }, remainingTime);
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF. Please try again.';
+        setError(errorMessage);
+        setUploadState('idle');
+      }
     }
   };
 
@@ -370,6 +490,26 @@ export default function UploadPage() {
           <div className={styles.formCard}>
             <div className={styles.cardGlow}></div>
 
+            {/* Upload Mode Tabs */}
+            <div className={styles.uploadTabs}>
+              <button
+                type="button"
+                className={`${styles.uploadTab} ${uploadMode === 'text' ? styles.uploadTabActive : ''}`}
+                onClick={() => setUploadMode('text')}
+              >
+                <Type size={18} />
+                Paste Text
+              </button>
+              <button
+                type="button"
+                className={`${styles.uploadTab} ${uploadMode === 'pdf' ? styles.uploadTabActive : ''}`}
+                onClick={() => setUploadMode('pdf')}
+              >
+                <FileText size={18} />
+                Upload PDF
+              </button>
+            </div>
+
             {error && <div className={styles.errorMessage}>{error}</div>}
 
             <form onSubmit={handleSubmit}>
@@ -389,28 +529,81 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              <div className={styles.formGroup}>
-                <div className={styles.labelRow}>
-                  <label className={styles.label}>Study Material</label>
-                  <span className={styles.charBadge}>Min 200 chars</span>
-                </div>
-                <div className={styles.textareaWrapper}>
-                  <textarea
-                    className={styles.textarea}
-                    placeholder="Paste your notes, article, or essay here... No character limit!"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={12}
-                  />
-                  <div className={styles.progressRow}>
-                    <span className={styles.charCount}>
-                      {charCount.toLocaleString()} chars
-                      {charCount > chunkSize && ` (~${estimatedChunks} chunks)`}
-                      {charCount >= 200 && ` • ~${estimatedCost} broins`}
-                    </span>
+              {uploadMode === 'text' ? (
+                <div className={styles.formGroup}>
+                  <div className={styles.labelRow}>
+                    <label className={styles.label}>Study Material</label>
+                    <span className={styles.charBadge}>Min 200 chars</span>
+                  </div>
+                  <div className={styles.textareaWrapper}>
+                    <textarea
+                      className={styles.textarea}
+                      placeholder="Paste your notes, article, or essay here... No character limit!"
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      rows={12}
+                    />
+                    <div className={styles.progressRow}>
+                      <span className={styles.charCount}>
+                        {charCount.toLocaleString()} chars
+                        {charCount > chunkSize && ` (~${estimatedChunks} chunks)`}
+                        {charCount >= 200 && ` • ~${estimatedCost} broins`}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className={styles.formGroup}>
+                  <div className={styles.labelRow}>
+                    <label className={styles.label}>PDF Document</label>
+                    <span className={styles.charBadge}>Text-based PDFs only</span>
+                  </div>
+
+                  {!pdfFile ? (
+                    <div
+                      className={`${styles.dropZone} ${isDragging ? styles.dropZoneDragging : ''}`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileInputChange}
+                        className={styles.fileInput}
+                      />
+                      <div className={styles.dropZoneIcon}>
+                        <Upload size={40} />
+                      </div>
+                      <p className={styles.dropZoneText}>
+                        Drag & drop your PDF here, or <span className={styles.dropZoneLink}>browse</span>
+                      </p>
+                      <p className={styles.dropZoneHint}>
+                        Only text-based PDFs are supported. Scanned documents won&apos;t work.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={styles.filePreview}>
+                      <div className={styles.filePreviewIcon}>
+                        <File size={32} />
+                      </div>
+                      <div className={styles.filePreviewInfo}>
+                        <p className={styles.filePreviewName}>{pdfFile.name}</p>
+                        <p className={styles.filePreviewSize}>{formatFileSize(pdfFile.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.filePreviewRemove}
+                        onClick={handleRemoveFile}
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <button
                 type="submit"
@@ -418,7 +611,7 @@ export default function UploadPage() {
                 disabled={uploadState !== 'idle' || !isValidLength}
               >
                 <Sparkles size={18} />
-                Generate Summary & Flashcards
+                {uploadMode === 'text' ? 'Generate Summary & Flashcards' : 'Process PDF & Generate Flashcards'}
               </button>
             </form>
           </div>

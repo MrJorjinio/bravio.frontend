@@ -15,7 +15,9 @@ import {
   CheckCircle2,
   Loader2,
   AlertCircle,
-  Clock
+  Clock,
+  Download,
+  File
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { uploadService } from '@/services';
@@ -46,6 +48,13 @@ export default function ContentDetailPage() {
   const [keyPointsPage, setKeyPointsPage] = useState(1);
   const [keyPointsTotalPages, setKeyPointsTotalPages] = useState(1);
   const [keyPointsLoading, setKeyPointsLoading] = useState(false);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // PDF download state
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Helper to truncate text
   const truncateText = (text: string, maxLength: number) => {
@@ -173,15 +182,38 @@ export default function ContentDetailPage() {
     return () => clearInterval(pollInterval);
   }, [upload, fetchData]);
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this content? This action cannot be undone.')) return;
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     try {
+      setIsDeleting(true);
       await uploadService.deleteUpload(uploadId);
       router.push('/dashboard/content');
     } catch (err) {
       console.error('Failed to delete upload:', err);
-      alert('Failed to delete content. Please try again.');
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!upload || upload.sourceType !== 'Pdf') return;
+
+    try {
+      setIsDownloading(true);
+      const downloadUrl = await uploadService.getDownloadUrl(uploadId);
+      // Open the presigned URL in a new tab to trigger download
+      window.open(downloadUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to get download URL:', err);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -267,14 +299,36 @@ export default function ContentDetailPage() {
               <Layers size={16} />
               <span>{upload.flashcardCount} Flashcards</span>
             </div>
+            {upload.sourceType === 'Pdf' && (
+              <div className={`${styles.badge} ${styles.pdf}`}>
+                <File size={16} />
+                <span>PDF{upload.pageCount ? ` • ${upload.pageCount} pages` : ''}</span>
+              </div>
+            )}
           </div>
         </div>
 
         <div className={styles.headerActions}>
-          <button onClick={handleDelete} className={styles.shareBtn}>
+          {upload.sourceType === 'Pdf' && (
+            <button
+              onClick={handleDownloadPdf}
+              className={styles.downloadBtn}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <Loader2 size={20} className={styles.spinningIcon} />
+              ) : (
+                <Download size={20} />
+              )}
+              <span>Download PDF</span>
+            </button>
+          )}
+          <button onClick={handleDeleteClick} className={styles.shareBtn}>
             <Trash2 size={20} />
           </button>
-          {isCompleted && (
+          {/* Only show Practice Now in header for non-chunked uploads */}
+          {/* Chunked uploads have Practice Key Flashcards button at bottom */}
+          {isCompleted && !upload.isChunked && (
             <Link href={`/practice/${uploadId}`} className={styles.practiceBtn}>
               <Play size={18} />
               Practice Now
@@ -493,11 +547,17 @@ export default function ContentDetailPage() {
             <div className={styles.sourceCard}>
               <div className={styles.sourceHeader}>
                 <h3 className={styles.sourceTitle}>
-                  <FileText size={16} />
-                  Source Content
+                  {upload.sourceType === 'Pdf' ? <File size={16} /> : <FileText size={16} />}
+                  {upload.sourceType === 'Pdf' ? 'PDF Content' : 'Source Content'}
                 </h3>
                 <span className={styles.readOnlyBadge}>Read Only</span>
               </div>
+              {upload.sourceType === 'Pdf' && upload.originalFileName && (
+                <div className={styles.sourceFileName}>
+                  <File size={14} />
+                  <span>{upload.originalFileName}</span>
+                </div>
+              )}
               <div className={styles.sourceContent}>
                 {upload.contentPreview || 'Content not available'}
               </div>
@@ -584,6 +644,58 @@ export default function ContentDetailPage() {
                   </button>
                 </div>
               )}
+
+              {/* Practice Key Flashcards button for chunked uploads */}
+              {upload.isChunked && upload.flashcardCount > 0 && (
+                <div className={styles.practiceKeySection}>
+                  <Link href={`/practice/${uploadId}`} className={styles.practiceKeyBtn}>
+                    <Play size={18} />
+                    Practice Key Flashcards
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay} onClick={handleDeleteCancel}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalIcon}>
+              <Trash2 size={32} />
+            </div>
+            <h2 className={styles.modalTitle}>Delete Content?</h2>
+            <p className={styles.modalText}>
+              Are you sure you want to delete <strong>"{upload.title}"</strong>?
+              This will permanently remove all flashcards and progress. This action cannot be undone.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                onClick={handleDeleteCancel}
+                className={styles.modalCancelBtn}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className={styles.modalDeleteBtn}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 size={16} className={styles.spinningIcon} />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Delete
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

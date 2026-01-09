@@ -1,6 +1,7 @@
 import api from '@/lib/api';
 import type {
   CreateUploadRequest,
+  CreatePdfUploadRequest,
   Upload,
   UploadSummary,
   UploadsResponse,
@@ -19,6 +20,22 @@ export const uploadService = {
   async createUpload(data: CreateUploadRequest): Promise<Upload> {
     const response = await api.post<Upload>('/uploads', data);
     return response.data;
+  },
+
+  async createPdfUpload(data: CreatePdfUploadRequest): Promise<Upload> {
+    const formData = new FormData();
+    formData.append('file', data.file);
+    if (data.title) {
+      formData.append('title', data.title);
+    }
+    // Don't set Content-Type header manually - axios will set it with correct boundary
+    const response = await api.post<Upload>('/uploads/pdf', formData);
+    return response.data;
+  },
+
+  async getDownloadUrl(uploadId: string): Promise<string> {
+    const response = await api.get<{ downloadUrl: string }>(`/uploads/${uploadId}/download`);
+    return response.data.downloadUrl;
   },
 
   async getUploads(page: number = 1, limit: number = 10, status?: string): Promise<UploadsResponse> {

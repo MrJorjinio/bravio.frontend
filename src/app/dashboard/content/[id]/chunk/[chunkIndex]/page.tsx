@@ -120,14 +120,6 @@ export default function ChunkDetailPage() {
           </div>
         </div>
 
-        <div className={styles.headerActions}>
-          {isCompleted && chunk.flashcardCount > 0 && (
-            <Link href={`/practice/${uploadId}?chunk=${chunkIndex}`} className={styles.practiceBtn}>
-              <Play size={18} />
-              Practice Now
-            </Link>
-          )}
-        </div>
       </header>
 
       {/* Error State */}
