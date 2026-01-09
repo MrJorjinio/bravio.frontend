@@ -217,14 +217,14 @@
   padding-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
 }
 
 .cardMeta {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 1;
+  flex: 1;
   min-width: 0;
   overflow: hidden;
 }
