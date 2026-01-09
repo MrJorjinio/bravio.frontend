@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { uploadService } from '@/services';
+import { useUploadProgress, ChunkProgress, UploadCompleted } from '@/hooks';
 import {
   ArrowLeft,
   Type,
@@ -11,35 +11,117 @@ import {
   FileText,
   ListChecks,
   Layers,
-  Cpu
+  Cpu,
+  Check,
+  X,
+  Loader2,
+  Clock
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './upload.module.css';
 
-type UploadState = 'idle' | 'processing' | 'transitioning' | 'success';
+type UploadState = 'idle' | 'spending' | 'processing' | 'chunking' | 'transitioning' | 'success';
+
+interface ChunkStatus {
+  index: number;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  flashcardCount?: number;
+  errorMessage?: string;
+}
 
 export default function UploadPage() {
-  const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [error, setError] = useState('');
   const [uploadedId, setUploadedId] = useState<string | null>(null);
 
+  // Chunk progress state
+  const [totalChunks, setTotalChunks] = useState(0);
+  const [completedChunks, setCompletedChunks] = useState(0);
+  const [totalFlashcards, setTotalFlashcards] = useState(0);
+  const [chunkStatuses, setChunkStatuses] = useState<ChunkStatus[]>([]);
+
   const charCount = content.length;
-  const isValidLength = charCount >= 200 && charCount <= 10000;
-  const progressPercent = Math.min((charCount / 10000) * 100, 100);
+  const isValidLength = charCount >= 200; // No max limit anymore
+  const chunkSize = 4000;
+  const estimatedChunks = Math.ceil(charCount / (chunkSize - 350)); // Account for overlap
+
+  // Calculate cost: 1 broin per 500 chars
+  const estimatedCost = Math.ceil(charCount / 500);
+
+  // SignalR handlers
+  const handleChunkProgress = useCallback((data: ChunkProgress) => {
+    if (data.uploadId !== uploadedId) return;
+
+    setCompletedChunks(data.completedChunks);
+    setTotalFlashcards(prev => prev + data.flashcardCount);
+
+    setChunkStatuses(prev => {
+      const updated = [...prev];
+      updated[data.chunkIndex] = {
+        index: data.chunkIndex,
+        status: data.status === 'COMPLETED' ? 'completed' : 'failed',
+        flashcardCount: data.flashcardCount,
+        errorMessage: data.errorMessage
+      };
+      // Mark next chunk as processing if not the last one
+      if (data.chunkIndex + 1 < totalChunks && data.status === 'COMPLETED') {
+        updated[data.chunkIndex + 1] = {
+          ...updated[data.chunkIndex + 1],
+          status: 'processing'
+        };
+      }
+      return updated;
+    });
+  }, [uploadedId, totalChunks]);
+
+  const handleUploadCompleted = useCallback((data: UploadCompleted) => {
+    if (data.uploadId !== uploadedId) return;
+
+    // For chunked uploads, go directly to success after a delay (no transitioning state to avoid money animation)
+    setTimeout(() => {
+      setUploadState('success');
+    }, 2000);
+  }, [uploadedId]);
+
+  // Connect to SignalR
+  useUploadProgress({
+    onChunkProgress: handleChunkProgress,
+    onUploadCompleted: handleUploadCompleted,
+    uploadId: uploadedId || undefined
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     if (!isValidLength) {
-      setError('Content must be between 200 and 10,000 characters');
+      setError('Content must be at least 200 characters');
       return;
     }
 
-    setUploadState('processing');
+    // Determine if this will be chunked (> 4000 chars)
+    const willBeChunked = charCount > chunkSize;
+
+    if (willBeChunked) {
+      // Initialize chunk statuses
+      const chunks = Math.ceil(charCount / (chunkSize - 350));
+      setTotalChunks(chunks);
+      setCompletedChunks(0);
+      setTotalFlashcards(0);
+      setChunkStatuses(
+        Array.from({ length: chunks }, (_, i) => ({
+          index: i,
+          status: i === 0 ? 'processing' : 'pending'
+        }))
+      );
+      // Show spending animation first, then transition to chunking
+      setUploadState('spending');
+    } else {
+      setUploadState('processing');
+    }
+
     const startTime = Date.now();
 
     try {
@@ -49,25 +131,172 @@ export default function UploadPage() {
       });
       setUploadedId(result.id);
 
-      // Ensure minimum 2 seconds of processing animation
-      const elapsed = Date.now() - startTime;
-      const minDisplayTime = 2000;
-      const remainingTime = Math.max(0, minDisplayTime - elapsed);
+      // For non-chunked uploads, handle completion directly
+      if (!willBeChunked) {
+        const elapsed = Date.now() - startTime;
+        const minDisplayTime = 2000;
+        const remainingTime = Math.max(0, minDisplayTime - elapsed);
 
-      // Transition phase - fade out processing
-      setTimeout(() => {
-        setUploadState('transitioning');
-        // After fade out, show success
         setTimeout(() => {
-          setUploadState('success');
-        }, 400);
-      }, remainingTime);
+          setUploadState('transitioning');
+          setTimeout(() => {
+            setUploadState('success');
+          }, 400);
+        }, remainingTime);
+      } else {
+        // For chunked uploads, show spending animation for longer, then show chunking progress
+        const elapsed = Date.now() - startTime;
+        const minSpendingTime = 3000; // 3 seconds for spending animation
+        const remainingTime = Math.max(0, minSpendingTime - elapsed);
+
+        setTimeout(() => {
+          setUploadState('chunking');
+        }, remainingTime);
+      }
+      // SignalR will handle the progress and completion for chunked uploads
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process content. Please try again.';
       setError(errorMessage);
       setUploadState('idle');
     }
   };
+
+  // Chunking progress state
+  if (uploadState === 'chunking') {
+    const progressPercent = totalChunks > 0 ? Math.min((completedChunks / totalChunks) * 100, 100) : 0;
+    const currentChunk = chunkStatuses.find(c => c.status === 'processing');
+    const allChunksComplete = completedChunks >= totalChunks && totalChunks > 0;
+
+    // Dynamic status messages based on progress
+    const getStatusTitle = () => {
+      if (allChunksComplete) return 'Finalizing Your Content';
+      if (completedChunks === 0) return 'Analyzing Your Content';
+      return 'Processing Your Content';
+    };
+
+    const getStatusSubtext = () => {
+      if (allChunksComplete) return 'Preparing top key points and organizing flashcards...';
+      if (completedChunks === 0) return 'Breaking down your text and starting AI analysis...';
+      return `Generating summaries, key points, and flashcards for each part...`;
+    };
+
+    return (
+      <div className={styles.container}>
+        <div className={styles.processingOverlay}>
+          <div className={styles.chunkProgressCard}>
+            <div className={styles.chunkProgressAnimation}>
+              <div className={styles.processingSpinner}></div>
+            </div>
+
+            <h2 className={styles.chunkProgressTitle}>{getStatusTitle()}</h2>
+            <p className={styles.chunkProgressSubtext}>
+              {getStatusSubtext()}
+            </p>
+
+            <div className={styles.chunkProgressBar}>
+              <div
+                className={styles.chunkProgressFill}
+                style={{ width: `${progressPercent}%` }}
+              ></div>
+            </div>
+
+            <div className={styles.chunkProgressStats}>
+              <div className={styles.chunkProgressStat}>
+                <div className={styles.chunkProgressStatValue}>{Math.min(completedChunks, totalChunks)}/{totalChunks}</div>
+                <div className={styles.chunkProgressStatLabel}>Parts</div>
+              </div>
+              <div className={styles.chunkProgressStat}>
+                <div className={styles.chunkProgressStatValue}>{totalFlashcards}</div>
+                <div className={styles.chunkProgressStatLabel}>Flashcards</div>
+              </div>
+            </div>
+
+            <div className={styles.chunkList}>
+              {chunkStatuses.map((chunk) => {
+                const isCompleted = chunk.status === 'completed';
+                const baseClassName = `${styles.chunkItem} ${
+                  chunk.status === 'processing' ? styles.chunkItemProcessing :
+                  chunk.status === 'completed' ? styles.chunkItemCompleted :
+                  chunk.status === 'failed' ? styles.chunkItemFailed : ''
+                }`;
+
+                const chunkContent = (
+                  <>
+                    <div className={`${styles.chunkItemIcon} ${styles[chunk.status]}`}>
+                      {chunk.status === 'processing' && <Loader2 size={14} />}
+                      {chunk.status === 'completed' && <Check size={14} />}
+                      {chunk.status === 'failed' && <X size={14} />}
+                      {chunk.status === 'pending' && <Clock size={14} />}
+                    </div>
+                    <div className={styles.chunkItemInfo}>
+                      <div className={styles.chunkItemTitle}>Part {chunk.index + 1}</div>
+                      <div className={styles.chunkItemMeta}>
+                        {chunk.status === 'processing' && 'Generating summary, key points & flashcards...'}
+                        {chunk.status === 'completed' && `${chunk.flashcardCount} flashcards ready - Click to view`}
+                        {chunk.status === 'failed' && (chunk.errorMessage || 'Failed to process')}
+                        {chunk.status === 'pending' && 'Queued for processing...'}
+                      </div>
+                    </div>
+                    {isCompleted && (
+                      <div className={styles.chunkItemArrow}>→</div>
+                    )}
+                  </>
+                );
+
+                return isCompleted ? (
+                  <Link
+                    key={chunk.index}
+                    href={`/dashboard/content/${uploadedId}`}
+                    className={`${baseClassName} ${styles.chunkItemClickable}`}
+                  >
+                    {chunkContent}
+                  </Link>
+                ) : (
+                  <div key={chunk.index} className={baseClassName}>
+                    {chunkContent}
+                  </div>
+                );
+              })}
+            </div>
+
+            {currentChunk ? (
+              <p className={styles.currentChunkText}>
+                AI is analyzing part {currentChunk.index + 1} of {totalChunks}...
+              </p>
+            ) : allChunksComplete ? (
+              <p className={styles.currentChunkText}>
+                All parts complete! Preparing your learning materials...
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Spending state for chunked uploads - show money animation before processing starts
+  if (uploadState === 'spending') {
+    return (
+      <div className={styles.container}>
+        <div className={styles.processingOverlay}>
+          <div className={styles.processingCard}>
+            <div className={styles.processingAnimation}>
+              <DotLottieReact
+                src="/animations/money-floating.lottie"
+                autoplay
+                loop
+                className={styles.moneyLottie}
+              />
+            </div>
+            <h2 className={styles.processingTitle}>Spending Broins...</h2>
+            <p className={styles.processingText}>
+              Your broins are being used to generate amazing learning materials!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Processing state - show money floating animation with blur overlay
   if (uploadState === 'processing' || uploadState === 'transitioning') {
@@ -108,7 +337,9 @@ export default function UploadPage() {
           </div>
           <h2 className={styles.successTitle}>Blast Off! Content Uploaded!</h2>
           <p className={styles.successText}>
-            Your content is being processed. We&apos;re generating a summary, key points, and flashcards for you.
+            {totalChunks > 1
+              ? `Your content was processed in ${totalChunks} chunks. ${totalFlashcards} flashcards were generated!`
+              : "Your content is being processed. We're generating a summary, key points, and flashcards for you."}
           </p>
           <Link href={`/dashboard/content/${uploadedId}`} className={styles.successBtn}>
             <Sparkles size={18} />
@@ -166,20 +397,16 @@ export default function UploadPage() {
                 <div className={styles.textareaWrapper}>
                   <textarea
                     className={styles.textarea}
-                    placeholder="Paste your notes, article, or essay here..."
+                    placeholder="Paste your notes, article, or essay here... No character limit!"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={12}
                   />
                   <div className={styles.progressRow}>
-                    <div className={styles.progressBar}>
-                      <div
-                        className={styles.progressFill}
-                        style={{ width: `${progressPercent}%` }}
-                      ></div>
-                    </div>
                     <span className={styles.charCount}>
-                      {charCount.toLocaleString()} / 10,000
+                      {charCount.toLocaleString()} chars
+                      {charCount > chunkSize && ` (~${estimatedChunks} chunks)`}
+                      {charCount >= 200 && ` • ~${estimatedCost} broins`}
                     </span>
                   </div>
                 </div>
@@ -191,7 +418,7 @@ export default function UploadPage() {
                 disabled={uploadState !== 'idle' || !isValidLength}
               >
                 <Sparkles size={18} />
-                {uploadState === 'processing' ? 'Processing...' : 'Generate Summary & Flashcards'}
+                Generate Summary & Flashcards
               </button>
             </form>
           </div>

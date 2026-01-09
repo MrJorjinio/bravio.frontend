@@ -340,25 +340,35 @@
 }
 
 .takeawaysCard {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.04) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
   border-radius: 24px;
   padding: 8px;
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.05);
 }
 
 .takeawaysHeader {
   padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .takeawaysTitle {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #64748b;
+  letter-spacing: 0.08em;
+  color: #f59e0b;
+}
+
+.takeawaysSubtitle {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-left: auto;
 }
 
 .takeawaysList {
@@ -374,38 +384,35 @@
   display: flex;
   gap: 16px;
   padding: 16px;
-  background: #0f172a;
-  border: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.15);
   border-radius: 16px;
   transition: all 0.2s ease;
   cursor: default;
 }
 
 .takeawayItem:hover {
-  border-color: rgba(245, 158, 11, 0.5);
-  background: #1e293b;
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .takeawayNumber {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #94a3b8;
-  transition: all 0.2s ease;
+  color: #020617;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
 .takeawayItem:hover .takeawayNumber {
-  background: #f59e0b;
-  border-color: #fbbf24;
-  color: #020617;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
 }
 
 .takeawayText {
@@ -678,5 +685,879 @@
   .practiceBtn {
     padding: 14px 24px;
     font-size: 1rem;
+  }
+}
+
+/* ======================================
+   CHUNK PROGRESS STYLES (Processing State)
+   ====================================== */
+
+.chunkProgressSection {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chunkProgressBar {
+  height: 6px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.chunkProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.chunkProgressGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.chunkProgressItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.chunkProgressItem.chunkpending {
+  color: #64748b;
+  border-color: rgba(100, 116, 139, 0.2);
+}
+
+.chunkProgressItem.chunkprocessing {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.chunkProgressItem.chunkcompleted {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.chunkProgressItem.chunkfailed {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.spinningIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Completed Chunks Section (while still processing) */
+.completedChunksSection {
+  margin-top: 32px;
+}
+
+.completedChunksSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 20px;
+}
+
+.completedChunksSectionTitle svg {
+  color: #4ade80;
+}
+
+/* Legacy - keep for backwards compatibility */
+.completedChunksPreview {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.completedChunksTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.chunkPreviewCard {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.chunkPreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.chunkCompleteIcon {
+  color: #4ade80;
+}
+
+.chunkFlashcardBadge {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.chunkPreviewSummary {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ======================================
+   CHUNK DISPLAY STYLES (Completed State)
+   ====================================== */
+
+.chunksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chunkCard {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chunkCard:hover {
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.chunkHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.chunkHeader:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.chunkHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.chunkBadge {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #020617;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chunkMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.chunkMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.chunkMetaItem svg {
+  opacity: 0.7;
+}
+
+.chunkExpandIcon {
+  color: #64748b;
+  transition: transform 0.3s ease;
+}
+
+.chunkExpandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+.chunkContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.chunkContent.expanded {
+  max-height: 1000px;
+  padding: 0 24px 24px;
+}
+
+.chunkSummarySection {
+  margin-bottom: 20px;
+}
+
+.chunkSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chunkSectionTitle svg {
+  color: #f59e0b;
+}
+
+.chunkSummaryText {
+  font-size: 0.9375rem;
+  color: #cbd5e1;
+  line-height: 1.7;
+  margin: 0;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.chunkKeyPointsSection {
+  /* No extra margin needed */
+}
+
+.chunkKeyPointsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chunkKeyPointItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+}
+
+.chunkKeyPointItem:hover {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(30, 41, 59, 0.4);
+}
+
+.chunkKeyPointNumber {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+/* Takeaways subtitle for chunked content */
+.takeawaysSubtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+/* Takeaway content wrapper for chunked uploads */
+.takeawayContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.takeawayChunkTag {
+  font-size: 0.6875rem;
+  color: #64748b;
+  background: rgba(100, 116, 139, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+/* Responsive adjustments for chunks */
+@media (max-width: 768px) {
+  .chunkHeader {
+    padding: 16px;
+  }
+
+  .chunkHeaderLeft {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .chunkMeta {
+    gap: 12px;
+  }
+
+  .chunkContent.expanded {
+    padding: 0 16px 16px;
+  }
+
+  .chunkProgressGrid {
+    gap: 6px;
+  }
+
+  .chunkProgressItem {
+    padding: 4px 8px;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chunkCard {
+    border-radius: 16px;
+  }
+
+  .chunkBadge {
+    padding: 4px 10px;
+    font-size: 0.6875rem;
+  }
+
+  .chunkMetaItem {
+    font-size: 0.75rem;
+  }
+}
+
+/* ======================================
+   CHUNK FLASHCARDS SECTION
+   ====================================== */
+
+.chunkFlashcardsSection {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chunkFlashcardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.miniFlashcard {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.miniFlashcardFront,
+.miniFlashcardBack {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.miniFlashcardFront {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.miniFlashcardLabel {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.miniFlashcardFront .miniFlashcardLabel {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.miniFlashcardBack .miniFlashcardLabel {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.miniFlashcardText {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.miniFlashcardBack .miniFlashcardText {
+  color: #94a3b8;
+}
+
+/* ======================================
+   HIGHLIGHT FLASHCARDS SECTION
+   ====================================== */
+
+.highlightCard {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 24px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.highlightTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.highlightTitle svg {
+  color: #f59e0b;
+}
+
+.highlightSubtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+/* ======================================
+   PRACTICE ALL SECTION
+   ====================================== */
+
+.practiceAllSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.practiceAllStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.practiceAllChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.practiceAllChip:hover {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.practiceAllChipLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.practiceAllChipCount {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.practiceAllBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 14px;
+  color: #020617;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+}
+
+.practiceAllBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+}
+
+@media (max-width: 480px) {
+  .practiceAllBtn {
+    padding: 14px 20px;
+    font-size: 0.9375rem;
+  }
+}
+
+/* ======================================
+   CHUNK PRACTICE BUTTON STYLES
+   ====================================== */
+
+.chunkPracticeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.chunkPracticeInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.chunkPracticeInfo svg {
+  color: #818cf8;
+}
+
+.chunkPracticeBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 10px;
+  color: #020617;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.chunkPracticeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+@media (max-width: 480px) {
+  .chunkPracticeRow {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .chunkPracticeBtn {
+    justify-content: center;
+  }
+}
+
+/* Responsive for flashcard sections */
+@media (max-width: 768px) {
+  .highlightCard {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .highlightFlashcard {
+    border-radius: 12px;
+  }
+
+  .miniFlashcardFront,
+  .miniFlashcardBack {
+    padding: 10px 14px;
+  }
+}
+
+/* ======================================
+   CHUNK TITLES LIST STYLES
+   ====================================== */
+
+.chunkTitlesCard {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.chunkTitlesHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 20px;
+}
+
+.chunkTitlesHeader svg {
+  color: #f59e0b;
+}
+
+.chunkTitlesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chunkTitleItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.chunkTitleItem:hover {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.25);
+  transform: translateX(4px);
+}
+
+.chunkTitleLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.chunkTitleIndex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #020617;
+  flex-shrink: 0;
+}
+
+.chunkTitleText {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chunkTitleMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.chunkTitleCards {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.chunkTitleCards svg {
+  color: #f59e0b;
+}
+
+.chunkTitleArrow {
+  color: #64748b;
+  transform: rotate(-90deg);
+  transition: all 0.2s ease;
+}
+
+.chunkTitleItem:hover .chunkTitleArrow {
+  color: #f59e0b;
+  transform: rotate(-90deg) translateY(2px);
+}
+
+/* Responsive for chunk titles */
+@media (max-width: 768px) {
+  .chunkTitlesCard {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .chunkTitleItem {
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .chunkTitleIndex {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8125rem;
+  }
+
+  .chunkTitleText {
+    font-size: 0.875rem;
+  }
+}
+
+/* ======================================
+   CHUNK TITLES COUNT & PAGINATION
+   ====================================== */
+
+.chunkTitlesCount {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-left: 8px;
+}
+
+.chunksLoadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.chunksPagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.paginationBtn {
+  padding: 8px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+  color: #f59e0b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationBtn:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.paginationBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ======================================
+   KEY POINTS GROUPED BY CHUNK
+   ====================================== */
+
+.takeawayGroup {
+  margin-bottom: 20px;
+}
+
+.takeawayGroup:last-child {
+  margin-bottom: 0;
+}
+
+.takeawayGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.takeawayGroupTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive for grouped key points */
+@media (max-width: 768px) {
+  .takeawayGroupTitle {
+    font-size: 0.75rem;
+  }
+
+  .chunksPagination {
+    gap: 12px;
+  }
+
+  .paginationBtn {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
   }
 }

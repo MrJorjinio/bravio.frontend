@@ -121,6 +121,17 @@ export interface CreateUploadRequest {
   title?: string;
 }
 
+export interface UploadChunk {
+  id: string;
+  chunkIndex: number;
+  title?: string;
+  status: 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  summary?: string;
+  keyPoints?: string[];
+  flashcardCount: number;
+  errorMessage?: string;
+}
+
 export interface Upload {
   id: string;
   title: string;
@@ -135,6 +146,29 @@ export interface Upload {
   summary?: string;
   keyPoints?: string[];
   errorMessage?: string;
+  createdAt: string;
+  // Chunking support
+  isChunked?: boolean;
+  totalChunks?: number;
+  completedChunks?: number;
+  chunks?: UploadChunk[];
+}
+
+// Lightweight upload summary (doesn't include all chunks/flashcards)
+export interface UploadSummary {
+  id: string;
+  title: string;
+  contentPreview: string;
+  summary?: string;
+  keyPoints?: string[];  // Only for non-chunked
+  characterCount: number;
+  broinsCost: number;
+  status: string;
+  errorMessage?: string;
+  flashcardCount: number;
+  isChunked: boolean;
+  totalChunks: number;
+  completedChunks: number;
   createdAt: string;
 }
 
@@ -151,6 +185,74 @@ export interface Flashcard {
   front: string;
   back: string;
   hint?: string;
+  uploadChunkId?: string;
+  chunkIndex?: number;
+  chunkTitle?: string;
+}
+
+// Key Flashcards Response
+export interface KeyFlashcardsResponse {
+  flashcards: Flashcard[];
+  total: number;
+}
+
+// Paginated Flashcards Response (for lazy loading)
+export interface PaginatedFlashcardsResponse {
+  flashcards: Flashcard[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
+// Top Key Points Response (Grouped by chunk, paginated)
+export interface TopKeyPointsResponse {
+  groups: KeyPointGroupItem[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface KeyPointGroupItem {
+  chunkIndex: number;
+  chunkTitle: string;
+  points: string[];
+}
+
+// Paginated Chunks Response
+export interface PaginatedChunksResponse {
+  chunks: ChunkSummaryItem[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface ChunkSummaryItem {
+  id: string;
+  chunkIndex: number;
+  title: string;
+  flashcardCount: number;
+  status: string;
+}
+
+// Chunk Detail Response (lightweight - single chunk)
+export interface ChunkDetail {
+  // Upload info
+  uploadId: string;
+  uploadTitle: string;
+  totalChunks: number;
+  // Chunk details
+  id: string;
+  chunkIndex: number;
+  title?: string;
+  status: string;
+  summary?: string;
+  keyPoints?: string[];
+  flashcardCount: number;
+  errorMessage?: string;
 }
 
 // Practice Types

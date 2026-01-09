@@ -660,6 +660,236 @@
   box-shadow: 0 0 40px rgba(34, 197, 94, 0.5);
 }
 
+/* Chunk Progress State */
+.chunkProgressCard {
+  max-width: 500px;
+  width: 90%;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 32px;
+  padding: 40px;
+  text-align: center;
+  box-shadow:
+    0 0 80px -20px rgba(99, 102, 241, 0.3),
+    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: cardScaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.chunkProgressTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.chunkProgressSubtext {
+  color: #94a3b8;
+  font-size: 0.9375rem;
+  margin-bottom: 32px;
+}
+
+.chunkProgressBar {
+  width: 100%;
+  height: 12px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.chunkProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  background-size: 200% 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  animation: chunkProgressShimmer 2s linear infinite;
+}
+
+@keyframes chunkProgressShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.chunkProgressStats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.chunkProgressStat {
+  text-align: center;
+}
+
+.chunkProgressStatValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.chunkProgressStatLabel {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chunkList {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.chunkItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chunkItem:last-child {
+  margin-bottom: 0;
+}
+
+.chunkItemProcessing {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.chunkItemCompleted {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.chunkItemFailed {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.chunkItemClickable {
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.chunkItemClickable:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.chunkItemArrow {
+  margin-left: auto;
+  font-size: 1.25rem;
+  color: #4ade80;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.chunkItemClickable:hover .chunkItemArrow {
+  opacity: 1;
+}
+
+.chunkItemIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chunkItemIcon.processing {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  animation: chunkIconPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes chunkIconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+
+.chunkItemIcon.completed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.chunkItemIcon.failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.chunkItemIcon.pending {
+  background: rgba(71, 85, 105, 0.2);
+  color: #64748b;
+}
+
+.chunkItemInfo {
+  flex: 1;
+  text-align: left;
+}
+
+.chunkItemTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.chunkItemMeta {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.chunkProgressAnimation {
+  margin-bottom: 24px;
+}
+
+.processingSpinner {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.processingSpinner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #6366f1;
+  border-right-color: #8b5cf6;
+  animation: spin 1s linear infinite;
+}
+
+.processingSpinner::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-bottom-color: #a78bfa;
+  border-left-color: #c4b5fd;
+  animation: spin 1.5s linear infinite reverse;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.currentChunkText {
+  font-size: 0.875rem;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .grid {

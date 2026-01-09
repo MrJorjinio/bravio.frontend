@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { uploadService, userService } from '@/services';
-import type { Flashcard, Upload, PracticeStats, SubmitDifficultyResponse, StreakResponse, LevelResponse } from '@/types';
+import type { Flashcard, UploadSummary, PracticeStats, StreakResponse, LevelResponse } from '@/types';
 import {
   X,
   CheckCircle2,
@@ -27,10 +27,14 @@ import styles from './practice.module.css';
 export default function PracticePage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const uploadId = params.uploadId as string;
+  const chunkIndexParam = searchParams.get('chunk');
+  const chunkIndex = chunkIndexParam !== null ? parseInt(chunkIndexParam, 10) : null;
+  const practiceMode = searchParams.get('mode'); // 'key' for key flashcards only
   const { isLoading: authLoading, isAuthenticated } = useAuth();
 
-  const [upload, setUpload] = useState<Upload | null>(null);
+  const [upload, setUpload] = useState<UploadSummary | null>(null);
   const [currentCard, setCurrentCard] = useState<Flashcard | null>(null);
   const [stats, setStats] = useState<PracticeStats | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -47,33 +51,107 @@ export default function PracticePage() {
   const [sessionXp, setSessionXp] = useState(0);
   const [streak, setStreak] = useState<StreakResponse | null>(null);
   const [level, setLevel] = useState<LevelResponse | null>(null);
+  const [loadedFlashcards, setLoadedFlashcards] = useState<Flashcard[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreCards, setHasMoreCards] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const CARDS_PER_PAGE = 10;
+
+  // Load more flashcards when running low (only for non-chunked uploads in normal mode)
+  const loadMoreCards = useCallback(async (page: number) => {
+    // Don't load more for key mode or chunked uploads (they use key flashcards)
+    if (isLoadingMore || practiceMode === 'key' || upload?.isChunked) return;
+
+    try {
+      setIsLoadingMore(true);
+      const response = await uploadService.getPaginatedFlashcards(
+        uploadId,
+        page,
+        CARDS_PER_PAGE,
+        chunkIndex ?? undefined
+      );
+
+      setLoadedFlashcards(prev => [...prev, ...response.flashcards]);
+      setCurrentPage(page);
+      setHasMoreCards(response.hasMore);
+    } catch (err) {
+      console.error('Failed to load more cards:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [uploadId, chunkIndex, practiceMode, isLoadingMore, upload?.isChunked]);
 
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
+
+      // Fetch upload summary (lightweight) and stats
       const [uploadData, statsData] = await Promise.all([
-        uploadService.getUpload(uploadId),
+        uploadService.getUploadSummary(uploadId),
         uploadService.getPracticeStats(uploadId)
       ]);
       setUpload(uploadData);
       setStats(statsData);
-      setTotalCards(uploadData.flashcardCount || 0);
 
-      const flashcard = await uploadService.getRandomFlashcard(uploadId, false);
-      setCurrentCard(flashcard);
+      // Determine if we should use key flashcards:
+      // - Explicitly requested via mode=key
+      // - OR it's a chunked upload (automatically use key flashcards for better UX)
+      const useKeyFlashcards = practiceMode === 'key' || uploadData.isChunked;
+
+      if (useKeyFlashcards) {
+        // Key mode: get curated key flashcards (1-2 per chunk) - load all at once
+        const keyFlashcardsRes = await uploadService.getKeyFlashcards(uploadId, 2);
+        let filteredFlashcards = keyFlashcardsRes.flashcards;
+
+        // Filter by chunk if specified
+        if (chunkIndex !== null) {
+          filteredFlashcards = filteredFlashcards.filter(f => f.chunkIndex === chunkIndex);
+        }
+
+        setLoadedFlashcards(filteredFlashcards);
+        setTotalCards(filteredFlashcards.length);
+        setHasMoreCards(false);
+
+        if (filteredFlashcards.length > 0) {
+          const randomIndex = Math.floor(Math.random() * filteredFlashcards.length);
+          setCurrentCard(filteredFlashcards[randomIndex]);
+        }
+      } else {
+        // Normal mode (non-chunked): use paginated loading
+        const paginatedRes = await uploadService.getPaginatedFlashcards(
+          uploadId,
+          1,
+          CARDS_PER_PAGE,
+          chunkIndex ?? undefined
+        );
+
+        setLoadedFlashcards(paginatedRes.flashcards);
+        setTotalCards(paginatedRes.totalCount);
+        setCurrentPage(1);
+        setHasMoreCards(paginatedRes.hasMore);
+
+        if (paginatedRes.flashcards.length > 0) {
+          const randomIndex = Math.floor(Math.random() * paginatedRes.flashcards.length);
+          setCurrentCard(paginatedRes.flashcards[randomIndex]);
+        } else {
+          setCurrentCard(null);
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [uploadId]);
+  }, [uploadId, chunkIndex, practiceMode]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
       return;
     }
-    if (isAuthenticated && uploadId) {
+    if (isAuthenticated && uploadId && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetchData();
     }
   }, [authLoading, isAuthenticated, uploadId, router, fetchData]);
@@ -171,30 +249,47 @@ export default function PracticePage() {
       setIsFlipped(false);
       setShowHint(false);
 
-      // Get all flashcards and pick a random one we haven't seen this session
-      try {
-        const allFlashcards = await uploadService.getFlashcards(uploadId);
-        const availableCards = allFlashcards.filter(f => !newAttemptedIds.has(f.id));
+      // Pick a random card from our loaded flashcards that we haven't seen this session
+      const availableCards = loadedFlashcards.filter(f => !newAttemptedIds.has(f.id));
 
-        if (availableCards.length === 0) {
-          // Fetch streak and level data for completion screen
+      // If running low on available cards and there are more to load, fetch them
+      if (availableCards.length <= 3 && hasMoreCards && !isLoadingMore) {
+        loadMoreCards(currentPage + 1);
+      }
+
+      if (availableCards.length === 0) {
+        // Check if there are more cards to load
+        if (hasMoreCards) {
+          // Wait for more cards to load
+          await loadMoreCards(currentPage + 1);
+          const newAvailableCards = loadedFlashcards.filter(f => !newAttemptedIds.has(f.id));
+          if (newAvailableCards.length > 0) {
+            const randomIndex = Math.floor(Math.random() * newAvailableCards.length);
+            setCurrentCard(newAvailableCards[randomIndex]);
+            setCardIndex(prev => prev + 1);
+            return;
+          }
+        }
+
+        // Fetch streak and level data for completion screen
+        try {
           const [streakData, levelData] = await Promise.all([
             userService.getStreak().catch(() => null),
             userService.getLevel().catch(() => null)
           ]);
           setStreak(streakData);
           setLevel(levelData);
-          setCompleted(true);
-          return;
+        } catch (e) {
+          console.error('Failed to fetch completion data:', e);
         }
-
-        // Pick a random card from available ones
-        const randomIndex = Math.floor(Math.random() * availableCards.length);
-        setCurrentCard(availableCards[randomIndex]);
-        setCardIndex(prev => prev + 1);
-      } catch {
         setCompleted(true);
+        return;
       }
+
+      // Pick a random card from available ones
+      const randomIndex = Math.floor(Math.random() * availableCards.length);
+      setCurrentCard(availableCards[randomIndex]);
+      setCardIndex(prev => prev + 1);
     } catch (err) {
       console.error('Failed to submit difficulty:', err);
       setFeedbackType(null);
@@ -212,7 +307,12 @@ export default function PracticePage() {
     setSessionXp(0); // Reset session XP
     setStreak(null);
     setLevel(null);
+    setLoadedFlashcards([]); // Reset loaded flashcards
+    setCurrentPage(1);
+    setHasMoreCards(false);
+    hasFetchedRef.current = false; // Allow re-fetch for restart
     fetchData();
+    hasFetchedRef.current = true; // Prevent subsequent double-fetches
   };
 
   const progressPercent = totalCards > 0
@@ -250,7 +350,14 @@ export default function PracticePage() {
 
           {/* Title */}
           <h1 className={styles.completedTitle}>{getMessage()}</h1>
-          <p className={styles.sessionName}>Session &quot;{upload?.title || 'Flashcards'}&quot;</p>
+          <p className={styles.sessionName}>
+            {chunkIndex !== null
+              ? `Part ${chunkIndex + 1} - ${upload?.title || 'Flashcards'}`
+              : practiceMode === 'key'
+                ? `Key Cards - ${upload?.title || 'Flashcards'}`
+                : `Session "${upload?.title || 'Flashcards'}"`
+            }
+          </p>
 
           {/* Stats Row */}
           <div className={styles.statsRow}>

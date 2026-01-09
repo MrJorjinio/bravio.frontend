@@ -2,8 +2,14 @@ import api from '@/lib/api';
 import type {
   CreateUploadRequest,
   Upload,
+  UploadSummary,
   UploadsResponse,
   Flashcard,
+  KeyFlashcardsResponse,
+  TopKeyPointsResponse,
+  PaginatedChunksResponse,
+  PaginatedFlashcardsResponse,
+  ChunkDetail,
   SubmitDifficultyRequest,
   SubmitDifficultyResponse,
   PracticeStats
@@ -27,6 +33,12 @@ export const uploadService = {
     return response.data;
   },
 
+  // Lightweight endpoint - doesn't load all chunks/flashcards
+  async getUploadSummary(uploadId: string): Promise<UploadSummary> {
+    const response = await api.get<UploadSummary>(`/uploads/${uploadId}/summary`);
+    return response.data;
+  },
+
   async deleteUpload(uploadId: string): Promise<void> {
     await api.delete(`/uploads/${uploadId}`);
   },
@@ -34,6 +46,39 @@ export const uploadService = {
   async getFlashcards(uploadId: string): Promise<Flashcard[]> {
     const response = await api.get<{ flashcards: Flashcard[] }>(`/uploads/${uploadId}/flashcards`);
     return response.data.flashcards;
+  },
+
+  async getPaginatedFlashcards(uploadId: string, page: number = 1, limit: number = 10, chunkIndex?: number): Promise<PaginatedFlashcardsResponse> {
+    const response = await api.get<PaginatedFlashcardsResponse>(`/uploads/${uploadId}/flashcards/paginated`, {
+      params: { page, limit, chunkIndex }
+    });
+    return response.data;
+  },
+
+  async getKeyFlashcards(uploadId: string, cardsPerChunk: number = 2): Promise<KeyFlashcardsResponse> {
+    const response = await api.get<KeyFlashcardsResponse>(`/uploads/${uploadId}/flashcards/key`, {
+      params: { cardsPerChunk }
+    });
+    return response.data;
+  },
+
+  async getTopKeyPoints(uploadId: string, pointsPerChunk: number = 2, page: number = 1, limit: number = 3): Promise<TopKeyPointsResponse> {
+    const response = await api.get<TopKeyPointsResponse>(`/uploads/${uploadId}/keypoints/top`, {
+      params: { pointsPerChunk, page, limit }
+    });
+    return response.data;
+  },
+
+  async getPaginatedChunks(uploadId: string, page: number = 1, limit: number = 5): Promise<PaginatedChunksResponse> {
+    const response = await api.get<PaginatedChunksResponse>(`/uploads/${uploadId}/chunks`, {
+      params: { page, limit }
+    });
+    return response.data;
+  },
+
+  async getChunkDetail(uploadId: string, chunkIndex: number): Promise<ChunkDetail> {
+    const response = await api.get<ChunkDetail>(`/uploads/${uploadId}/chunks/${chunkIndex}`);
+    return response.data;
   },
 
   async getRandomFlashcard(uploadId: string, excludeAttempted: boolean = false): Promise<Flashcard> {

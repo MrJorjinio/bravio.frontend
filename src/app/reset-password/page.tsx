@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { authService } from '@/services';
-import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import styles from './reset-password.module.css';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
@@ -181,5 +181,28 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.formPanel}>
+        <div className={styles.formContainer}>
+          <div className={styles.loadingState}>
+            <Loader2 size={48} className={styles.spinner} />
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
