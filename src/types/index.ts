@@ -5,13 +5,14 @@ export interface SendOtpRequest {
 
 export interface RegisterRequest {
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
   otpCode: string;
 }
 
 export interface LoginRequest {
-  email: string;
+  credential: string; // Email or Username
   password: string;
 }
 
@@ -359,4 +360,288 @@ export interface PackagePurchaseResponse {
   amountUSD: number;
   amountBroins: number;
   newBalance: number;
+}
+
+// ============================================
+// Tier & Subscription Types
+// ============================================
+
+export type UserTier = 'Free' | 'Pro';
+export type SubscriptionStatus = 'None' | 'Active' | 'GracePeriod' | 'Cancelled' | 'Expired';
+
+export interface SubscriptionStatusResponse {
+  tier: UserTier;
+  isPro: boolean;
+  status: SubscriptionStatus;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  cancelledAt?: string;
+  willCancelAtPeriodEnd: boolean;
+  gracePeriodEnd?: string;
+  isInGracePeriod: boolean;
+  daysRemainingInPeriod: number;
+  monthlyPrice: number;
+  proBenefits: string[];
+}
+
+export interface SubscriptionCheckoutResponse {
+  checkoutUrl: string;
+  sessionId: string;
+}
+
+// Extended User type with tier info
+export interface UserWithTier extends User {
+  tier: UserTier;
+  isPro: boolean;
+  subscriptionStatus: SubscriptionStatus;
+  monthlyBroinsEarned: number;
+  monthlyBroinCap: number;
+  documentsProcessedToday: number;
+  dailyDocumentLimit: number;
+  hasStreakProtection: boolean;
+  streakProtectionUsedThisMonth: boolean;
+}
+
+// ============================================
+// Badge Types
+// ============================================
+
+export type BadgeType =
+  // Basic Badges
+  | 'FirstDocument'
+  | 'Streak7Day'
+  | 'Streak30Day'
+  | 'Documents10'
+  | 'Documents50'
+  | 'FirstReferral'
+  | 'Referrals5'
+  | 'Level5'
+  | 'Level10'
+  // Pro Exclusive
+  | 'ProMember'
+  | 'Documents100'
+  | 'Streak90Day'
+  | 'Level20'
+  | 'Top10Weekly';
+
+export interface Badge {
+  id: string;
+  type: BadgeType;
+  name: string;
+  description: string;
+  icon: string;
+  isProExclusive: boolean;
+  isEarned: boolean;
+  earnedAt?: string;
+  currentProgress: number;
+  requiredProgress: number;
+  progressPercent: number;
+}
+
+export interface UserBadgesResponse {
+  badges: Badge[];
+  totalBadges: number;
+  earnedCount: number;
+}
+
+export interface AllBadgesResponse {
+  badges: Badge[];
+  totalCount: number;
+  basicCount: number;
+  proExclusiveCount: number;
+}
+
+export interface BadgeAwardedResponse {
+  badgeType: string;
+  badgeName: string;
+  description: string;
+  earnedAt: string;
+}
+
+export interface CheckBadgesResponse {
+  newBadgesAwarded: number;
+  badges: BadgeAwardedResponse[];
+}
+
+// ============================================
+// Leaderboard Types
+// ============================================
+
+export type LeaderboardPeriod = 'weekly' | 'alltime';
+
+export interface LeaderboardEntry {
+  rank: number;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  level: number;
+  experience: number;
+  weeklyXp: number;
+  isPro: boolean;
+  isCurrentUser: boolean;
+  displayBadgeIcon?: string;
+  displayBadgeName?: string;
+}
+
+export interface UserRankResponse {
+  rank: number;
+  totalUsers: number;
+  experience: number;
+  weeklyXp: number;
+  level: number;
+  xpToNextRank: number;
+  period: LeaderboardPeriod;
+}
+
+export interface LeaderboardResponse {
+  period: LeaderboardPeriod;
+  periodStart?: string;
+  periodEnd?: string;
+  topUsers: LeaderboardEntry[];
+  currentUser?: UserRankResponse;
+}
+
+// ============================================
+// Updated Streak Response (with protection)
+// ============================================
+
+export interface StreakResponseWithProtection extends StreakResponse {
+  hasStreakProtection?: boolean;
+  streakProtectionUsed?: boolean;
+  streakProtectionMessage?: string;
+}
+
+// ============================================
+// Tier Limits (for display)
+// ============================================
+
+export interface TierLimits {
+  // Monthly cap
+  monthlyBroinCap: number | null; // null = unlimited
+
+  // Daily document limit
+  dailyDocumentLimit: number | null; // null = unlimited
+
+  // PDF limits
+  pdfMaxPages: number;
+
+  // Text limits
+  textMaxChars: number;
+
+  // File size (in MB)
+  maxFileSizeMB: number;
+
+  // History limit
+  historyLimit: number | null; // null = unlimited
+
+  // Bonuses
+  dailyBonus: number;
+  levelUpBonus: number;
+  streakBonus: number;
+  referralBonus: number;
+
+  // Special features
+  hasStreakProtection: boolean;
+  hasPriorityQueue: boolean;
+}
+
+export const FREE_TIER_LIMITS: TierLimits = {
+  monthlyBroinCap: 500,
+  dailyDocumentLimit: 5,
+  pdfMaxPages: 50,
+  textMaxChars: 50000,
+  maxFileSizeMB: 10,
+  historyLimit: 5,
+  dailyBonus: 10,
+  levelUpBonus: 25,
+  streakBonus: 50,
+  referralBonus: 100,
+  hasStreakProtection: false,
+  hasPriorityQueue: false,
+};
+
+export const PRO_TIER_LIMITS: TierLimits = {
+  monthlyBroinCap: null,
+  dailyDocumentLimit: null,
+  pdfMaxPages: 300,
+  textMaxChars: 100000,
+  maxFileSizeMB: 50,
+  historyLimit: null,
+  dailyBonus: 20,
+  levelUpBonus: 50,
+  streakBonus: 100,
+  referralBonus: 200,
+  hasStreakProtection: true,
+  hasPriorityQueue: true,
+};
+
+// ============================================
+// Profile Types
+// ============================================
+
+export interface ProfileResponse {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl?: string;
+  tier: UserTier;
+  isPro: boolean;
+  subscriptionStatus: SubscriptionStatus;
+  subscriptionStartDate?: string;
+  subscriptionExpiresAt?: string;
+  balance: number;
+  level: number;
+  experience: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalDocuments: number;
+  totalReferrals: number;
+  badgesEarned: number;
+  createdAt: string;
+  lastActivityDate?: string;
+}
+
+// Public profile visible to other users
+export interface PublicProfileResponse {
+  id: string;
+  username: string;
+  avatarUrl?: string;
+  isPro: boolean;
+  level: number;
+  experience: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalDocuments: number;
+  badgesEarned: number;
+  displayBadgeIcon?: string;
+  displayBadgeName?: string;
+  badges: PublicBadgeInfo[];
+  joinedAt: string;
+}
+
+export interface PublicBadgeInfo {
+  type: string;
+  name: string;
+  icon: string;
+  earnedAt: string;
+}
+
+// ============================================
+// Subscription History Types
+// ============================================
+
+export interface SubscriptionHistoryEntry {
+  id: string;
+  status: string;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  amountUSD: number;
+  totalRenewals: number;
+  cancelledAt?: string;
+  createdAt: string;
+}
+
+export interface SubscriptionHistoryResponse {
+  history: SubscriptionHistoryEntry[];
+  totalCount: number;
 }

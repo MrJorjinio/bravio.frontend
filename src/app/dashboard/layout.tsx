@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { walletService } from '@/services';
-import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift } from 'lucide-react';
+import { walletService, subscriptionService } from '@/services';
+import type { SubscriptionStatusResponse } from '@/types';
+import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift, Crown, Award, Trophy, Settings } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -17,6 +18,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const { user, logout, isLoading: authLoading, isAuthenticated } = useAuth();
   const [balance, setBalance] = useState(0);
+  const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -29,6 +31,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }, []);
 
+  const fetchSubscription = useCallback(async () => {
+    try {
+      const res = await subscriptionService.getStatus();
+      setSubscription(res);
+    } catch (err) {
+      console.error('Failed to fetch subscription:', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
@@ -36,8 +47,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
     if (isAuthenticated) {
       fetchBalance();
+      fetchSubscription();
     }
-  }, [authLoading, isAuthenticated, router, fetchBalance]);
+  }, [authLoading, isAuthenticated, router, fetchBalance, fetchSubscription]);
 
   // Listen for balance update events from other components
   useEffect(() => {
@@ -134,6 +146,38 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Gift className={styles.navIcon} />
             <span>Referrals</span>
           </Link>
+          <Link
+            href="/dashboard/leaderboard"
+            className={`${styles.navItem} ${isActive('/dashboard/leaderboard') ? styles.active : ''}`}
+          >
+            <Trophy className={styles.navIcon} />
+            <span>Leaderboard</span>
+          </Link>
+          <Link
+            href="/dashboard/badges"
+            className={`${styles.navItem} ${isActive('/dashboard/badges') ? styles.active : ''}`}
+          >
+            <Award className={styles.navIcon} />
+            <span>Badges</span>
+          </Link>
+
+          <p className={styles.navLabel}>Account</p>
+
+          <Link
+            href="/dashboard/settings"
+            className={`${styles.navItem} ${styles.settingsItem} ${isActive('/dashboard/settings') ? styles.active : ''}`}
+          >
+            <Settings className={styles.navIcon} />
+            <span>Profile</span>
+            {subscription?.isPro && <span className={styles.proBadge}>PRO</span>}
+          </Link>
+          <Link
+            href="/dashboard/subscription"
+            className={`${styles.navItem} ${styles.subscriptionItem} ${isActive('/dashboard/subscription') ? styles.active : ''}`}
+          >
+            <Crown className={styles.navIcon} />
+            <span>Subscription</span>
+          </Link>
         </nav>
 
         <div className={styles.sidebarFooter}>
@@ -192,18 +236,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <span>Content</span>
         </Link>
         <Link
-          href="/dashboard/wallet"
-          className={`${styles.bottomNavItem} ${isActive('/dashboard/wallet') ? styles.active : ''}`}
+          href="/dashboard/leaderboard"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/leaderboard') ? styles.active : ''}`}
         >
-          <Wallet size={20} />
-          <span>Wallet</span>
+          <Trophy size={20} />
+          <span>Rank</span>
         </Link>
         <Link
-          href="/dashboard/referral"
-          className={`${styles.bottomNavItem} ${isActive('/dashboard/referral') ? styles.active : ''}`}
+          href="/dashboard/subscription"
+          className={`${styles.bottomNavItem} ${subscription?.isPro ? styles.proNavItem : ''} ${isActive('/dashboard/subscription') ? styles.active : ''}`}
         >
-          <Gift size={20} />
-          <span>Referral</span>
+          <Crown size={20} />
+          <span>{subscription?.isPro ? 'Pro' : 'Upgrade'}</span>
         </Link>
       </nav>
 

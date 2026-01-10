@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email');
 
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -103,6 +104,16 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!username || username.length < 3 || username.length > 20) {
+      setError('Username must be between 3 and 20 characters');
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      setError('Username can only contain letters, numbers, and underscores');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -123,6 +134,7 @@ export default function RegisterPage() {
     try {
       await register({
         email,
+        username,
         password,
         confirmPassword,
         otpCode
@@ -245,6 +257,21 @@ export default function RegisterPage() {
                 >
                   Resend Code
                 </button>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel} htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  className={styles.formInput}
+                  placeholder="Choose a username (3-20 characters)"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20))}
+                  maxLength={20}
+                  required
+                />
+                <span className={styles.inputHint}>Letters, numbers, and underscores only</span>
               </div>
 
               <div className={styles.formGroup}>

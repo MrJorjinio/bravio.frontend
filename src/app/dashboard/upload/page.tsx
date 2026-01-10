@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { uploadService } from '@/services';
+import { uploadService, subscriptionService } from '@/services';
+import type { SubscriptionStatusResponse } from '@/types';
+import { FREE_TIER_LIMITS, PRO_TIER_LIMITS } from '@/types';
 import { useUploadProgress, ChunkProgress, UploadCompleted } from '@/hooks';
 import {
   ArrowLeft,
@@ -17,7 +19,9 @@ import {
   Loader2,
   Clock,
   Upload,
-  File
+  File,
+  Crown,
+  AlertTriangle
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './upload.module.css';
@@ -45,14 +49,34 @@ export default function UploadPage() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Subscription/tier state
+  const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
+
   // Chunk progress state
   const [totalChunks, setTotalChunks] = useState(0);
   const [completedChunks, setCompletedChunks] = useState(0);
   const [totalFlashcards, setTotalFlashcards] = useState(0);
   const [chunkStatuses, setChunkStatuses] = useState<ChunkStatus[]>([]);
 
+  // Fetch subscription status
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const data = await subscriptionService.getStatus();
+        setSubscription(data);
+      } catch (err) {
+        console.error('Failed to fetch subscription:', err);
+      }
+    };
+    fetchSubscription();
+  }, []);
+
   const charCount = content.length;
-  const isValidLength = uploadMode === 'text' ? charCount >= 200 : pdfFile !== null;
+  const tierLimits = subscription?.isPro ? PRO_TIER_LIMITS : FREE_TIER_LIMITS;
+  const maxChars = tierLimits.textMaxChars;
+  const maxPdfPages = tierLimits.pdfMaxPages;
+  const isOverCharLimit = charCount > maxChars;
+  const isValidLength = uploadMode === 'text' ? charCount >= 200 && !isOverCharLimit : pdfFile !== null;
   const chunkSize = 4000;
   const estimatedChunks = Math.ceil(charCount / (chunkSize - 350)); // Account for overlap
 
@@ -533,30 +557,69 @@ export default function UploadPage() {
                 <div className={styles.formGroup}>
                   <div className={styles.labelRow}>
                     <label className={styles.label}>Study Material</label>
-                    <span className={styles.charBadge}>Min 200 chars</span>
+                    <span className={styles.charBadge}>
+                      {(maxChars / 1000).toFixed(0)}K chars max
+                      {!subscription?.isPro && ' (Free)'}
+                    </span>
                   </div>
                   <div className={styles.textareaWrapper}>
                     <textarea
-                      className={styles.textarea}
-                      placeholder="Paste your notes, article, or essay here... No character limit!"
+                      className={`${styles.textarea} ${isOverCharLimit ? styles.textareaError : ''}`}
+                      placeholder="Paste your notes, article, or essay here..."
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       rows={12}
                     />
                     <div className={styles.progressRow}>
-                      <span className={styles.charCount}>
-                        {charCount.toLocaleString()} chars
+                      <span className={`${styles.charCount} ${isOverCharLimit ? styles.charCountError : ''}`}>
+                        {charCount.toLocaleString()} / {(maxChars / 1000).toFixed(0)}K chars
                         {charCount > chunkSize && ` (~${estimatedChunks} chunks)`}
-                        {charCount >= 200 && ` • ~${estimatedCost} broins`}
+                        {charCount >= 200 && !isOverCharLimit && ` • ~${estimatedCost} broins`}
                       </span>
                     </div>
                   </div>
+
+                  {/* Tier limit warning */}
+                  {isOverCharLimit && (
+                    <div className={styles.tierWarning}>
+                      <AlertTriangle size={16} />
+                      <span>
+                        Text exceeds {subscription?.isPro ? 'Pro' : 'Free'} tier limit of {(maxChars / 1000).toFixed(0)}K characters.
+                        {!subscription?.isPro && (
+                          <>
+                            {' '}
+                            <Link href="/dashboard/subscription" className={styles.tierWarningLink}>
+                              <Crown size={12} /> Upgrade to Pro
+                            </Link>
+                            {' '}for up to {(PRO_TIER_LIMITS.textMaxChars / 1000).toFixed(0)}K characters.
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Pro upsell hint for non-pro users approaching limit */}
+                  {!subscription?.isPro && charCount > maxChars * 0.8 && !isOverCharLimit && (
+                    <div className={styles.tierHint}>
+                      <Crown size={14} />
+                      <span>
+                        Approaching limit.{' '}
+                        <Link href="/dashboard/subscription" className={styles.tierHintLink}>
+                          Upgrade to Pro
+                        </Link>
+                        {' '}for {(PRO_TIER_LIMITS.textMaxChars / 1000).toFixed(0)}K chars.
+                      </span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className={styles.formGroup}>
                   <div className={styles.labelRow}>
                     <label className={styles.label}>PDF Document</label>
-                    <span className={styles.charBadge}>Text-based PDFs only</span>
+                    <span className={styles.charBadge}>
+                      Up to {maxPdfPages} pages
+                      {!subscription?.isPro && ' (Free)'}
+                    </span>
                   </div>
 
                   {!pdfFile ? (
@@ -581,8 +644,13 @@ export default function UploadPage() {
                         Drag & drop your PDF here, or <span className={styles.dropZoneLink}>browse</span>
                       </p>
                       <p className={styles.dropZoneHint}>
-                        Only text-based PDFs are supported. Scanned documents won&apos;t work.
+                        Text-based PDFs only (up to {maxPdfPages} pages, {tierLimits.maxFileSizeMB}MB max)
                       </p>
+                      {!subscription?.isPro && (
+                        <p className={styles.dropZoneProHint}>
+                          <Crown size={12} /> Pro users get up to {PRO_TIER_LIMITS.pdfMaxPages} pages
+                        </p>
+                      )}
                     </div>
                   ) : (
                     <div className={styles.filePreview}>

@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import type { StreakResponse, LevelResponse, DailyBonusResponse } from '@/types';
+import type { StreakResponse, LevelResponse, DailyBonusResponse, ProfileResponse, PublicProfileResponse } from '@/types';
 
 export const userService = {
   async getStreak(): Promise<StreakResponse> {
@@ -14,6 +14,16 @@ export const userService = {
 
   async claimDailyBonus(): Promise<DailyBonusResponse> {
     const response = await api.post<DailyBonusResponse>('/users/me/daily-bonus');
+    return response.data;
+  },
+
+  async getProfile(): Promise<ProfileResponse> {
+    const response = await api.get<ProfileResponse>('/users/me/profile');
+    return response.data;
+  },
+
+  async getPublicProfile(username: string): Promise<PublicProfileResponse> {
+    const response = await api.get<PublicProfileResponse>(`/users/profile/${username}`);
     return response.data;
   },
 };

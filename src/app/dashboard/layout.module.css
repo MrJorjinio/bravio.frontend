@@ -101,6 +101,37 @@
   height: 20px;
 }
 
+/* Settings Item with Pro Badge */
+.settingsItem {
+  position: relative;
+}
+
+/* Subscription Item */
+.subscriptionItem {
+  position: relative;
+}
+
+.proBadge {
+  margin-left: auto;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 179, 8, 0.2) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.05em;
+}
+
+/* Pro Nav Item (Mobile) */
+.proNavItem {
+  color: #fbbf24 !important;
+}
+
+.proNavItem.active {
+  color: #fbbf24 !important;
+}
+
 /* Sidebar Footer */
 .sidebarFooter {
   padding: 16px;

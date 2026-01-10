@@ -11,7 +11,7 @@ import styles from './login.module.css';
 export default function LoginPage() {
   const router = useRouter();
   const { login, googleLogin } = useAuth();
-  const [email, setEmail] = useState('');
+  const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -25,10 +25,10 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login({ email, password });
+      await login({ credential, password });
       router.push('/dashboard');
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Invalid email or password. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Invalid credentials. Please try again.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -106,14 +106,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
-              <label className={styles.formLabel} htmlFor="email">Email Address</label>
+              <label className={styles.formLabel} htmlFor="credential">Email or Username</label>
               <input
-                type="email"
-                id="email"
+                type="text"
+                id="credential"
                 className={styles.formInput}
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email or username"
+                value={credential}
+                onChange={(e) => setCredential(e.target.value)}
                 required
               />
             </div>

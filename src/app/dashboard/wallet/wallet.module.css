@@ -549,6 +549,10 @@
 
 /* Empty State */
 .emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 48px 24px;
   background: rgba(15, 23, 42, 0.4);
@@ -557,6 +561,9 @@
 }
 
 .emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #64748b;
   margin-bottom: 16px;
 }

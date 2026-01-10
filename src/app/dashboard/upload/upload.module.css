@@ -402,6 +402,78 @@
   color: #94a3b8;
 }
 
+.charCountError {
+  color: #f87171;
+}
+
+/* Textarea error state */
+.textareaError {
+  border-color: rgba(248, 113, 113, 0.5) !important;
+}
+
+/* Tier Warning */
+.tierWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 12px;
+  color: #f87171;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.tierWarning svg:first-child {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tierWarningLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fbbf24;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tierWarningLink:hover {
+  text-decoration: underline;
+}
+
+/* Tier Hint (approaching limit) */
+.tierHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 10px;
+  color: #fbbf24;
+  font-size: 0.75rem;
+}
+
+.tierHintLink {
+  color: #fbbf24;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Pro hint in dropzone */
+.dropZoneProHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: #fbbf24;
+}
+
 /* Error Message */
 .errorMessage {
   background: rgba(239, 68, 68, 0.1);
