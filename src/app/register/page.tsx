@@ -1,17 +1,28 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services';
-import { ArrowLeft, Eye, EyeOff, ArrowRight, Gift } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, ArrowRight, Gift, Users } from 'lucide-react';
 import styles from './register.module.css';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, googleLogin } = useAuth();
+
+  // Capture referral code from URL
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setReferralCode(ref);
+    }
+  }, [searchParams]);
 
   const [step, setStep] = useState<'email' | 'otp'>('email');
 
@@ -137,7 +148,8 @@ export default function RegisterPage() {
         username,
         password,
         confirmPassword,
-        otpCode
+        otpCode,
+        referralCode: referralCode || undefined
       });
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -192,6 +204,15 @@ export default function RegisterPage() {
             <span className={styles.bonusBadgeIcon}><Gift size={18} /></span>
             <span className={styles.bonusBadgeText}>Get <strong>150 free Broins</strong> when you sign up!</span>
           </div>
+
+          {referralCode && (
+            <div className={styles.referralBadge}>
+              <span className={styles.referralBadgeIcon}><Users size={18} /></span>
+              <span className={styles.referralBadgeText}>
+                Referral code applied! Get <strong>+50 bonus Broins</strong>
+              </span>
+            </div>
+          )}
 
           {error && (
             <div className={styles.errorMessage}>{error}</div>

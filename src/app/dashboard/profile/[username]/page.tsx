@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { userService } from '@/services';
+import { getAssetUrl } from '@/lib/api';
 import type { PublicProfileResponse } from '@/types';
 import {
   User,
@@ -12,9 +13,54 @@ import {
   Calendar,
   FileText,
   ArrowLeft,
-  TrendingUp
+  TrendingUp,
+  BookOpen,
+  GraduationCap,
+  Star,
+  UserPlus,
+  Users,
+  Sparkles,
+  Gem,
+  Library,
+  Trophy,
+  Zap,
+  Medal,
+  LucideIcon
 } from 'lucide-react';
+
 import styles from './profile.module.css';
+
+// Map icon names to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+  FileText, BookOpen, GraduationCap, Flame, Star, UserPlus, Users,
+  Sparkles, Gem, Crown, Library, Trophy, Zap, Medal, Award
+};
+
+const BadgeIcon = ({ iconName, size = 14 }: { iconName: string; size?: number }) => {
+  const IconComponent = iconMap[iconName] || Award;
+  return <IconComponent size={size} />;
+};
+
+// Get color class based on badge icon
+const getBadgeColorClass = (iconName: string): string => {
+  const colorMap: Record<string, string> = {
+    Crown: 'badgeGold',
+    Trophy: 'badgeGold',
+    Medal: 'badgeSilver',
+    Flame: 'badgeOrange',
+    Star: 'badgeYellow',
+    Zap: 'badgeYellow',
+    Sparkles: 'badgePink',
+    Gem: 'badgePurple',
+    FileText: 'badgeBlue',
+    BookOpen: 'badgeBlue',
+    GraduationCap: 'badgeIndigo',
+    Library: 'badgeIndigo',
+    UserPlus: 'badgeGreen',
+    Users: 'badgeTeal',
+  };
+  return colorMap[iconName] || 'badgePurple';
+};
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -92,7 +138,7 @@ export default function PublicProfilePage() {
         <div className={styles.avatarSection}>
           <div className={styles.avatarWrapper}>
             {profile.avatarUrl ? (
-              <img src={profile.avatarUrl} alt={profile.username} className={styles.avatar} />
+              <img src={getAssetUrl(profile.avatarUrl)} alt={profile.username} className={styles.avatar} />
             ) : (
               <div className={styles.avatarPlaceholder}>
                 <User size={48} />
@@ -108,11 +154,6 @@ export default function PublicProfilePage() {
           <div className={styles.userInfo}>
             <div className={styles.usernameRow}>
               <h1 className={styles.username}>{profile.username}</h1>
-              {profile.displayBadgeIcon && (
-                <span className={styles.displayBadge} title={profile.displayBadgeName}>
-                  {profile.displayBadgeIcon}
-                </span>
-              )}
             </div>
             {profile.isPro && (
               <span className={styles.proLabel}>Pro Member</span>
@@ -128,7 +169,7 @@ export default function PublicProfilePage() {
       {/* Stats Grid */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+          <div className={`${styles.statIcon} ${styles.levelIcon}`}>
             <TrendingUp size={20} />
           </div>
           <div className={styles.statContent}>
@@ -138,8 +179,8 @@ export default function PublicProfilePage() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
-            <Award size={20} />
+          <div className={`${styles.statIcon} ${styles.xpIcon}`}>
+            <Zap size={20} />
           </div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{profile.experience.toLocaleString()}</span>
@@ -148,7 +189,7 @@ export default function PublicProfilePage() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+          <div className={`${styles.statIcon} ${styles.streakIcon}`}>
             <Flame size={20} />
           </div>
           <div className={styles.statContent}>
@@ -158,8 +199,8 @@ export default function PublicProfilePage() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
-            <Flame size={20} />
+          <div className={`${styles.statIcon} ${styles.streakIcon}`}>
+            <Trophy size={20} />
           </div>
           <div className={styles.statContent}>
             <span className={styles.statValue}>{profile.longestStreak}</span>
@@ -168,7 +209,7 @@ export default function PublicProfilePage() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+          <div className={`${styles.statIcon} ${styles.docsIcon}`}>
             <FileText size={20} />
           </div>
           <div className={styles.statContent}>
@@ -178,7 +219,7 @@ export default function PublicProfilePage() {
         </div>
 
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+          <div className={`${styles.statIcon} ${styles.badgesIcon}`}>
             <Award size={20} />
           </div>
           <div className={styles.statContent}>
@@ -197,8 +238,10 @@ export default function PublicProfilePage() {
           </h2>
           <div className={styles.badgesGrid}>
             {profile.badges.map((badge) => (
-              <div key={badge.type} className={styles.badgeCard}>
-                <span className={styles.badgeIcon}>{badge.icon}</span>
+              <div key={badge.type} className={`${styles.badgeCard} ${styles[getBadgeColorClass(badge.icon)]}`}>
+                <div className={styles.badgeIconWrapper}>
+                  <BadgeIcon iconName={badge.icon} size={24} />
+                </div>
                 <span className={styles.badgeName}>{badge.name}</span>
                 <span className={styles.badgeDate}>
                   {new Date(badge.earnedAt).toLocaleDateString('en-US', {

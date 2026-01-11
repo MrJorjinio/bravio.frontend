@@ -9,6 +9,7 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   otpCode: string;
+  referralCode?: string;
 }
 
 export interface LoginRequest {
@@ -73,8 +74,17 @@ export interface XpGainResponse {
   broinsAwarded?: number;
 }
 
-export interface UpdateUserRequest {
+export interface UpdateProfileRequest {
+  username?: string;
+}
+
+export interface UpdateProfileResponse {
+  id: string;
+  email: string;
+  username: string;
   avatarUrl?: string;
+  usernameChanged: boolean;
+  avatarChanged: boolean;
 }
 
 // Wallet Types
@@ -422,7 +432,14 @@ export type BadgeType =
   | 'Documents100'
   | 'Streak90Day'
   | 'Level20'
-  | 'Top10Weekly';
+  | 'Top10Weekly'
+  // Leaderboard Placement Badges
+  | 'Top1Daily'
+  | 'Top1Weekly'
+  | 'Top1AllTime'
+  | 'Top3Daily'
+  | 'Top3Weekly'
+  | 'Top3AllTime';
 
 export interface Badge {
   id: string;
@@ -467,7 +484,7 @@ export interface CheckBadgesResponse {
 // Leaderboard Types
 // ============================================
 
-export type LeaderboardPeriod = 'weekly' | 'alltime';
+export type LeaderboardPeriod = 'daily' | 'weekly' | 'alltime';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -477,6 +494,7 @@ export interface LeaderboardEntry {
   level: number;
   experience: number;
   weeklyXp: number;
+  dailyXp: number;
   isPro: boolean;
   isCurrentUser: boolean;
   displayBadgeIcon?: string;
@@ -488,6 +506,7 @@ export interface UserRankResponse {
   totalUsers: number;
   experience: number;
   weeklyXp: number;
+  dailyXp: number;
   level: number;
   xpToNextRank: number;
   period: LeaderboardPeriod;

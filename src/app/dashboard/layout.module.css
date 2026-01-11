@@ -123,14 +123,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Pro Nav Item (Mobile) */
-.proNavItem {
-  color: #fbbf24 !important;
-}
-
-.proNavItem.active {
-  color: #fbbf24 !important;
-}
 
 /* Sidebar Footer */
 .sidebarFooter {

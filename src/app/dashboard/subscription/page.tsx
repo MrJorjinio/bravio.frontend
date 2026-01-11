@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { subscriptionService } from '@/services';
 import type { SubscriptionStatusResponse } from '@/types';
@@ -17,7 +17,8 @@ import {
   AlertCircle,
   Loader2,
   ExternalLink,
-  CheckCircle
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
 import styles from './subscription.module.css';
 
@@ -27,7 +28,9 @@ export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const verifyCalledRef = useRef(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -51,17 +54,24 @@ export default function SubscriptionPage() {
   // Verify subscription when returning from checkout
   useEffect(() => {
     const verifyCheckout = async () => {
+      // Prevent duplicate calls
+      if (verifyCalledRef.current) return;
+
       // Check for success parameter (returned from Dodo checkout)
       const success = searchParams.get('success');
       const paymentId = searchParams.get('payment_id');
 
       if (success === 'true' || paymentId) {
+        verifyCalledRef.current = true; // Mark as called
         setIsVerifying(true);
         try {
           const result = await subscriptionService.verifySubscription();
           setSubscription(result);
           if (result.isPro) {
             setSuccessMessage('Welcome to Bravio Pro! Your subscription is now active.');
+            // Notify layout to update Pro badge and balance
+            window.dispatchEvent(new Event('subscriptionUpdated'));
+            window.dispatchEvent(new Event('balanceUpdated'));
           }
         } catch (err) {
           console.error('Failed to verify subscription:', err);
@@ -91,11 +101,12 @@ export default function SubscriptionPage() {
     }
   };
 
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel your Pro subscription? You will lose access to Pro benefits at the end of your current billing period.')) {
-      return;
-    }
+  const handleCancelClick = () => {
+    setShowCancelModal(true);
+  };
 
+  const handleConfirmCancel = async () => {
+    setShowCancelModal(false);
     try {
       setIsCancelling(true);
       setError('');
@@ -207,7 +218,7 @@ export default function SubscriptionPage() {
           {isPro && isActive && !willCancel && (
             <button
               className={styles.cancelBtn}
-              onClick={handleCancel}
+              onClick={handleCancelClick}
               disabled={isCancelling}
             >
               {isCancelling ? 'Cancelling...' : 'Cancel Subscription'}
@@ -407,6 +418,35 @@ export default function SubscriptionPage() {
           </div>
         </div>
       </div>
+
+      {/* Cancel Subscription Modal */}
+      {showCancelModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowCancelModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalIcon}>
+              <AlertTriangle size={32} />
+            </div>
+            <h3 className={styles.modalTitle}>Cancel Subscription?</h3>
+            <p className={styles.modalText}>
+              Are you sure you want to cancel your Pro subscription? You will lose access to Pro benefits at the end of your current billing period.
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalCancelBtn}
+                onClick={() => setShowCancelModal(false)}
+              >
+                Keep Subscription
+              </button>
+              <button
+                className={styles.modalConfirmBtn}
+                onClick={handleConfirmCancel}
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

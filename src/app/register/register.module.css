@@ -135,6 +135,32 @@
   color: #f59e0b;
 }
 
+/* Referral Badge */
+.referralBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 12px 20px;
+  border-radius: 50px;
+  margin-bottom: 24px;
+  margin-top: -12px;
+}
+
+.referralBadgeIcon {
+  color: #22c55e;
+}
+
+.referralBadgeText {
+  font-size: 0.9375rem;
+  color: #dcfce7;
+}
+
+.referralBadgeText strong {
+  color: #22c55e;
+}
+
 /* Messages */
 .errorMessage {
   background: rgba(239, 68, 68, 0.1);
@@ -516,6 +542,16 @@
   }
 
   .bonusBadgeText {
+    font-size: 0.8125rem;
+  }
+
+  .referralBadge {
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    margin-top: -8px;
+  }
+
+  .referralBadgeText {
     font-size: 0.8125rem;
   }
 

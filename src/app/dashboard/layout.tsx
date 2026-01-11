@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { walletService, subscriptionService } from '@/services';
 import type { SubscriptionStatusResponse } from '@/types';
-import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift, Crown, Award, Trophy, Settings } from 'lucide-react';
+import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift, Crown, Award, Trophy, Settings, User } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -61,6 +61,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       window.removeEventListener('balanceUpdated', handleBalanceUpdate);
     };
   }, [fetchBalance]);
+
+  // Listen for subscription update events from other components
+  useEffect(() => {
+    const handleSubscriptionUpdate = () => {
+      fetchSubscription();
+    };
+    window.addEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+    return () => {
+      window.removeEventListener('subscriptionUpdated', handleSubscriptionUpdate);
+    };
+  }, [fetchSubscription]);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -233,7 +244,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           className={`${styles.bottomNavItem} ${isActive('/dashboard/content') ? styles.active : ''}`}
         >
           <Folder size={20} />
-          <span>Content</span>
+          <span>Learn</span>
         </Link>
         <Link
           href="/dashboard/leaderboard"
@@ -243,11 +254,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <span>Rank</span>
         </Link>
         <Link
-          href="/dashboard/subscription"
-          className={`${styles.bottomNavItem} ${subscription?.isPro ? styles.proNavItem : ''} ${isActive('/dashboard/subscription') ? styles.active : ''}`}
+          href="/dashboard/profile"
+          className={`${styles.bottomNavItem} ${isActive('/dashboard/profile') && pathname === '/dashboard/profile' ? styles.active : ''} ${isActive('/dashboard/settings') || isActive('/dashboard/badges') || isActive('/dashboard/wallet') || isActive('/dashboard/subscription') || isActive('/dashboard/referral') ? styles.active : ''}`}
         >
-          <Crown size={20} />
-          <span>{subscription?.isPro ? 'Pro' : 'Upgrade'}</span>
+          <User size={20} />
+          <span>Profile</span>
         </Link>
       </nav>
 

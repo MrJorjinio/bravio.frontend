@@ -510,6 +510,12 @@
   color: #a855f7;
 }
 
+.transactionIcon.subscription {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
 .transactionInfo {
   display: flex;
   flex-direction: column;

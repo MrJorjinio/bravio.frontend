@@ -1,6 +1,18 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const BACKEND_URL = API_BASE_URL.replace('/api', '');
+
+// Helper to get full URL for static assets (avatars, etc.)
+export const getAssetUrl = (path?: string | null): string | undefined => {
+  if (!path) return undefined;
+  // If already a full URL (e.g., Google avatar), return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  // Otherwise, prepend the backend URL
+  return `${BACKEND_URL}${path}`;
+};
 
 // Create axios instance
 export const api = axios.create({

@@ -63,8 +63,8 @@
 }
 
 .periodBtn.activeBtn {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
-  color: #a855f7;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 179, 8, 0.2) 100%);
+  color: #fbbf24;
 }
 
 .periodDates {
@@ -76,7 +76,7 @@
 /* Your Rank Card */
 .yourRankCard {
   background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.3);
   border-radius: 24px;
   padding: 24px;
   margin-bottom: 32px;
@@ -90,7 +90,7 @@
   bottom: -40px;
   width: 180px;
   height: 180px;
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(245, 158, 11, 0.15);
   border-radius: 50%;
   filter: blur(60px);
   pointer-events: none;
@@ -113,13 +113,13 @@
 .yourRankIcon {
   width: 52px;
   height: 52px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #818cf8;
+  color: #fbbf24;
 }
 
 .yourRankInfo {
@@ -174,6 +174,12 @@
 /* Podium Section */
 .podiumSection {
   margin-bottom: 40px;
+  transition: opacity 0.15s ease;
+}
+
+.podiumSection.refreshing {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .podium {
@@ -189,10 +195,12 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  width: 100px;
 }
 
 .podiumItem.first {
   order: 2;
+  width: 120px;
 }
 
 .podiumItem.second {
@@ -231,23 +239,26 @@
   border-radius: 50%;
 }
 
-.proCrown {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  border-radius: 50%;
-  display: flex;
+.proLabel {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
+  padding: 1px 4px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(234, 179, 8, 0.25) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 3px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
 }
 
-.first .proCrown {
-  width: 24px;
-  height: 24px;
+.proName {
+  color: #fbbf24 !important;
+}
+
+.proName:hover {
+  color: #fcd34d !important;
 }
 
 .goldIcon {
@@ -270,17 +281,16 @@
   font-weight: 700;
   color: #f1f5f9;
   text-align: center;
-  max-width: 100px;
+  max-width: 70px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 4px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .podiumName:hover {
-  color: #a5b4fc;
+  color: #fcd34d;
 }
 
 .first .podiumName {
@@ -291,8 +301,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 22px;
+  margin-bottom: 4px;
 }
 
 .displayBadge {
@@ -322,6 +333,8 @@
   color: #64748b;
   font-weight: 600;
   margin-bottom: 12px;
+  min-width: 60px;
+  text-align: center;
 }
 
 .podiumBase {
@@ -357,6 +370,12 @@
 /* Rankings Section */
 .rankingsSection {
   margin-bottom: 40px;
+  transition: opacity 0.15s ease;
+}
+
+.rankingsSection.refreshing {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .sectionHeader {
@@ -369,7 +388,7 @@
 .sectionIndicator {
   width: 6px;
   height: 24px;
-  background: #a855f7;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
   border-radius: 50px;
 }
 
@@ -401,8 +420,8 @@
 }
 
 .rankingRow.currentUserRow {
-  border-color: rgba(99, 102, 241, 0.4);
-  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .rankingRank {
@@ -438,18 +457,17 @@
   overflow: hidden;
 }
 
-.proTag {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  border-radius: 50%;
-  display: flex;
+.proLabelSmall {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
+  padding: 2px 5px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 179, 8, 0.2) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 4px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.03em;
 }
 
 .rankingInfo {
@@ -477,7 +495,7 @@
 }
 
 .rankingName:hover {
-  color: #a5b4fc;
+  color: #fcd34d;
 }
 
 .displayBadgeSmall {
@@ -495,7 +513,7 @@
 }
 
 .youLabel {
-  color: #818cf8;
+  color: #fbbf24;
   font-size: 0.75rem;
 }
 
@@ -539,8 +557,8 @@
 .spinner {
   width: 48px;
   height: 48px;
-  border: 3px solid rgba(168, 85, 247, 0.2);
-  border-top-color: #a855f7;
+  border: 3px solid rgba(245, 158, 11, 0.2);
+  border-top-color: #f59e0b;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -549,14 +567,40 @@
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* Responsive - Tablet */
 @media (max-width: 768px) {
   .container {
     padding: 24px 16px;
   }
 
+  .header {
+    margin-bottom: 24px;
+  }
+
   .title {
     font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .periodToggle {
+    width: 100%;
+    gap: 4px;
+  }
+
+  .periodBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+
+  .yourRankCard {
+    padding: 20px;
+    border-radius: 20px;
   }
 
   .yourRankContent {
@@ -568,6 +612,15 @@
     width: 100%;
   }
 
+  .yourRankIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .yourRankValue {
+    font-size: 1.5rem;
+  }
+
   .yourRankStats {
     width: 100%;
     justify-content: space-between;
@@ -577,9 +630,21 @@
     align-items: center;
   }
 
+  .yourRankStatValue {
+    font-size: 1rem;
+  }
+
   .podium {
     gap: 8px;
     padding-top: 32px;
+  }
+
+  .podiumItem {
+    width: 90px;
+  }
+
+  .podiumItem.first {
+    width: 105px;
   }
 
   .podiumAvatar {
@@ -593,11 +658,11 @@
   }
 
   .podiumBase {
-    width: 80px;
+    width: 90px;
   }
 
   .first .podiumBase {
-    width: 96px;
+    width: 105px;
   }
 
   .goldBase {
@@ -611,29 +676,129 @@
   .bronzeBase {
     height: 48px;
   }
+
+  .rankingRow {
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .rankingRank {
+    width: 40px;
+  }
+
+  .rankingUser {
+    gap: 10px;
+  }
 }
 
+/* Responsive - Mobile */
 @media (max-width: 480px) {
   .container {
     padding: 16px 12px;
+  }
+
+  .header {
+    margin-bottom: 20px;
   }
 
   .title {
     font-size: 1.75rem;
   }
 
+  .subtitle {
+    font-size: 0.85rem;
+  }
+
   .periodToggle {
     width: 100%;
+    padding: 3px;
+    border-radius: 12px;
   }
 
   .periodBtn {
     flex: 1;
     justify-content: center;
+    padding: 8px 8px;
+    font-size: 0.75rem;
+    gap: 4px;
+    border-radius: 9px;
+  }
+
+  .periodBtn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .periodDates {
+    font-size: 0.8rem;
+    margin-bottom: 16px;
+  }
+
+  .yourRankCard {
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .yourRankGlow {
+    width: 120px;
+    height: 120px;
+    right: -30px;
+    bottom: -30px;
+  }
+
+  .yourRankIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .yourRankIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .yourRankLabel {
+    font-size: 0.7rem;
+  }
+
+  .yourRankValue {
+    font-size: 1.35rem;
+  }
+
+  .yourRankStats {
+    gap: 12px;
+  }
+
+  .yourRankStatValue {
+    font-size: 0.95rem;
+  }
+
+  .yourRankStatLabel {
+    font-size: 0.6rem;
+  }
+
+  .podiumSection {
+    margin-bottom: 28px;
+  }
+
+  .podium {
+    gap: 6px;
+    padding-top: 24px;
+  }
+
+  .podiumItem {
+    width: 72px;
+  }
+
+  .podiumItem.first {
+    width: 88px;
   }
 
   .podiumAvatar {
     width: 48px;
     height: 48px;
+    margin-bottom: 6px;
   }
 
   .first .podiumAvatar {
@@ -641,24 +806,240 @@
     height: 60px;
   }
 
+  .goldIcon, .silverIcon, .bronzeIcon {
+    margin-bottom: 6px;
+  }
+
+  .podiumNameRow {
+    min-height: 18px;
+    gap: 3px;
+    margin-bottom: 2px;
+  }
+
+  .proLabel {
+    font-size: 0.45rem;
+    padding: 1px 3px;
+  }
+
+  .podiumName {
+    max-width: 55px;
+    font-size: 0.7rem;
+  }
+
+  .first .podiumName {
+    font-size: 0.8rem;
+    max-width: 65px;
+  }
+
+  .podiumXp {
+    font-size: 0.65rem;
+    margin-bottom: 8px;
+    min-width: 50px;
+  }
+
   .podiumBase {
-    width: 70px;
+    width: 72px;
+    border-radius: 6px 6px 0 0;
   }
 
   .first .podiumBase {
-    width: 84px;
+    width: 88px;
+  }
+
+  .goldBase {
+    height: 70px;
+  }
+
+  .silverBase {
+    height: 52px;
+  }
+
+  .bronzeBase {
+    height: 40px;
+  }
+
+  .sectionHeader {
+    margin-bottom: 14px;
+  }
+
+  .sectionIndicator {
+    width: 5px;
+    height: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .rankingsList {
+    gap: 6px;
   }
 
   .rankingRow {
-    padding: 12px 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
   }
 
   .rankingRank {
-    width: 36px;
+    width: 32px;
+  }
+
+  .rankNumber {
+    font-size: 0.9rem;
+  }
+
+  .rankingUser {
+    gap: 10px;
   }
 
   .rankingAvatar {
     width: 36px;
     height: 36px;
+  }
+
+  .proLabelSmall {
+    font-size: 0.5rem;
+    padding: 1px 4px;
+  }
+
+  .rankingName {
+    font-size: 0.85rem;
+  }
+
+  .rankingLevel {
+    font-size: 0.7rem;
+  }
+
+  .xpValue {
+    font-size: 0.9rem;
+  }
+
+  .xpLabel {
+    font-size: 0.6rem;
+  }
+
+  .loading {
+    padding: 60px 16px;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Responsive - Very small phones */
+@media (max-width: 360px) {
+  .container {
+    padding: 12px 10px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .periodBtn {
+    padding: 7px 6px;
+    font-size: 0.7rem;
+    gap: 3px;
+  }
+
+  .periodBtn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .yourRankCard {
+    padding: 14px;
+  }
+
+  .yourRankLeft {
+    gap: 12px;
+  }
+
+  .yourRankIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .yourRankValue {
+    font-size: 1.25rem;
+  }
+
+  .podium {
+    gap: 4px;
+  }
+
+  .podiumItem {
+    width: 64px;
+  }
+
+  .podiumItem.first {
+    width: 78px;
+  }
+
+  .podiumAvatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .first .podiumAvatar {
+    width: 52px;
+    height: 52px;
+  }
+
+  .podiumName {
+    max-width: 48px;
+    font-size: 0.65rem;
+  }
+
+  .first .podiumName {
+    font-size: 0.72rem;
+    max-width: 58px;
+  }
+
+  .podiumBase {
+    width: 64px;
+  }
+
+  .first .podiumBase {
+    width: 78px;
+  }
+
+  .goldBase {
+    height: 60px;
+  }
+
+  .silverBase {
+    height: 45px;
+  }
+
+  .bronzeBase {
+    height: 35px;
+  }
+
+  .rankingRow {
+    padding: 10px 12px;
+  }
+
+  .rankingRank {
+    width: 28px;
+  }
+
+  .rankNumber {
+    font-size: 0.85rem;
+  }
+
+  .rankingAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rankingName {
+    font-size: 0.8rem;
+  }
+
+  .xpValue {
+    font-size: 0.85rem;
   }
 }

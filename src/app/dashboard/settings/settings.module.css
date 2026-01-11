@@ -75,6 +75,13 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.usernameWithEdit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .email {
@@ -113,6 +120,231 @@
   gap: 6px;
   color: #64748b;
   font-size: 0.875rem;
+}
+
+/* Avatar Edit Styles */
+.avatarWrapper {
+  position: relative;
+}
+
+.avatar {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatar:hover {
+  border-color: rgba(99, 102, 241, 0.6);
+}
+
+.avatarLoading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.avatarEditBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: 2px solid #0f172a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatarEditBtn:hover:not(:disabled) {
+  background: #4f46e5;
+  transform: scale(1.1);
+}
+
+.avatarEditBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* Username Edit Styles */
+.usernameSection {
+  margin-bottom: 8px;
+}
+
+.username {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.email {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.editBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.usernameEdit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.usernameInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.usernameInput {
+  width: 100%;
+  max-width: 250px;
+  padding: 10px 14px;
+  padding-right: 36px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.usernameInput:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.usernameInput.inputError {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.checkingIcon {
+  position: absolute;
+  right: 12px;
+  color: #64748b;
+  animation: spin 1s linear infinite;
+}
+
+.errorText {
+  font-size: 0.8rem;
+  color: #f87171;
+  margin: 0;
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
+}
+
+.saveBtn,
+.cancelBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveBtn {
+  background: #22c55e;
+  border: none;
+  color: white;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success Message */
+.successMessage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  color: #4ade80;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinnerIcon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Subscription Status */
@@ -470,9 +702,13 @@
   }
 
   .nameRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tierBadge {
+    margin-top: 8px;
   }
 
   .historyContent {

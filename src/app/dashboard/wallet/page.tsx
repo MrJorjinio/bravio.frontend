@@ -15,7 +15,8 @@ import {
   Clock,
   Flame,
   TrendingUp,
-  Users
+  Users,
+  Crown
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import PremiumBravioCard from '@/components/PremiumBravioCard';
@@ -136,7 +137,7 @@ export default function WalletPage() {
   };
 
   const isPositiveTransaction = (type: string) => {
-    return ['purchase', 'signupbonus', 'refund', 'levelup', 'dailybonus', 'streakbonus', 'referralbonus', 'referredbonus'].includes(type.toLowerCase());
+    return ['purchase', 'signupbonus', 'refund', 'levelup', 'dailybonus', 'streakbonus', 'referralbonus', 'referredbonus', 'subscriptionbonus'].includes(type.toLowerCase());
   };
 
   const isPendingTransaction = (type: string) => {
@@ -155,6 +156,7 @@ export default function WalletPage() {
       case 'streakbonus': return 'Streak Bonus';
       case 'referralbonus': return 'Referral Reward';
       case 'referredbonus': return 'Welcome Referral Bonus';
+      case 'subscriptionbonus': return 'Pro Subscription Bonus';
       case 'refund': return 'Refund';
       default: return type;
     }
@@ -167,6 +169,7 @@ export default function WalletPage() {
     if (t === 'signupbonus' || t === 'referredbonus') return styles.bonus;
     if (t === 'streakbonus') return styles.streak;
     if (t === 'referralbonus') return styles.referral;
+    if (t === 'subscriptionbonus') return styles.subscription;
     return styles.received;
   };
 
@@ -178,6 +181,7 @@ export default function WalletPage() {
     if (t === 'streakbonus') return <Flame size={20} />;
     if (t === 'dailybonus') return <TrendingUp size={20} />;
     if (t === 'referralbonus') return <Users size={20} />;
+    if (t === 'subscriptionbonus') return <Crown size={20} />;
     return <ArrowUpRight size={20} />;
   };
 

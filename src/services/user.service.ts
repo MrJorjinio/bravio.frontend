@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import type { StreakResponse, LevelResponse, DailyBonusResponse, ProfileResponse, PublicProfileResponse } from '@/types';
+import type { StreakResponse, LevelResponse, DailyBonusResponse, ProfileResponse, PublicProfileResponse, UpdateProfileResponse } from '@/types';
 
 export const userService = {
   async getStreak(): Promise<StreakResponse> {
@@ -24,6 +24,25 @@ export const userService = {
 
   async getPublicProfile(username: string): Promise<PublicProfileResponse> {
     const response = await api.get<PublicProfileResponse>(`/users/profile/${username}`);
+    return response.data;
+  },
+
+  async updateProfile(username?: string, avatar?: File): Promise<UpdateProfileResponse> {
+    const formData = new FormData();
+
+    if (username) {
+      formData.append('Username', username);
+    }
+
+    if (avatar) {
+      formData.append('avatar', avatar);
+    }
+
+    const response = await api.post<UpdateProfileResponse>('/users/me/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 };

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { userService, subscriptionService } from '@/services';
+import { getAssetUrl } from '@/lib/api';
 import type { ProfileResponse, SubscriptionHistoryEntry } from '@/types';
 import {
   User,
   Crown,
   Zap,
-  Mail,
   Calendar,
   Coins,
   TrendingUp,
@@ -19,7 +19,12 @@ import {
   CreditCard,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Camera,
+  Edit3,
+  Save,
+  X,
+  Loader2
 } from 'lucide-react';
 import styles from './settings.module.css';
 
@@ -28,6 +33,18 @@ export default function SettingsPage() {
   const [history, setHistory] = useState<SubscriptionHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Edit mode state
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState('');
+
+  // Avatar upload state
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -73,6 +90,105 @@ export default function SettingsPage() {
     }
   };
 
+  // Username editing functions
+  const handleEditUsername = () => {
+    setNewUsername(profile?.username || '');
+    setUsernameError('');
+    setIsEditingUsername(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingUsername(false);
+    setNewUsername('');
+    setUsernameError('');
+  };
+
+  const validateUsername = (username: string): string | null => {
+    if (username.length < 3) return 'Username must be at least 3 characters';
+    if (username.length > 30) return 'Username must be less than 30 characters';
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) return 'Only letters, numbers, and underscores allowed';
+    return null;
+  };
+
+  const handleUsernameChange = (value: string) => {
+    setNewUsername(value);
+    const validationError = validateUsername(value);
+
+    if (validationError) {
+      setUsernameError(validationError);
+      return;
+    }
+
+    setUsernameError('');
+  };
+
+  const handleSaveUsername = async () => {
+    if (usernameError || !newUsername || newUsername === profile?.username) return;
+
+    setIsSaving(true);
+    try {
+      const result = await userService.updateProfile(newUsername);
+      setProfile(prev => prev ? { ...prev, username: result.username } : prev);
+      setIsEditingUsername(false);
+      setSaveSuccess('Username updated successfully!');
+      setTimeout(() => setSaveSuccess(''), 3000);
+    } catch (err: any) {
+      setUsernameError(err.response?.data?.message || 'Failed to update username');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Avatar upload functions
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Only JPEG, PNG, GIF, and WebP images are allowed');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('File size must be less than 5MB');
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setAvatarPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload
+    setIsUploadingAvatar(true);
+    setError('');
+    try {
+      const result = await userService.updateProfile(undefined, file);
+      setProfile(prev => prev ? { ...prev, avatarUrl: result.avatarUrl } : prev);
+      setAvatarPreview(null); // Clear preview to show server URL
+      setSaveSuccess('Avatar updated successfully!');
+      setTimeout(() => setSaveSuccess(''), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to upload avatar');
+      setAvatarPreview(null);
+    } finally {
+      setIsUploadingAvatar(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -103,25 +219,93 @@ export default function SettingsPage() {
         <p className={styles.subtitle}>Manage your account and view your stats</p>
       </div>
 
+      {/* Success Message */}
+      {saveSuccess && (
+        <div className={styles.successMessage}>
+          <CheckCircle size={16} />
+          {saveSuccess}
+        </div>
+      )}
+
       {/* Profile Card */}
       <div className={styles.profileCard}>
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>
-            <div className={styles.avatar}>
-              {profile.avatarUrl ? (
-                <img src={profile.avatarUrl} alt="Avatar" />
-              ) : (
-                <User size={40} />
-              )}
-            </div>
-            <div className={styles.userInfo}>
-              <div className={styles.nameRow}>
-                <h2 className={styles.email}>{profile.email}</h2>
-                <div className={`${styles.tierBadge} ${profile.isPro ? styles.proBadge : styles.freeBadge}`}>
-                  {profile.isPro ? <Crown size={14} /> : <Zap size={14} />}
-                  <span>{profile.tier}</span>
-                </div>
+            {/* Avatar with edit button */}
+            <div className={styles.avatarWrapper}>
+              <div className={styles.avatar} onClick={handleAvatarClick}>
+                {isUploadingAvatar ? (
+                  <div className={styles.avatarLoading}>
+                    <Loader2 size={24} className={styles.spinnerIcon} />
+                  </div>
+                ) : avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar preview" />
+                ) : profile.avatarUrl ? (
+                  <img src={getAssetUrl(profile.avatarUrl)} alt="Avatar" />
+                ) : (
+                  <User size={40} />
+                )}
               </div>
+              <button className={styles.avatarEditBtn} onClick={handleAvatarClick} disabled={isUploadingAvatar}>
+                <Camera size={14} />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handleFileChange}
+                className={styles.hiddenInput}
+              />
+            </div>
+
+            <div className={styles.userInfo}>
+              {/* Username with edit */}
+              <div className={styles.usernameSection}>
+                {isEditingUsername ? (
+                  <div className={styles.usernameEdit}>
+                    <div className={styles.usernameInputWrapper}>
+                      <input
+                        type="text"
+                        value={newUsername}
+                        onChange={(e) => handleUsernameChange(e.target.value)}
+                        className={`${styles.usernameInput} ${usernameError ? styles.inputError : ''}`}
+                        placeholder="Enter username"
+                        maxLength={30}
+                      />
+                    </div>
+                    {usernameError && <p className={styles.errorText}>{usernameError}</p>}
+                    <div className={styles.editActions}>
+                      <button
+                        className={styles.saveBtn}
+                        onClick={handleSaveUsername}
+                        disabled={!!usernameError || isSaving || newUsername === profile.username}
+                      >
+                        {isSaving ? <Loader2 size={14} className={styles.spinnerIcon} /> : <Save size={14} />}
+                        Save
+                      </button>
+                      <button className={styles.cancelBtn} onClick={handleCancelEdit} disabled={isSaving}>
+                        <X size={14} />
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.nameRow}>
+                    <div className={styles.usernameWithEdit}>
+                      <h2 className={styles.username}>{profile.username}</h2>
+                      <button className={styles.editBtn} onClick={handleEditUsername}>
+                        <Edit3 size={14} />
+                      </button>
+                    </div>
+                    <div className={`${styles.tierBadge} ${profile.isPro ? styles.proBadge : styles.freeBadge}`}>
+                      {profile.isPro ? <Crown size={14} /> : <Zap size={14} />}
+                      <span>{profile.tier}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className={styles.email}>{profile.email}</p>
               <p className={styles.memberSince}>
                 <Calendar size={14} />
                 Member since {formatDate(profile.createdAt)}

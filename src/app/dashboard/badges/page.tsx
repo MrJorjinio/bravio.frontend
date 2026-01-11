@@ -3,45 +3,67 @@
 import { useState, useEffect, useCallback } from 'react';
 import { badgeService } from '@/services';
 import type { UserBadgesResponse, Badge } from '@/types';
-import { Award, Crown, Lock, Check, Sparkles, Star } from 'lucide-react';
+import {
+  Award,
+  Crown,
+  Lock,
+  Check,
+  Sparkles,
+  Star,
+  FileText,
+  BookOpen,
+  GraduationCap,
+  Flame,
+  UserPlus,
+  Users,
+  Gem,
+  Library,
+  Trophy,
+  Zap,
+  Medal,
+  LucideIcon
+} from 'lucide-react';
 import styles from './badges.module.css';
+
+// Map icon names to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+  FileText,
+  BookOpen,
+  GraduationCap,
+  Flame,
+  Star,
+  UserPlus,
+  Users,
+  Sparkles,
+  Gem,
+  Crown,
+  Library,
+  Trophy,
+  Zap,
+  Medal,
+  Award
+};
+
+const getBadgeIcon = (iconName: string): LucideIcon => {
+  return iconMap[iconName] || Award;
+};
 
 export default function BadgesPage() {
   const [badgesData, setBadgesData] = useState<UserBadgesResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'earned' | 'locked'>('all');
-  const [displayBadgeType, setDisplayBadgeType] = useState<string | null>(null);
-  const [isSettingDisplay, setIsSettingDisplay] = useState(false);
 
   const fetchBadges = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [badgesData, displayBadge] = await Promise.all([
-        badgeService.getUserBadges(),
-        badgeService.getDisplayBadge()
-      ]);
-      setBadgesData(badgesData);
-      setDisplayBadgeType(displayBadge?.type || null);
+      const data = await badgeService.getUserBadges();
+      setBadgesData(data);
     } catch (err) {
       console.error('Failed to fetch badges:', err);
     } finally {
       setIsLoading(false);
     }
   }, []);
-
-  const handleSetDisplayBadge = async (badgeType: string) => {
-    if (isSettingDisplay || displayBadgeType === badgeType) return;
-
-    try {
-      setIsSettingDisplay(true);
-      await badgeService.setDisplayBadge(badgeType);
-      setDisplayBadgeType(badgeType);
-    } catch (err) {
-      console.error('Failed to set display badge:', err);
-    } finally {
-      setIsSettingDisplay(false);
-    }
-  };
 
   useEffect(() => {
     fetchBadges();
@@ -147,9 +169,6 @@ export default function BadgesPage() {
                 key={badge.type}
                 badge={badge}
                 formatDate={formatDate}
-                isDisplayBadge={displayBadgeType === badge.type}
-                onSetDisplay={handleSetDisplayBadge}
-                isSettingDisplay={isSettingDisplay}
               />
             ))}
           </div>
@@ -175,9 +194,6 @@ export default function BadgesPage() {
                 badge={badge}
                 formatDate={formatDate}
                 isPro
-                isDisplayBadge={displayBadgeType === badge.type}
-                onSetDisplay={handleSetDisplayBadge}
-                isSettingDisplay={isSettingDisplay}
               />
             ))}
           </div>
@@ -198,35 +214,18 @@ interface BadgeCardProps {
   badge: Badge;
   formatDate: (date?: string) => string;
   isPro?: boolean;
-  isDisplayBadge?: boolean;
-  onSetDisplay: (badgeType: string) => void;
-  isSettingDisplay?: boolean;
 }
 
-function BadgeCard({ badge, formatDate, isPro, isDisplayBadge, onSetDisplay, isSettingDisplay }: BadgeCardProps) {
+function BadgeCard({ badge, formatDate, isPro }: BadgeCardProps) {
   const isEarned = badge.isEarned;
   const progress = badge.progressPercent;
   const circumference = 2 * Math.PI * 54; // radius = 54
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
-  const handleClick = () => {
-    if (isEarned && !isDisplayBadge) {
-      onSetDisplay(badge.type);
-    }
-  };
-
   return (
     <div
-      className={`${styles.badgeCard} ${isEarned ? styles.earnedCard : styles.lockedCard} ${isPro ? styles.proCard : ''} ${isDisplayBadge ? styles.displayCard : ''} ${isEarned ? styles.clickable : ''}`}
-      onClick={handleClick}
-      title={isEarned ? (isDisplayBadge ? 'Current display badge' : 'Click to set as display badge') : ''}
+      className={`${styles.badgeCard} ${isEarned ? styles.earnedCard : styles.lockedCard} ${isPro ? styles.proCard : ''}`}
     >
-      {isDisplayBadge && (
-        <div className={styles.displayBadgeLabel}>
-          <Star size={10} />
-          <span>DISPLAY</span>
-        </div>
-      )}
       {isPro && !isEarned && (
         <div className={styles.proBadgeLabel}>
           <Crown size={10} />
@@ -252,7 +251,7 @@ function BadgeCard({ badge, formatDate, isPro, isDisplayBadge, onSetDisplay, isS
             cy="60"
             r="54"
             fill="none"
-            stroke={isDisplayBadge ? "#f59e0b" : isEarned ? "#34d399" : isPro ? "#fbbf24" : "#6366f1"}
+            stroke={isEarned ? "#fbbf24" : "#f59e0b"}
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -261,8 +260,11 @@ function BadgeCard({ badge, formatDate, isPro, isDisplayBadge, onSetDisplay, isS
             className={styles.progressCircle}
           />
         </svg>
-        <div className={`${styles.badgeIcon} ${isEarned ? styles.earnedIcon : styles.lockedIcon} ${isDisplayBadge ? styles.displayIcon : ''}`}>
-          <span className={styles.badgeEmoji}>{badge.icon}</span>
+        <div className={`${styles.badgeIcon} ${isEarned ? styles.earnedIcon : styles.lockedIcon}`}>
+          {(() => {
+            const IconComponent = getBadgeIcon(badge.icon);
+            return <IconComponent size={32} className={styles.badgeIconSvg} />;
+          })()}
           {!isEarned && (
             <div className={styles.lockOverlay}>
               <Lock size={16} />
