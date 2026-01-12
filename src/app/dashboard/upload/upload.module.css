@@ -141,7 +141,7 @@
   padding: 48px 32px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
   background: rgba(15, 23, 42, 0.4);
   /* Match textarea wrapper height for consistent layout */
   min-height: 300px;
@@ -305,7 +305,7 @@
   display: flex;
   align-items: center;
   padding: 4px 16px;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .inputWrapper:focus-within {
@@ -346,7 +346,7 @@
   padding: 16px;
   min-height: 300px;
   position: relative;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .textareaWrapper:focus-within {
@@ -1166,6 +1166,12 @@
     padding: 24px;
     border-radius: 24px;
   }
+
+  .submitBtn {
+    padding: 16px 20px;
+    font-size: 0.9375rem;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1213,9 +1219,15 @@
   }
 
   .submitBtn {
-    padding: 16px 20px;
-    font-size: 1rem;
+    padding: 14px 16px;
+    font-size: 0.875rem;
     border-radius: 12px;
+    gap: 8px;
+  }
+
+  .submitBtn svg {
+    width: 16px;
+    height: 16px;
   }
 
   .progressRow {
@@ -1241,5 +1253,23 @@
   .textareaWrapper {
     padding: 14px;
     border-radius: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .submitBtn {
+    padding: 12px 14px;
+    font-size: 0.8125rem;
+  }
+
+  .uploadTab {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  .uploadTab svg {
+    width: 14px;
+    height: 14px;
   }
 }

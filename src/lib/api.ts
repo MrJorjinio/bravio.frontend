@@ -10,8 +10,16 @@ export const getAssetUrl = (path?: string | null): string | undefined => {
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
-  // Otherwise, prepend the backend URL
-  return `${BACKEND_URL}${path}`;
+  // If path starts with avatars/ (MinIO path), serve via files API
+  if (path.startsWith('avatars/') || path.startsWith('uploads/')) {
+    return `${API_BASE_URL}/files/${path}`;
+  }
+  // Legacy paths starting with / (local file storage)
+  if (path.startsWith('/')) {
+    return `${BACKEND_URL}${path}`;
+  }
+  // Default: serve via files API
+  return `${API_BASE_URL}/files/${path}`;
 };
 
 // Create axios instance

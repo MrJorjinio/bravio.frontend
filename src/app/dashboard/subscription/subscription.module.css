@@ -399,6 +399,26 @@
   flex-shrink: 0;
 }
 
+.coinsIcon {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.usersIcon {
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.giftIcon {
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.crownIcon {
+  color: #a855f7;
+  flex-shrink: 0;
+}
+
 .currentPlanLabel {
   text-align: center;
   padding: 12px;
@@ -591,6 +611,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 16px;
   animation: fadeIn 0.2s ease;
 }
 
@@ -600,15 +621,16 @@
 }
 
 .modal {
-  background: rgba(30, 41, 59, 0.95);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.99) 100%);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(248, 113, 113, 0.3);
-  border-radius: 24px;
-  padding: 32px;
-  max-width: 420px;
-  width: 90%;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 20px;
+  padding: 28px 24px;
+  max-width: 360px;
+  width: 100%;
   text-align: center;
   animation: scaleIn 0.2s ease;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(245, 158, 11, 0.05);
 }
 
 @keyframes scaleIn {
@@ -623,69 +645,98 @@
 }
 
 .modalIcon {
-  width: 64px;
-  height: 64px;
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  width: 56px;
+  height: 56px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f87171;
-  margin: 0 auto 20px;
+  color: #f59e0b;
+  margin: 0 auto 16px;
 }
 
 .modalTitle {
-  font-size: 1.375rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #f1f5f9;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
 }
 
 .modalText {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   color: #94a3b8;
-  line-height: 1.6;
-  margin: 0 0 28px 0;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
 }
 
 .modalActions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modalCancelBtn {
   flex: 1;
-  padding: 14px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: #f1f5f9;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  border-radius: 10px;
+  color: #020617;
+  font-size: 0.8125rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .modalCancelBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
 }
 
 .modalConfirmBtn {
   flex: 1;
-  padding: 14px 20px;
-  background: rgba(248, 113, 113, 0.2);
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  border-radius: 12px;
-  color: #f87171;
-  font-size: 0.9375rem;
+  padding: 12px 16px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #94a3b8;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .modalConfirmBtn:hover {
-  background: rgba(248, 113, 113, 0.3);
-  border-color: rgba(248, 113, 113, 0.5);
+  background: rgba(51, 65, 85, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f1f5f9;
+}
+
+@media (max-width: 400px) {
+  .modal {
+    padding: 24px 20px;
+  }
+
+  .modalIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .modalTitle {
+    font-size: 1.125rem;
+  }
+
+  .modalText {
+    font-size: 0.8125rem;
+  }
+
+  .modalCancelBtn,
+  .modalConfirmBtn {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+  }
 }

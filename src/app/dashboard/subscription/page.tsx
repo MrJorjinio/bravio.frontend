@@ -18,7 +18,9 @@ import {
   Loader2,
   ExternalLink,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Coins,
+  Users
 } from 'lucide-react';
 import styles from './subscription.module.css';
 
@@ -314,6 +316,10 @@ export default function SubscriptionPage() {
 
             <ul className={styles.featureList}>
               <li className={styles.featureItem}>
+                <Coins size={16} className={styles.coinsIcon} />
+                <span>+1,000 Broins welcome bonus</span>
+              </li>
+              <li className={styles.featureItem}>
                 <Infinity size={16} className={styles.infinityIcon} />
                 <span>Unlimited Broins earning</span>
               </li>
@@ -336,6 +342,14 @@ export default function SubscriptionPage() {
               <li className={styles.featureItem}>
                 <Shield size={16} className={styles.shieldIcon} />
                 <span>Streak protection (1x/month)</span>
+              </li>
+              <li className={styles.featureItem}>
+                <Gift size={16} className={styles.giftIcon} />
+                <span>2x bonus rewards (daily, streak, referral)</span>
+              </li>
+              <li className={styles.featureItem}>
+                <Crown size={16} className={styles.crownIcon} />
+                <span>5 Exclusive Pro badges</span>
               </li>
               <li className={styles.featureItem}>
                 <Zap size={16} className={styles.zapIcon} />
@@ -376,7 +390,8 @@ export default function SubscriptionPage() {
               <p className={styles.benefitDesc}>
                 Double daily bonus ({PRO_TIER_LIMITS.dailyBonus} vs {FREE_TIER_LIMITS.dailyBonus}),
                 level-up ({PRO_TIER_LIMITS.levelUpBonus} vs {FREE_TIER_LIMITS.levelUpBonus}),
-                and streak rewards ({PRO_TIER_LIMITS.streakBonus} vs {FREE_TIER_LIMITS.streakBonus})
+                streak ({PRO_TIER_LIMITS.streakBonus} vs {FREE_TIER_LIMITS.streakBonus}),
+                and referral rewards (200 vs 100 broins)
               </p>
             </div>
           </div>
