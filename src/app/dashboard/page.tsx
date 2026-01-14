@@ -54,11 +54,19 @@ export default function DashboardPage() {
         if (upload.status.toLowerCase() === 'completed') {
           try {
             const practiceStats = await uploadService.getPracticeStats(upload.id);
-            statsMap.set(upload.id, {
-              attempted: practiceStats.flashcardsAttempted,
-              total: practiceStats.totalFlashcards
+            // Debug: Log practice stats to identify issues
+            console.log(`[Dashboard] Practice stats for upload ${upload.id}:`, {
+              apiResponse: practiceStats,
+              uploadFlashcardCount: upload.flashcardCount
             });
-          } catch {
+            // Use upload.flashcardCount as fallback if API returns 0 for totalFlashcards
+            const total = practiceStats.totalFlashcards || upload.flashcardCount || 0;
+            statsMap.set(upload.id, {
+              attempted: practiceStats.flashcardsAttempted || 0,
+              total
+            });
+          } catch (err) {
+            console.error(`[Dashboard] Failed to get practice stats for upload ${upload.id}:`, err);
             statsMap.set(upload.id, { attempted: 0, total: upload.flashcardCount || 0 });
           }
         }
@@ -88,6 +96,26 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchData();
+
+    // Refresh data when returning to the page (visibility change)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
+      }
+    };
+
+    // Refresh data when practice is completed (custom event)
+    const handlePracticeComplete = () => {
+      fetchData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('practiceComplete', handlePracticeComplete);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('practiceComplete', handlePracticeComplete);
+    };
   }, [fetchData]);
 
   const getUserName = () => {

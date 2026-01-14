@@ -239,6 +239,8 @@ export default function PracticePage() {
         } catch (e) {
           console.error('Failed to fetch completion data:', e);
         }
+        // Dispatch event to refresh dashboard stats
+        window.dispatchEvent(new CustomEvent('practiceComplete'));
         setCompleted(true);
         return;
       }
@@ -279,6 +281,8 @@ export default function PracticePage() {
         } catch (e) {
           console.error('Failed to fetch completion data:', e);
         }
+        // Dispatch event to refresh dashboard stats
+        window.dispatchEvent(new CustomEvent('practiceComplete'));
         setCompleted(true);
         return;
       }
