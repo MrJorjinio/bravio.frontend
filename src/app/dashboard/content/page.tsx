@@ -4,18 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { uploadService } from '@/services';
 import type { Upload } from '@/types';
+import { DeckCard } from '@/components/ui';
 import {
   Plus,
   UploadCloud,
-  CheckCircle2,
-  Target,
-  Layers,
-  Coins,
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Loader2,
-  Eye
+  Loader2
 } from 'lucide-react';
 import styles from './content.module.css';
 
@@ -129,23 +125,6 @@ export default function ContentPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
-  const getStatusClass = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === 'completed') return styles.completed;
-    if (s === 'processing') return styles.processing;
-    if (s === 'pending') return styles.pending;
-    return styles.failed;
-  };
-
   const filters: { value: FilterStatus; label: string }[] = [
     { value: 'all', label: 'All' },
     { value: 'completed', label: 'Completed' },
@@ -217,85 +196,18 @@ export default function ContentPage() {
         </div>
       ) : (
         <div className={styles.contentGrid}>
-          {uploads.map((upload) => {
-            const progress = getProgress(upload.id);
-            const complete = isComplete(upload.id);
-            const isCompleted = upload.status.toLowerCase() === 'completed';
-
-            return (
-              <div key={upload.id} className={styles.contentCard}>
-                <div className={styles.cardGlow}></div>
-                <div className={styles.cardInner}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.deckIcon}>
-                      <Layers size={18} />
-                    </div>
-                    <div className={styles.headerRight}>
-                      {complete && <span className={styles.completeBadge}>Complete</span>}
-                      <div className={`${styles.statusBadge} ${getStatusClass(upload.status)}`}>
-                        {isCompleted && <CheckCircle2 size={12} />}
-                        {upload.status}
-                      </div>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => handleDeleteClick(upload.id)}
-                        title="Delete"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <h3 className={styles.cardTitle}>{upload.title || 'Untitled'}</h3>
-
-                  <p className={styles.cardPreview}>
-                    {upload.summaryPreview || upload.contentPreview || 'Processing...'}
-                  </p>
-
-                  <div className={styles.cardMeta}>
-                    <span className={styles.metaItem}>
-                      <Layers size={14} />
-                      {upload.flashcardCount} cards
-                    </span>
-                    {upload.keyPointsCount !== undefined && upload.keyPointsCount > 0 && (
-                      <span className={styles.metaItem}>
-                        <Target size={14} />
-                        {upload.keyPointsCount} points
-                      </span>
-                    )}
-                    <span className={styles.metaItem}>
-                      <Coins size={14} />
-                      {upload.broinsCost} broins
-                    </span>
-                  </div>
-
-                  {isCompleted && (
-                    <div className={styles.progressSection}>
-                      <div className={styles.progressBar}>
-                        <div
-                          className={`${styles.progressFill} ${complete ? styles.complete : ''}`}
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                      <span className={styles.progressText}>{progress}% mastered</span>
-                    </div>
-                  )}
-
-                  <div className={styles.cardActions}>
-                    <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
-                      <Eye size={16} />
-                      View Details
-                    </Link>
-                    {isCompleted && (
-                      <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
-                        Practice
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {uploads.map((upload) => (
+            <DeckCard
+              key={upload.id}
+              upload={upload}
+              progress={getProgress(upload.id)}
+              isComplete={isComplete(upload.id)}
+              showStatus={true}
+              showDelete={true}
+              showPractice={true}
+              onDelete={handleDeleteClick}
+            />
+          ))}
         </div>
       )}
 

@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Layers, Target, Eye, ChevronRight, UploadCloud, Plus, Coins } from 'lucide-react';
+import { ChevronRight, UploadCloud, Plus } from 'lucide-react';
 import type { Upload } from '@/types';
+import { DeckCard } from '@/components/ui';
 import styles from './ContinueLearning.module.css';
 
 interface ContinueLearningProps {
@@ -91,62 +92,4 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
   );
 }
 
-interface DeckCardProps {
-  upload: Upload;
-  progress: number;
-  isComplete: boolean;
-}
 
-function DeckCard({ upload, progress, isComplete }: DeckCardProps) {
-  return (
-    <div className={styles.deckCard}>
-      <div className={styles.cardGlow}></div>
-      <div className={styles.cardInner}>
-        <div className={styles.cardHeader}>
-          <div className={styles.deckIcon}>
-            <Layers size={18} />
-          </div>
-          {isComplete && <span className={styles.completeBadge}>Complete</span>}
-        </div>
-
-        <h3 className={styles.deckTitle}>{upload.title || 'Untitled'}</h3>
-
-        <p className={styles.deckPreview}>
-          {upload.summaryPreview || upload.contentPreview || 'No preview available'}
-        </p>
-
-        <div className={styles.cardMeta}>
-          <span className={styles.metaItem}>
-            <Layers size={14} />
-            {upload.flashcardCount} cards
-          </span>
-          {upload.keyPointsCount && upload.keyPointsCount > 0 && (
-            <span className={styles.metaItem}>
-              <Target size={14} />
-              {upload.keyPointsCount} points
-            </span>
-          )}
-          <span className={styles.metaItem}>
-            <Coins size={14} />
-            {upload.broinsCost} broins
-          </span>
-        </div>
-
-        <div className={styles.progressSection}>
-          <div className={styles.progressBar}>
-            <div
-              className={`${styles.progressFill} ${isComplete ? styles.complete : ''}`}
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-          <span className={styles.progressText}>{progress}% mastered</span>
-        </div>
-
-        <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
-          <Eye size={16} />
-          View Details
-        </Link>
-      </div>
-    </div>
-  );
-}
