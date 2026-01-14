@@ -53,7 +53,7 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Continue Learning</h2>
-        {completedUploads.length > 6 && (
+        {completedUploads.length > 3 && (
           <Link href="/dashboard/content" className={styles.viewAllBtn}>
             View All
             <ChevronRight size={16} />
@@ -77,7 +77,7 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
         </div>
       ) : (
         <div className={styles.deckGrid}>
-          {completedUploads.slice(0, 6).map(upload => (
+          {completedUploads.slice(0, 3).map(upload => (
             <DeckCard
               key={upload.id}
               upload={upload}
