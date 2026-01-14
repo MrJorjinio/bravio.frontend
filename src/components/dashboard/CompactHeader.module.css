@@ -9,11 +9,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Top Row - Desktop: just displays contents inline */
-.topRow {
-  display: contents;
-}
-
 /* Level Badge */
 .levelBadge {
   display: flex;
@@ -87,7 +82,7 @@
   height: 100%;
   min-height: 8px;
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
-  border-radius: 100px;
+  border-radius: inherit;
   transition: width 0.5s ease;
 }
 
@@ -152,23 +147,15 @@
     gap: 1rem;
   }
 
-  .topRow {
-    display: contents;
-  }
-
-  .levelBadge {
-    order: 1;
+  .xpSection {
+    flex-basis: 100%;
+    width: 100%;
+    order: 3;
   }
 
   .dailyBonusBtn {
     order: 2;
     margin-left: auto;
-  }
-
-  .xpSection {
-    order: 3;
-    flex-basis: 100%;
-    width: 100%;
   }
 }
 
@@ -183,16 +170,8 @@
     margin-bottom: 1rem;
   }
 
-  /* Top row becomes a flex container on mobile */
-  .topRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
   .levelBadge {
-    order: unset;
+    align-self: flex-start;
     padding: 0.45rem 0.9rem;
     gap: 0.4rem;
   }
@@ -206,16 +185,7 @@
     font-size: 0.85rem;
   }
 
-  .dailyBonusBtn {
-    order: unset;
-    margin-left: 0;
-    padding: 0.5rem 0.9rem;
-    font-size: 0.8rem;
-    gap: 0.4rem;
-    border-radius: 10px;
-  }
-
-  /* XP Section - Full width below */
+  /* XP Section - Full width */
   .xpSection {
     order: unset;
     flex-basis: auto;
@@ -255,6 +225,17 @@
     padding: 0;
     margin: 0.15rem 0 0 0;
     line-height: 1.2;
+  }
+
+  .dailyBonusBtn {
+    order: unset;
+    margin-left: 0;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+    gap: 0.4rem;
+    border-radius: 10px;
+    width: 100%;
+    justify-content: center;
   }
 }
 
