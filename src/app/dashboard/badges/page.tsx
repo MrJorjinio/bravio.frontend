@@ -91,9 +91,47 @@ export default function BadgesPage() {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading badges...</p>
+        {/* Skeleton Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={`${styles.skeleton} ${styles.skeletonTitle}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`}></div>
+          </div>
+          <div className={styles.headerStats}>
+            <div className={`${styles.skeleton} ${styles.skeletonBadge}`}></div>
+          </div>
+        </div>
+
+        {/* Skeleton Progress */}
+        <div className={styles.progressSection}>
+          <div className={`${styles.skeleton} ${styles.skeletonProgressBar}`}></div>
+          <div className={`${styles.skeleton} ${styles.skeletonProgressText}`}></div>
+        </div>
+
+        {/* Skeleton Filter Tabs */}
+        <div className={styles.skeletonFilterTabs}>
+          <div className={`${styles.skeleton} ${styles.skeletonTab}`}></div>
+          <div className={`${styles.skeleton} ${styles.skeletonTab}`}></div>
+          <div className={`${styles.skeleton} ${styles.skeletonTab}`}></div>
+        </div>
+
+        {/* Skeleton Badge Cards */}
+        <div className={styles.badgeSection}>
+          <div className={styles.skeletonSectionHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonIndicator}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`}></div>
+          </div>
+          <div className={styles.badgesGrid}>
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className={styles.skeletonCard}>
+                <div className={`${styles.skeleton} ${styles.skeletonIconWrapper}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonBadgeName}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonBadgeDesc}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonBadgeDesc}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonBadgeProgress}`}></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

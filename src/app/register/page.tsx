@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -9,7 +9,7 @@ import { authService } from '@/services';
 import { ArrowLeft, Eye, EyeOff, ArrowRight, Gift, Users } from 'lucide-react';
 import styles from './register.module.css';
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { register, googleLogin } = useAuth();
@@ -397,5 +397,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className={styles.container}><div className={styles.formPanel}><div className={styles.formContainer}>Loading...</div></div></div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

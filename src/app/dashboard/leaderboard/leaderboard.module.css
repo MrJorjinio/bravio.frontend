@@ -567,6 +567,201 @@
   to { transform: rotate(360deg); }
 }
 
+/* Skeleton Loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonTitle {
+  height: 40px;
+  width: 180px;
+  margin-bottom: 8px;
+}
+
+.skeletonSubtitle {
+  height: 20px;
+  width: 200px;
+}
+
+.skeletonPeriodToggle {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 14px;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.skeletonPeriodBtn {
+  height: 44px;
+  width: 100px;
+  border-radius: 10px;
+}
+
+.skeletonRankCard {
+  height: 100px;
+  width: 100%;
+  border-radius: 24px;
+  margin-bottom: 32px;
+}
+
+.skeletonPodium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+  padding-top: 40px;
+  margin-bottom: 40px;
+}
+
+.skeletonPodiumItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100px;
+}
+
+.skeletonPodiumFirst {
+  width: 120px;
+}
+
+.skeletonPodiumAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.skeletonPodiumFirst .skeletonPodiumAvatar {
+  width: 80px;
+  height: 80px;
+}
+
+.skeletonPodiumIcon {
+  height: 24px;
+  width: 24px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+}
+
+.skeletonPodiumName {
+  height: 18px;
+  width: 60px;
+  margin-bottom: 4px;
+}
+
+.skeletonPodiumXp {
+  height: 14px;
+  width: 50px;
+  margin-bottom: 12px;
+}
+
+.skeletonPodiumBase {
+  width: 100px;
+  border-radius: 8px 8px 0 0;
+}
+
+.skeletonPodiumFirst .skeletonPodiumBase {
+  width: 120px;
+  height: 100px;
+}
+
+.skeletonPodiumSecond .skeletonPodiumBase {
+  height: 72px;
+}
+
+.skeletonPodiumThird .skeletonPodiumBase {
+  height: 56px;
+}
+
+.skeletonSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.skeletonIndicator {
+  width: 6px;
+  height: 24px;
+  border-radius: 50px;
+}
+
+.skeletonSectionTitle {
+  height: 22px;
+  width: 100px;
+}
+
+.skeletonRankingRow {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.skeletonRankNumber {
+  width: 24px;
+  height: 20px;
+  margin-right: 24px;
+}
+
+.skeletonRankingAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.skeletonRankingInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeletonRankingName {
+  height: 18px;
+  width: 100px;
+}
+
+.skeletonRankingLevel {
+  height: 14px;
+  width: 60px;
+}
+
+.skeletonRankingXp {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.skeletonXpValue {
+  height: 18px;
+  width: 50px;
+}
+
+.skeletonXpLabel {
+  height: 12px;
+  width: 25px;
+}
+
 /* Responsive - Tablet */
 @media (max-width: 768px) {
   .container {

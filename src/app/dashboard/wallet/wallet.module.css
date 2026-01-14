@@ -603,6 +603,176 @@
   to { transform: rotate(360deg); }
 }
 
+/* Skeleton Loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonTitle {
+  height: 40px;
+  width: 120px;
+  margin-bottom: 8px;
+}
+
+.skeletonSubtitle {
+  height: 20px;
+  width: 200px;
+}
+
+.skeletonCard {
+  height: 220px;
+  width: 100%;
+  border-radius: 24px;
+  margin-bottom: 40px;
+}
+
+.skeletonSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.skeletonIndicator {
+  width: 6px;
+  height: 24px;
+  border-radius: 50px;
+}
+
+.skeletonSectionTitle {
+  height: 22px;
+  width: 140px;
+}
+
+.skeletonPurchaseGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.skeletonPurchaseOption {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonOptionLabel {
+  height: 14px;
+  width: 60%;
+}
+
+.skeletonOptionPrice {
+  height: 28px;
+  width: 80%;
+}
+
+.skeletonOptionBroins {
+  height: 14px;
+  width: 70%;
+}
+
+.skeletonBtn {
+  height: 64px;
+  width: 100%;
+  border-radius: 16px;
+  margin-bottom: 40px;
+}
+
+.skeletonActivityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.skeletonActivityTitle {
+  height: 22px;
+  width: 120px;
+}
+
+.skeletonViewAll {
+  height: 14px;
+  width: 60px;
+}
+
+.skeletonTransaction {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+
+.skeletonTransactionLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.skeletonTransactionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.skeletonTransactionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeletonTransactionTitle {
+  height: 18px;
+  width: 120px;
+}
+
+.skeletonTransactionDate {
+  height: 14px;
+  width: 80px;
+}
+
+.skeletonTransactionAmount {
+  height: 20px;
+  width: 60px;
+}
+
+@media (max-width: 768px) {
+  .skeletonPurchaseGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .skeletonCard {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skeletonCard {
+    height: 160px;
+  }
+}
+
 /* Payment Status Banner */
 .paymentBanner {
   display: flex;
@@ -704,9 +874,10 @@
   }
 
   .bestValueBadge {
-    top: 50%;
-    right: 16px;
-    transform: translateY(-50%);
+    top: -10px;
+    right: 12px;
+    font-size: 0.5rem;
+    padding: 3px 6px;
   }
 
   .customInput {
@@ -766,6 +937,32 @@
 
   .historyLink {
     font-size: 0.75rem;
+  }
+
+  .purchaseOption {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .bestValueBadge {
+    top: -8px;
+    right: 8px;
+    font-size: 0.45rem;
+    padding: 2px 5px;
+    border-radius: 6px;
+  }
+
+  .optionLabel {
+    font-size: 0.65rem;
+    margin-bottom: 12px;
+  }
+
+  .optionPrice {
+    font-size: 1.25rem;
+  }
+
+  .optionBroins {
+    font-size: 0.65rem;
   }
 
   .transaction {

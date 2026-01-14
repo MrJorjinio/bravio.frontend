@@ -441,67 +441,343 @@
   to { transform: rotate(360deg); }
 }
 
+/* Skeleton Loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonTitle {
+  height: 40px;
+  width: 150px;
+  margin-bottom: 8px;
+}
+
+.skeletonSubtitle {
+  height: 20px;
+  width: 220px;
+}
+
+.skeletonCodeCard {
+  height: 200px;
+  width: 100%;
+  border-radius: 24px;
+  margin-bottom: 24px;
+}
+
+.skeletonStatCard {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.skeletonStatIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+}
+
+.skeletonStatInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeletonStatValue {
+  height: 28px;
+  width: 60px;
+}
+
+.skeletonStatLabel {
+  height: 14px;
+  width: 100px;
+}
+
+.skeletonSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.skeletonIndicator {
+  width: 6px;
+  height: 24px;
+  border-radius: 50px;
+}
+
+.skeletonSectionTitle {
+  height: 22px;
+  width: 140px;
+}
+
+.skeletonStep {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.skeletonStepNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.skeletonStepTitle {
+  height: 18px;
+  width: 80%;
+}
+
+.skeletonStepDesc {
+  height: 14px;
+  width: 90%;
+}
+
+.skeletonApplyForm {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.skeletonInput {
+  flex: 1;
+  height: 56px;
+  border-radius: 14px;
+}
+
+.skeletonBtn {
+  height: 56px;
+  width: 120px;
+  border-radius: 14px;
+}
+
+.skeletonRewards {
+  height: 96px;
+  width: 100%;
+  border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+  .skeletonApplyForm {
+    flex-direction: column;
+  }
+
+  .skeletonBtn {
+    width: 100%;
+  }
+
+  .skeletonStep {
+    flex-direction: row;
+    padding: 16px;
+  }
+
+  .skeletonStepNumber {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
     padding: 24px 16px;
   }
 
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
   .title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
   }
 
   .codeCard {
-    padding: 24px;
-    border-radius: 20px;
+    padding: 20px;
+    border-radius: 18px;
+    margin-bottom: 20px;
+  }
+
+  .codeHeader {
+    margin-bottom: 16px;
+  }
+
+  .codeIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .codeLabel {
+    font-size: 0.8rem;
+  }
+
+  .codeDisplay {
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 16px;
   }
 
   .codeText {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+  }
+
+  .copyBtn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .shareBtn {
+    height: 50px;
+    font-size: 0.9rem;
+    border-radius: 12px;
   }
 
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .statCard {
+    padding: 16px;
+    border-radius: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .statIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .statLabel {
+    font-size: 0.65rem;
+  }
+
+  .sectionHeader {
+    margin-bottom: 16px;
+  }
+
+  .sectionTitle {
+    font-size: 1rem;
+  }
+
+  .howItWorks {
+    margin-bottom: 28px;
   }
 
   .stepsGrid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
   }
 
   .step {
-    padding: 20px;
+    padding: 16px;
     display: flex;
     align-items: center;
     text-align: left;
-    gap: 16px;
+    gap: 14px;
+    border-radius: 14px;
   }
 
   .stepNumber {
+    width: 36px;
+    height: 36px;
     margin: 0;
     flex-shrink: 0;
+    font-size: 1rem;
+    border-radius: 10px;
   }
 
   .stepTitle {
-    margin-bottom: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+
+  .stepDesc {
+    font-size: 0.7rem;
+  }
+
+  .applySection {
+    margin-bottom: 28px;
   }
 
   .applyForm {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .applyInput {
+    height: 50px;
+    font-size: 0.9rem;
+    border-radius: 12px;
   }
 
   .applyBtn {
     width: 100%;
+    height: 50px;
+    font-size: 0.85rem;
+    border-radius: 12px;
   }
 
   .rewardsInfo {
-    flex-direction: column;
-    gap: 20px;
+    padding: 20px;
+    border-radius: 16px;
+    flex-direction: row;
+    gap: 0;
+  }
+
+  .rewardItem {
+    flex: 1;
+  }
+
+  .rewardLabel {
+    font-size: 0.65rem;
+  }
+
+  .rewardValue {
+    font-size: 1.1rem;
   }
 
   .rewardDivider {
-    width: 100%;
-    height: 1px;
+    width: 1px;
+    height: 40px;
   }
 }
 
@@ -510,38 +786,168 @@
     padding: 16px 12px;
   }
 
+  .header {
+    margin-bottom: 20px;
+  }
+
   .title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
   }
 
   .codeCard {
-    padding: 20px;
-    border-radius: 16px;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  .codeHeader {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .codeIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .codeLabel {
+    font-size: 0.7rem;
   }
 
   .codeDisplay {
-    padding: 12px 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
   }
 
   .codeText {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
   }
 
   .copyBtn {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
   }
 
   .shareBtn {
-    height: 52px;
-    font-size: 0.9rem;
+    height: 46px;
+    font-size: 0.85rem;
+    border-radius: 10px;
+    gap: 8px;
+  }
+
+  .statsGrid {
+    gap: 10px;
+    margin-bottom: 24px;
   }
 
   .statCard {
-    padding: 20px;
+    padding: 14px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .statIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
 
   .statValue {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+  }
+
+  .statLabel {
+    font-size: 0.6rem;
+  }
+
+  .sectionIndicator {
+    width: 5px;
+    height: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 0.9rem;
+  }
+
+  .howItWorks {
+    margin-bottom: 24px;
+  }
+
+  .stepsGrid {
+    gap: 8px;
+  }
+
+  .step {
+    padding: 14px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .stepNumber {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+
+  .stepTitle {
+    font-size: 0.8rem;
+  }
+
+  .stepDesc {
+    font-size: 0.65rem;
+  }
+
+  .applySection {
+    margin-bottom: 24px;
+  }
+
+  .applyInput {
+    height: 46px;
+    font-size: 0.85rem;
+    padding: 0 14px 0 42px;
+    border-radius: 10px;
+  }
+
+  .inputIcon {
+    left: 14px;
+  }
+
+  .applyBtn {
+    height: 46px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .errorMessage,
+  .successMessage {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    border-radius: 10px;
+  }
+
+  .rewardsInfo {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .rewardLabel {
+    font-size: 0.6rem;
+  }
+
+  .rewardValue {
+    font-size: 1rem;
+  }
+
+  .rewardDivider {
+    height: 32px;
   }
 }

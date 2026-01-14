@@ -40,15 +40,43 @@ export default function ReferralPage() {
     fetchReferralInfo();
   }, [fetchReferralInfo]);
 
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // Fall through to fallback
+      }
+    }
+
+    // Fallback for mobile and non-HTTPS
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const success = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
   const handleCopyCode = async () => {
     if (!referralInfo?.referralCode) return;
 
-    try {
-      await navigator.clipboard.writeText(referralInfo.referralCode);
+    const success = await copyToClipboard(referralInfo.referralCode);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
     }
   };
 
@@ -65,18 +93,16 @@ export default function ReferralPage() {
           text: shareText,
           url: shareUrl,
         });
-      } catch (err) {
+      } catch {
         // User cancelled or share failed, fallback to copy
         handleCopyCode();
       }
     } else {
       // Fallback: copy the full message
-      try {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+      const success = await copyToClipboard(`${shareText}\n${shareUrl}`);
+      if (success) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
       }
     }
   };
@@ -110,10 +136,61 @@ export default function ReferralPage() {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading referral info...</p>
+        {/* Skeleton Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={`${styles.skeleton} ${styles.skeletonTitle}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`}></div>
+          </div>
         </div>
+
+        {/* Skeleton Code Card */}
+        <div className={`${styles.skeleton} ${styles.skeletonCodeCard}`}></div>
+
+        {/* Skeleton Stats Grid */}
+        <div className={styles.statsGrid}>
+          {[1, 2].map((i) => (
+            <div key={i} className={styles.skeletonStatCard}>
+              <div className={`${styles.skeleton} ${styles.skeletonStatIcon}`}></div>
+              <div className={styles.skeletonStatInfo}>
+                <div className={`${styles.skeleton} ${styles.skeletonStatValue}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonStatLabel}`}></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Skeleton How It Works */}
+        <div className={styles.howItWorks}>
+          <div className={styles.skeletonSectionHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonIndicator}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`}></div>
+          </div>
+          <div className={styles.stepsGrid}>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={styles.skeletonStep}>
+                <div className={`${styles.skeleton} ${styles.skeletonStepNumber}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonStepTitle}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonStepDesc}`}></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skeleton Apply Section */}
+        <div className={styles.applySection}>
+          <div className={styles.skeletonSectionHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonIndicator}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`}></div>
+          </div>
+          <div className={styles.skeletonApplyForm}>
+            <div className={`${styles.skeleton} ${styles.skeletonInput}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
+          </div>
+        </div>
+
+        {/* Skeleton Rewards */}
+        <div className={`${styles.skeleton} ${styles.skeletonRewards}`}></div>
       </div>
     );
   }

@@ -76,17 +76,6 @@ export default function ProfileHubPage() {
     setShowLogoutModal(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       {/* Profile Header */}

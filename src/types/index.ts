@@ -664,3 +664,55 @@ export interface SubscriptionHistoryResponse {
   history: SubscriptionHistoryEntry[];
   totalCount: number;
 }
+
+// ============================================
+// Dashboard Types
+// ============================================
+
+// Weekly Activity for Streak Calendar
+export interface WeeklyActivity {
+  date: string;
+  dayOfWeek: string;
+  isActive: boolean;
+  isProtected: boolean; // Day was skipped but streak was saved by protection
+  xpEarned: number;
+  flashcardsStudied: number;
+}
+
+export interface WeeklyActivityResponse {
+  activities: WeeklyActivity[];
+  currentStreak: number;
+  weeklyTotal: {
+    xpEarned: number;
+    flashcardsStudied: number;
+    activeDays: number;
+  };
+  isPro: boolean;
+  streakProtectionUsedThisMonth: boolean;
+}
+
+// Full Activity History (all days since account creation)
+export interface ActivityHistoryResponse {
+  activities: WeeklyActivity[];
+  totalDays: number;
+  activeDays: number;
+  protectedDays: number;
+  currentStreak: number;
+  longestStreak: number;
+  accountCreatedAt: string;
+  isPro: boolean;
+}
+
+// Quick Action Type
+export interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  href?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+// Dashboard Filter Type
+export type DashboardFilter = 'all' | 'in_progress' | 'completed';

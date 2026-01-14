@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { userService, subscriptionService } from '@/services';
 import { getAssetUrl } from '@/lib/api';
 import type { ProfileResponse, SubscriptionHistoryEntry } from '@/types';
@@ -24,15 +26,20 @@ import {
   Edit3,
   Save,
   X,
-  Loader2
+  Loader2,
+  LogOut
 } from 'lucide-react';
 import styles from './settings.module.css';
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { logout } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [history, setHistory] = useState<SubscriptionHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Edit mode state
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -62,6 +69,20 @@ export default function SettingsPage() {
       setIsLoading(false);
     }
   }, []);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
+    await logout();
+    router.push('/');
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
 
   useEffect(() => {
     fetchData();
@@ -132,8 +153,9 @@ export default function SettingsPage() {
       setIsEditingUsername(false);
       setSaveSuccess('Username updated successfully!');
       setTimeout(() => setSaveSuccess(''), 3000);
-    } catch (err: any) {
-      setUsernameError(err.response?.data?.message || 'Failed to update username');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update username';
+      setUsernameError(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -177,8 +199,9 @@ export default function SettingsPage() {
       setAvatarPreview(null); // Clear preview to show server URL
       setSaveSuccess('Avatar updated successfully!');
       setTimeout(() => setSaveSuccess(''), 3000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to upload avatar');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload avatar';
+      setError(errorMessage);
       setAvatarPreview(null);
     } finally {
       setIsUploadingAvatar(false);
@@ -189,28 +212,6 @@ export default function SettingsPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !profile) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.error}>
-          <AlertCircle size={48} />
-          <p>{error || 'Failed to load profile'}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.container}>
       {/* Header */}
@@ -218,6 +219,13 @@ export default function SettingsPage() {
         <h1 className={styles.title}>Profile Settings</h1>
         <p className={styles.subtitle}>Manage your account and view your stats</p>
       </div>
+
+      {error && !profile && (
+        <div className={styles.error}>
+          <AlertCircle size={48} />
+          <p>{error || 'Failed to load profile'}</p>
+        </div>
+      )}
 
       {/* Success Message */}
       {saveSuccess && (
@@ -229,93 +237,104 @@ export default function SettingsPage() {
 
       {/* Profile Card */}
       <div className={styles.profileCard}>
-        <div className={styles.profileHeader}>
-          <div className={styles.avatarSection}>
-            {/* Avatar with edit button */}
-            <div className={styles.avatarWrapper}>
-              <div className={styles.avatar} onClick={handleAvatarClick}>
-                {isUploadingAvatar ? (
-                  <div className={styles.avatarLoading}>
-                    <Loader2 size={24} className={styles.spinnerIcon} />
-                  </div>
-                ) : avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar preview" />
-                ) : profile.avatarUrl ? (
-                  <img src={getAssetUrl(profile.avatarUrl)} alt="Avatar" />
-                ) : (
-                  <User size={40} />
-                )}
-              </div>
-              <button className={styles.avatarEditBtn} onClick={handleAvatarClick} disabled={isUploadingAvatar}>
-                <Camera size={14} />
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                onChange={handleFileChange}
-                className={styles.hiddenInput}
-              />
-            </div>
-
-            <div className={styles.userInfo}>
-              {/* Username with edit */}
-              <div className={styles.usernameSection}>
-                {isEditingUsername ? (
-                  <div className={styles.usernameEdit}>
-                    <div className={styles.usernameInputWrapper}>
-                      <input
-                        type="text"
-                        value={newUsername}
-                        onChange={(e) => handleUsernameChange(e.target.value)}
-                        className={`${styles.usernameInput} ${usernameError ? styles.inputError : ''}`}
-                        placeholder="Enter username"
-                        maxLength={30}
-                      />
-                    </div>
-                    {usernameError && <p className={styles.errorText}>{usernameError}</p>}
-                    <div className={styles.editActions}>
-                      <button
-                        className={styles.saveBtn}
-                        onClick={handleSaveUsername}
-                        disabled={!!usernameError || isSaving || newUsername === profile.username}
-                      >
-                        {isSaving ? <Loader2 size={14} className={styles.spinnerIcon} /> : <Save size={14} />}
-                        Save
-                      </button>
-                      <button className={styles.cancelBtn} onClick={handleCancelEdit} disabled={isSaving}>
-                        <X size={14} />
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={styles.nameRow}>
-                    <div className={styles.usernameWithEdit}>
-                      <h2 className={styles.username}>{profile.username}</h2>
-                      <button className={styles.editBtn} onClick={handleEditUsername}>
-                        <Edit3 size={14} />
-                      </button>
-                    </div>
-                    <div className={`${styles.tierBadge} ${profile.isPro ? styles.proBadge : styles.freeBadge}`}>
-                      {profile.isPro ? <Crown size={14} /> : <Zap size={14} />}
-                      <span>{profile.tier}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <p className={styles.email}>{profile.email}</p>
-              <p className={styles.memberSince}>
-                <Calendar size={14} />
-                Member since {formatDate(profile.createdAt)}
-              </p>
+        {isLoading ? (
+          <div className={styles.profileCardSkeleton}>
+            <div className={styles.skeletonAvatar}></div>
+            <div className={styles.skeletonInfo}>
+              <div className={styles.skeletonLine} style={{ width: '60%' }}></div>
+              <div className={styles.skeletonLine} style={{ width: '40%' }}></div>
+              <div className={styles.skeletonLine} style={{ width: '50%' }}></div>
             </div>
           </div>
-        </div>
+        ) : profile ? (
+          <>
+            <div className={styles.profileHeader}>
+              <div className={styles.avatarSection}>
+                {/* Avatar with edit button */}
+                <div className={styles.avatarWrapper}>
+                  <div className={styles.avatar} onClick={handleAvatarClick}>
+                    {isUploadingAvatar ? (
+                      <div className={styles.avatarLoading}>
+                        <Loader2 size={24} className={styles.spinnerIcon} />
+                      </div>
+                    ) : avatarPreview ? (
+                      <img src={avatarPreview} alt="Avatar preview" />
+                    ) : profile.avatarUrl ? (
+                      <img src={getAssetUrl(profile.avatarUrl)} alt="Avatar" />
+                    ) : (
+                      <User size={40} />
+                    )}
+                  </div>
+                  <button className={styles.avatarEditBtn} onClick={handleAvatarClick} disabled={isUploadingAvatar}>
+                    <Camera size={14} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleFileChange}
+                    className={styles.hiddenInput}
+                  />
+                </div>
 
-        {/* Subscription Status */}
-        {profile.isPro && (
+                <div className={styles.userInfo}>
+                  {/* Username with edit */}
+                  <div className={styles.usernameSection}>
+                    {isEditingUsername ? (
+                      <div className={styles.usernameEdit}>
+                        <div className={styles.usernameInputWrapper}>
+                          <input
+                            type="text"
+                            value={newUsername}
+                            onChange={(e) => handleUsernameChange(e.target.value)}
+                            className={`${styles.usernameInput} ${usernameError ? styles.inputError : ''}`}
+                            placeholder="Enter username"
+                            maxLength={30}
+                          />
+                        </div>
+                        {usernameError && <p className={styles.errorText}>{usernameError}</p>}
+                        <div className={styles.editActions}>
+                          <button
+                            className={styles.saveBtn}
+                            onClick={handleSaveUsername}
+                            disabled={!!usernameError || isSaving || newUsername === profile.username}
+                          >
+                            {isSaving ? <Loader2 size={14} className={styles.spinnerIcon} /> : <Save size={14} />}
+                            Save
+                          </button>
+                          <button className={styles.cancelBtn} onClick={handleCancelEdit} disabled={isSaving}>
+                            <X size={14} />
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={styles.nameRow}>
+                        <div className={styles.usernameWithEdit}>
+                          <h2 className={styles.username}>{profile.username}</h2>
+                          <button className={styles.editBtn} onClick={handleEditUsername}>
+                            <Edit3 size={14} />
+                          </button>
+                        </div>
+                        <div className={`${styles.tierBadge} ${profile.isPro ? styles.proBadge : styles.freeBadge}`}>
+                          {profile.isPro ? <Crown size={14} /> : <Zap size={14} />}
+                          <span>{profile.tier}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className={styles.email}>{profile.email}</p>
+                  <p className={styles.memberSince}>
+                    <Calendar size={14} />
+                    Member since {formatDate(profile.createdAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Subscription Status */}
+            {profile.isPro && (
           <div className={styles.subscriptionStatus}>
             <div className={styles.subscriptionInfo}>
               <Crown size={20} className={styles.proIcon} />
@@ -332,7 +351,9 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
-        )}
+            )}
+          </>
+        ) : null}
       </div>
 
       {/* Stats Grid */}
@@ -341,33 +362,46 @@ export default function SettingsPage() {
         <h2 className={styles.sectionTitle}>Your Stats</h2>
       </div>
 
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.balanceIcon}`}>
-            <Coins size={20} />
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{profile.balance}</p>
-            <p className={styles.statLabel}>Broins Balance</p>
-          </div>
+      {isLoading ? (
+        <div className={styles.statsGridSkeleton}>
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className={styles.statCardSkeleton}>
+              <div className={styles.skeletonIcon}></div>
+              <div className={styles.skeletonStatInfo}>
+                <div className={styles.skeletonLine} style={{ width: '50%' }}></div>
+                <div className={styles.skeletonLine} style={{ width: '70%' }}></div>
+              </div>
+            </div>
+          ))}
         </div>
+      ) : profile ? (
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.balanceIcon}`}>
+              <Coins size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <p className={styles.statValue}>{profile.balance}</p>
+              <p className={styles.statLabel}>Broins Balance</p>
+            </div>
+          </div>
 
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.levelIcon}`}>
-            <TrendingUp size={20} />
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.levelIcon}`}>
+              <TrendingUp size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <p className={styles.statValue}>Level {profile.level}</p>
+              <p className={styles.statLabel}>{profile.experience} XP</p>
+            </div>
           </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>Level {profile.level}</p>
-            <p className={styles.statLabel}>{profile.experience} XP</p>
-          </div>
-        </div>
 
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.streakIcon}`}>
-            <Flame size={20} />
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{profile.currentStreak} days</p>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.streakIcon}`}>
+              <Flame size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <p className={styles.statValue}>{profile.currentStreak} days</p>
             <p className={styles.statLabel}>Current Streak</p>
           </div>
         </div>
@@ -412,16 +446,17 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className={styles.statCard}>
-          <div className={`${styles.statIcon} ${styles.activityIcon}`}>
-            <Clock size={20} />
-          </div>
-          <div className={styles.statContent}>
-            <p className={styles.statValue}>{formatDate(profile.lastActivityDate)}</p>
-            <p className={styles.statLabel}>Last Active</p>
+          <div className={styles.statCard}>
+            <div className={`${styles.statIcon} ${styles.activityIcon}`}>
+              <Clock size={20} />
+            </div>
+            <div className={styles.statContent}>
+              <p className={styles.statValue}>{formatDate(profile.lastActivityDate)}</p>
+              <p className={styles.statLabel}>Last Active</p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Subscription History */}
       <div className={styles.sectionHeader}>
@@ -469,6 +504,46 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Sign Out Button - Desktop Only */}
+      <button className={styles.desktopLogoutBtn} onClick={handleLogoutClick}>
+        <LogOut size={20} />
+        <span>Sign Out</span>
+      </button>
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <div className={styles.modalOverlay} onClick={handleLogoutCancel}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={handleLogoutCancel}>
+              <X size={20} />
+            </button>
+            <div className={styles.modalIcon}>
+              <LogOut size={32} />
+            </div>
+            <h3 className={styles.modalTitle}>Sign Out?</h3>
+            <p className={styles.modalText}>
+              Are you sure you want to sign out of your account?
+            </p>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.modalCancelBtn}
+                onClick={handleLogoutCancel}
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.modalConfirmBtn}
+                onClick={handleLogoutConfirm}
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

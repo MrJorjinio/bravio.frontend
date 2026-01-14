@@ -1,0 +1,395 @@
+.streakWidget {
+  background: rgba(20, 20, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  height: 100%;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.widgetTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.fireIcon {
+  color: #f97316;
+}
+
+.streakBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(251, 146, 60, 0.1));
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fb923c;
+}
+
+/* Calendar Grid */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dayLabel {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+.dayCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.dayCircle.active {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(251, 146, 60, 0.15));
+  border-color: rgba(249, 115, 22, 0.5);
+  color: #fb923c;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.dayCircle.protected {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(14, 165, 233, 0.15));
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #38bdf8;
+  animation: glowIce 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(249, 115, 22, 0.2);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+  }
+}
+
+@keyframes glowIce {
+  from {
+    box-shadow: 0 0 5px rgba(56, 189, 248, 0.2);
+  }
+  to {
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  }
+}
+
+.dayNumber {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Weekly Stats */
+.weeklyStats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.statValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.xpIcon {
+  color: #fbbf24;
+}
+
+.statDivider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* View All Button */
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.65rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewAllBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+/* Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeletonTitle {
+  width: 120px;
+  height: 20px;
+}
+
+.skeletonBadge {
+  width: 80px;
+  height: 28px;
+  border-radius: 100px;
+}
+
+.skeletonDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skeletonDayLabel {
+  width: 24px;
+  height: 12px;
+}
+
+.skeletonDayCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeletonStats {
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .streakWidget {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .widgetHeader {
+    margin-bottom: 1rem;
+  }
+
+  .widgetTitle {
+    font-size: 0.95rem;
+    gap: 0.4rem;
+  }
+
+  .fireIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .streakBadge {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .calendarGrid {
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .dayLabel {
+    font-size: 0.65rem;
+  }
+
+  .dayCircle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dayNumber {
+    font-size: 0.75rem;
+  }
+
+  .weeklyStats {
+    padding: 0.65rem;
+    border-radius: 8px;
+    gap: 0.75rem;
+  }
+
+  .statValue {
+    font-size: 0.85rem;
+  }
+
+  .statLabel {
+    font-size: 0.7rem;
+  }
+
+  .viewAllBtn {
+    margin-top: 0.875rem;
+    padding: 0.6rem 0.875rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .streakWidget {
+    padding: 0.875rem;
+  }
+
+  .widgetHeader {
+    margin-bottom: 0.875rem;
+  }
+
+  .widgetTitle {
+    font-size: 0.9rem;
+  }
+
+  .streakBadge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .calendarGrid {
+    gap: 0.25rem;
+  }
+
+  .dayColumn {
+    gap: 0.35rem;
+  }
+
+  .dayLabel {
+    font-size: 0.6rem;
+  }
+
+  .dayCircle {
+    width: 32px;
+    height: 32px;
+    border-width: 1.5px;
+  }
+
+  .dayCircle svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .dayNumber {
+    font-size: 0.7rem;
+  }
+
+  .weeklyStats {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .statDivider {
+    display: none;
+  }
+
+  .statItem {
+    width: calc(33% - 0.5rem);
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .statItem svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .statValue {
+    font-size: 0.8rem;
+  }
+
+  .statLabel {
+    font-size: 0.65rem;
+  }
+
+  .viewAllBtn {
+    margin-top: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .viewAllBtn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dayCircle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .dayCircle svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .dayNumber {
+    font-size: 0.65rem;
+  }
+
+  .statItem {
+    width: 100%;
+  }
+}

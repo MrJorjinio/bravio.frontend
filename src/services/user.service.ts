@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import type { StreakResponse, LevelResponse, DailyBonusResponse, ProfileResponse, PublicProfileResponse, UpdateProfileResponse } from '@/types';
+import type { StreakResponse, LevelResponse, DailyBonusResponse, ProfileResponse, PublicProfileResponse, UpdateProfileResponse, WeeklyActivityResponse, ActivityHistoryResponse } from '@/types';
 
 export const userService = {
   async getStreak(): Promise<StreakResponse> {
@@ -43,6 +43,16 @@ export const userService = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
+  },
+
+  async getWeeklyActivity(): Promise<WeeklyActivityResponse> {
+    const response = await api.get<WeeklyActivityResponse>('/users/me/weekly-activity');
+    return response.data;
+  },
+
+  async getActivityHistory(): Promise<ActivityHistoryResponse> {
+    const response = await api.get<ActivityHistoryResponse>('/users/me/activity-history');
     return response.data;
   },
 };

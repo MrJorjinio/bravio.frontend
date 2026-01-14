@@ -188,9 +188,57 @@ export default function WalletPage() {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading wallet...</p>
+        {/* Skeleton Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={`${styles.skeleton} ${styles.skeletonTitle}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`}></div>
+          </div>
+        </div>
+
+        {/* Skeleton Balance Card */}
+        <div className={styles.cardWrapper}>
+          <div className={`${styles.skeleton} ${styles.skeletonCard}`}></div>
+        </div>
+
+        {/* Skeleton Purchase Section */}
+        <div className={styles.purchaseSection}>
+          <div className={styles.skeletonSectionHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonIndicator}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`}></div>
+          </div>
+          <div className={styles.skeletonPurchaseGrid}>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className={styles.skeletonPurchaseOption}>
+                <div className={`${styles.skeleton} ${styles.skeletonOptionLabel}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonOptionPrice}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonOptionBroins}`}></div>
+              </div>
+            ))}
+          </div>
+          <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
+        </div>
+
+        {/* Skeleton Activity Section */}
+        <div className={styles.activitySection}>
+          <div className={styles.skeletonActivityHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonActivityTitle}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonViewAll}`}></div>
+          </div>
+          <div className={styles.transactionList}>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className={styles.skeletonTransaction}>
+                <div className={styles.skeletonTransactionLeft}>
+                  <div className={`${styles.skeleton} ${styles.skeletonTransactionIcon}`}></div>
+                  <div className={styles.skeletonTransactionInfo}>
+                    <div className={`${styles.skeleton} ${styles.skeletonTransactionTitle}`}></div>
+                    <div className={`${styles.skeleton} ${styles.skeletonTransactionDate}`}></div>
+                  </div>
+                </div>
+                <div className={`${styles.skeleton} ${styles.skeletonTransactionAmount}`}></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

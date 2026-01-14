@@ -420,6 +420,120 @@
   to { transform: rotate(360deg); }
 }
 
+/* Skeleton Loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonTitle {
+  height: 40px;
+  width: 150px;
+  margin-bottom: 8px;
+}
+
+.skeletonSubtitle {
+  height: 20px;
+  width: 280px;
+}
+
+.skeletonBadge {
+  height: 42px;
+  width: 100px;
+  border-radius: 12px;
+}
+
+.skeletonProgressBar {
+  height: 8px;
+  width: 100%;
+  border-radius: 50px;
+  margin-bottom: 8px;
+}
+
+.skeletonProgressText {
+  height: 16px;
+  width: 100px;
+  margin-left: auto;
+}
+
+.skeletonFilterTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.skeletonTab {
+  height: 40px;
+  width: 90px;
+  border-radius: 12px;
+}
+
+.skeletonSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.skeletonIndicator {
+  width: 6px;
+  height: 24px;
+  border-radius: 50px;
+}
+
+.skeletonSectionTitle {
+  height: 22px;
+  width: 120px;
+}
+
+.skeletonCard {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skeletonIconWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 16px;
+}
+
+.skeletonBadgeName {
+  height: 20px;
+  width: 80%;
+  margin-bottom: 8px;
+}
+
+.skeletonBadgeDesc {
+  height: 14px;
+  width: 90%;
+  margin-bottom: 4px;
+}
+
+.skeletonBadgeProgress {
+  height: 36px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
@@ -436,7 +550,14 @@
   }
 
   .filterTabs {
-    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filterTab {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    gap: 4px;
+    border-radius: 10px;
   }
 
   .badgesGrid {
@@ -446,6 +567,20 @@
 
   .badgeCard {
     padding: 20px 12px;
+  }
+
+  .proBadgeLabel {
+    top: 6px;
+    right: 6px;
+    padding: 2px 5px;
+    font-size: 0.5rem;
+  }
+
+  .displayBadgeLabel {
+    top: 6px;
+    left: 6px;
+    padding: 2px 5px;
+    font-size: 0.45rem;
   }
 
   .badgeWrapper {
@@ -482,6 +617,17 @@
     font-size: 1.75rem;
   }
 
+  .filterTabs {
+    gap: 4px;
+  }
+
+  .filterTab {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    gap: 3px;
+    border-radius: 8px;
+  }
+
   .badgesGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -490,6 +636,22 @@
   .badgeCard {
     padding: 16px 10px;
     border-radius: 16px;
+  }
+
+  .proBadgeLabel {
+    top: 4px;
+    right: 4px;
+    padding: 2px 4px;
+    font-size: 0.45rem;
+    gap: 2px;
+  }
+
+  .displayBadgeLabel {
+    top: 4px;
+    left: 4px;
+    padding: 2px 4px;
+    font-size: 0.4rem;
+    gap: 2px;
   }
 
   .badgeWrapper {

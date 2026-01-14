@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { walletService, subscriptionService } from '@/services';
 import type { SubscriptionStatusResponse } from '@/types';
-import { LayoutGrid, UploadCloud, Folder, Wallet, LogOut, Coins, X, Gift, Crown, Award, Trophy, Settings, User } from 'lucide-react';
+import { LayoutGrid, UploadCloud, Folder, Wallet, Coins, Gift, Crown, Award, Trophy, Settings, User } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -16,11 +16,9 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [balance, setBalance] = useState(0);
   const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -72,20 +70,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       window.removeEventListener('subscriptionUpdated', handleSubscriptionUpdate);
     };
   }, [fetchSubscription]);
-
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-  };
-
-  const handleLogoutConfirm = async () => {
-    setIsLoggingOut(true);
-    await logout();
-    router.push('/');
-  };
-
-  const handleLogoutCancel = () => {
-    setShowLogoutModal(false);
-  };
 
   const isActive = (path: string) => {
     if (path === '/dashboard') {
@@ -191,19 +175,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </Link>
         </nav>
 
-        <div className={styles.sidebarFooter}>
-          <div className={styles.balanceCard}>
-            <p className={styles.balanceLabel}>Your Balance</p>
-            <div className={styles.balanceValue}>
-              <Coins className={styles.balanceIcon} />
-              <span>{balance}</span>
-            </div>
-          </div>
-          <button className={styles.logoutBtn} onClick={handleLogoutClick}>
-            <LogOut size={18} />
-            <span>Sign Out</span>
-          </button>
-        </div>
       </aside>
 
       {/* Mobile Header */}
@@ -262,39 +233,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </Link>
       </nav>
 
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className={styles.modalOverlay} onClick={handleLogoutCancel}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={handleLogoutCancel}>
-              <X size={20} />
-            </button>
-            <div className={styles.modalIcon}>
-              <LogOut size={32} />
-            </div>
-            <h3 className={styles.modalTitle}>Sign Out?</h3>
-            <p className={styles.modalText}>
-              Are you sure you want to sign out of your account?
-            </p>
-            <div className={styles.modalActions}>
-              <button
-                className={styles.modalCancelBtn}
-                onClick={handleLogoutCancel}
-                disabled={isLoggingOut}
-              >
-                Cancel
-              </button>
-              <button
-                className={styles.modalConfirmBtn}
-                onClick={handleLogoutConfirm}
-                disabled={isLoggingOut}
-              >
-                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

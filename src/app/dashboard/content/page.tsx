@@ -151,9 +151,31 @@ export default function ContentPage() {
 
       {/* Content Grid */}
       {isLoading ? (
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading content...</p>
+        <div className={styles.contentGrid}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className={styles.skeletonCard}>
+              <div className={styles.skeletonCardHeader}>
+                <div className={`${styles.skeleton} ${styles.skeletonDate}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonStatus}`}></div>
+              </div>
+              <div className={styles.skeletonCardBody}>
+                <div className={`${styles.skeleton} ${styles.skeletonCardTitle}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonCardPreview}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonCardPreview2}`}></div>
+              </div>
+              <div className={styles.skeletonCardFooter}>
+                <div className={styles.skeletonMeta}>
+                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
+                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
+                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
+                </div>
+                <div className={styles.skeletonActions}>
+                  <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
+                  <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : uploads.length === 0 ? (
         <div className={styles.emptyState}>

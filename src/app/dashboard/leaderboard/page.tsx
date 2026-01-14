@@ -94,9 +94,71 @@ export default function LeaderboardPage() {
   if (isLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading leaderboard...</p>
+        {/* Skeleton Header */}
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <div className={`${styles.skeleton} ${styles.skeletonTitle}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSubtitle}`}></div>
+          </div>
+        </div>
+
+        {/* Skeleton Period Toggle */}
+        <div className={styles.skeletonPeriodToggle}>
+          <div className={`${styles.skeleton} ${styles.skeletonPeriodBtn}`}></div>
+          <div className={`${styles.skeleton} ${styles.skeletonPeriodBtn}`}></div>
+          <div className={`${styles.skeleton} ${styles.skeletonPeriodBtn}`}></div>
+        </div>
+
+        {/* Skeleton Your Rank Card */}
+        <div className={`${styles.skeleton} ${styles.skeletonRankCard}`}></div>
+
+        {/* Skeleton Podium */}
+        <div className={styles.skeletonPodium}>
+          <div className={`${styles.skeletonPodiumItem} ${styles.skeletonPodiumSecond}`}>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumAvatar}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumIcon}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumName}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumXp}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumBase}`}></div>
+          </div>
+          <div className={`${styles.skeletonPodiumItem} ${styles.skeletonPodiumFirst}`}>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumAvatar}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumIcon}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumName}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumXp}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumBase}`}></div>
+          </div>
+          <div className={`${styles.skeletonPodiumItem} ${styles.skeletonPodiumThird}`}>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumAvatar}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumIcon}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumName}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumXp}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonPodiumBase}`}></div>
+          </div>
+        </div>
+
+        {/* Skeleton Rankings Section */}
+        <div className={styles.rankingsSection}>
+          <div className={styles.skeletonSectionHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonIndicator}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonSectionTitle}`}></div>
+          </div>
+          <div className={styles.rankingsList}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className={styles.skeletonRankingRow}>
+                <div className={`${styles.skeleton} ${styles.skeletonRankNumber}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonRankingAvatar}`}></div>
+                <div className={styles.skeletonRankingInfo}>
+                  <div className={`${styles.skeleton} ${styles.skeletonRankingName}`}></div>
+                  <div className={`${styles.skeleton} ${styles.skeletonRankingLevel}`}></div>
+                </div>
+                <div className={styles.skeletonRankingXp}>
+                  <div className={`${styles.skeleton} ${styles.skeletonXpValue}`}></div>
+                  <div className={`${styles.skeleton} ${styles.skeletonXpLabel}`}></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
