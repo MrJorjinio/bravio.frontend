@@ -14,7 +14,8 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
+  Eye
 } from 'lucide-react';
 import styles from './content.module.css';
 
@@ -31,6 +32,7 @@ export default function ContentPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [practiceStatsMap, setPracticeStatsMap] = useState<Map<string, { attempted: number; total: number }>>(new Map());
 
   const fetchUploads = useCallback(async () => {
     try {
@@ -39,6 +41,23 @@ export default function ContentPage() {
       const res = await uploadService.getUploads(currentPage, ITEMS_PER_PAGE, status);
       setUploads(res.uploads || []);
       setTotalCount(res.totalCount || 0);
+
+      // Build practice stats map for completed uploads
+      const statsMap = new Map<string, { attempted: number; total: number }>();
+      for (const upload of res.uploads || []) {
+        if (upload.status.toLowerCase() === 'completed') {
+          try {
+            const practiceStats = await uploadService.getPracticeStats(upload.id);
+            statsMap.set(upload.id, {
+              attempted: practiceStats.flashcardsAttempted,
+              total: practiceStats.totalFlashcards
+            });
+          } catch {
+            statsMap.set(upload.id, { attempted: 0, total: upload.flashcardCount || 0 });
+          }
+        }
+      }
+      setPracticeStatsMap(statsMap);
     } catch (err) {
       console.error('Failed to fetch uploads:', err);
     } finally {
@@ -49,6 +68,19 @@ export default function ContentPage() {
   useEffect(() => {
     fetchUploads();
   }, [fetchUploads]);
+
+  const getProgress = (uploadId: string) => {
+    const stats = practiceStatsMap.get(uploadId);
+    if (!stats || !stats.total || stats.total === 0) return 0;
+    const percent = Math.round((stats.attempted / stats.total) * 100);
+    return isNaN(percent) ? 0 : percent;
+  };
+
+  const isComplete = (uploadId: string) => {
+    const stats = practiceStatsMap.get(uploadId);
+    if (!stats) return false;
+    return stats.attempted >= stats.total && stats.total > 0;
+  };
 
   const handleDeleteClick = (uploadId: string) => {
     setSelectedUploadId(uploadId);
@@ -154,26 +186,11 @@ export default function ContentPage() {
         <div className={styles.contentGrid}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className={styles.skeletonCard}>
-              <div className={styles.skeletonCardHeader}>
-                <div className={`${styles.skeleton} ${styles.skeletonDate}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonStatus}`}></div>
-              </div>
-              <div className={styles.skeletonCardBody}>
-                <div className={`${styles.skeleton} ${styles.skeletonCardTitle}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonCardPreview}`}></div>
-                <div className={`${styles.skeleton} ${styles.skeletonCardPreview2}`}></div>
-              </div>
-              <div className={styles.skeletonCardFooter}>
-                <div className={styles.skeletonMeta}>
-                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
-                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
-                  <div className={`${styles.skeleton} ${styles.skeletonMetaItem}`}></div>
-                </div>
-                <div className={styles.skeletonActions}>
-                  <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
-                  <div className={`${styles.skeleton} ${styles.skeletonBtn}`}></div>
-                </div>
-              </div>
+              <div className={`${styles.skeleton} ${styles.skeletonIcon}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonCardTitle}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonCardMeta}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonProgress}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonViewBtn}`}></div>
             </div>
           ))}
         </div>
@@ -200,55 +217,76 @@ export default function ContentPage() {
         </div>
       ) : (
         <div className={styles.contentGrid}>
-          {uploads.map((upload) => (
-            <div key={upload.id} className={styles.contentCard}>
-              <div className={styles.cardGlow}></div>
-              <div className={styles.cardInner}>
-                <div className={styles.cardHeader}>
-                  <span className={styles.cardDate}>{formatDate(upload.createdAt)}</span>
-                  <div className={`${styles.statusBadge} ${getStatusClass(upload.status)}`}>
-                    {upload.status.toLowerCase() === 'completed' && <CheckCircle2 size={12} />}
-                    {upload.status}
-                  </div>
-                </div>
+          {uploads.map((upload) => {
+            const progress = getProgress(upload.id);
+            const complete = isComplete(upload.id);
+            const isCompleted = upload.status.toLowerCase() === 'completed';
 
-                <div className={styles.cardBody}>
+            return (
+              <div key={upload.id} className={styles.contentCard}>
+                <div className={styles.cardGlow}></div>
+                <div className={styles.cardInner}>
+                  <div className={styles.cardHeader}>
+                    <div className={styles.deckIcon}>
+                      <Layers size={18} />
+                    </div>
+                    <div className={styles.headerRight}>
+                      {complete && <span className={styles.completeBadge}>Complete</span>}
+                      <div className={`${styles.statusBadge} ${getStatusClass(upload.status)}`}>
+                        {isCompleted && <CheckCircle2 size={12} />}
+                        {upload.status}
+                      </div>
+                      <button
+                        className={styles.deleteBtn}
+                        onClick={() => handleDeleteClick(upload.id)}
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+
                   <h3 className={styles.cardTitle}>{upload.title || 'Untitled'}</h3>
+
                   <p className={styles.cardPreview}>
                     {upload.summaryPreview || upload.contentPreview || 'Processing...'}
                   </p>
-                </div>
 
-                <div className={styles.cardFooter}>
                   <div className={styles.cardMeta}>
+                    <span className={styles.metaItem}>
+                      <Layers size={14} />
+                      {upload.flashcardCount} cards
+                    </span>
                     {upload.keyPointsCount !== undefined && upload.keyPointsCount > 0 && (
-                      <span className={styles.metaItem} title="Key Points">
-                        <Target size={14} className={styles.pinkIcon} />
-                        {upload.keyPointsCount}
+                      <span className={styles.metaItem}>
+                        <Target size={14} />
+                        {upload.keyPointsCount} points
                       </span>
                     )}
-                    <span className={styles.metaItem} title="Flashcards">
-                      <Layers size={14} className={styles.purpleIcon} />
-                      {upload.flashcardCount}
-                    </span>
-                    <span className={styles.metaItem} title="Broins">
-                      <Coins size={14} className={styles.yellowIcon} />
-                      {upload.broinsCost}
+                    <span className={styles.metaItem}>
+                      <Coins size={14} />
+                      {upload.broinsCost} broins
                     </span>
                   </div>
 
+                  {isCompleted && (
+                    <div className={styles.progressSection}>
+                      <div className={styles.progressBar}>
+                        <div
+                          className={`${styles.progressFill} ${complete ? styles.complete : ''}`}
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                      <span className={styles.progressText}>{progress}% mastered</span>
+                    </div>
+                  )}
+
                   <div className={styles.cardActions}>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => handleDeleteClick(upload.id)}
-                      title="Delete"
-                    >
-                      <Trash2 size={18} />
-                    </button>
                     <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
-                      View
+                      <Eye size={16} />
+                      View Details
                     </Link>
-                    {upload.status.toLowerCase() === 'completed' && (
+                    {isCompleted && (
                       <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
                         Practice
                       </Link>
@@ -256,8 +294,8 @@ export default function ContentPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
