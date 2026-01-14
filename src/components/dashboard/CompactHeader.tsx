@@ -39,39 +39,12 @@ export default function CompactHeader({
 
   return (
     <div className={styles.compactHeader}>
-      {/* Top Row - Level & Daily Bonus */}
-      <div className={styles.topRow}>
-        {/* Level Badge */}
-        <div className={styles.levelBadge}>
-          <div className={styles.levelIcon}>
-            <Star size={16} />
-          </div>
-          <span className={styles.levelText}>Level {level}</span>
+      {/* Level Badge */}
+      <div className={styles.levelBadge}>
+        <div className={styles.levelIcon}>
+          <Star size={16} />
         </div>
-
-        {/* Daily Bonus Button */}
-        <button
-          className={`${styles.dailyBonusBtn} ${dailyBonusClaimed ? styles.claimed : ''}`}
-          onClick={handleClaim}
-          disabled={dailyBonusClaimed || isClaiming}
-        >
-          {isClaiming ? (
-            <>
-              <Loader2 size={18} className={styles.spinner} />
-              <span>Claiming...</span>
-            </>
-          ) : dailyBonusClaimed ? (
-            <>
-              <CheckCircle2 size={18} />
-              <span>Claimed!</span>
-            </>
-          ) : (
-            <>
-              <Gift size={18} />
-              <span>+{dailyBonusAmount} Daily</span>
-            </>
-          )}
-        </button>
+        <span className={styles.levelText}>Level {level}</span>
       </div>
 
       {/* XP Progress */}
@@ -94,6 +67,30 @@ export default function CompactHeader({
           </span>
         </div>
       </div>
+
+      {/* Daily Bonus Button */}
+      <button
+        className={`${styles.dailyBonusBtn} ${dailyBonusClaimed ? styles.claimed : ''}`}
+        onClick={handleClaim}
+        disabled={dailyBonusClaimed || isClaiming}
+      >
+        {isClaiming ? (
+          <>
+            <Loader2 size={18} className={styles.spinner} />
+            <span>Claiming...</span>
+          </>
+        ) : dailyBonusClaimed ? (
+          <>
+            <CheckCircle2 size={18} />
+            <span>Claimed!</span>
+          </>
+        ) : (
+          <>
+            <Gift size={18} />
+            <span>+{dailyBonusAmount} Daily</span>
+          </>
+        )}
+      </button>
     </div>
   );
 }
