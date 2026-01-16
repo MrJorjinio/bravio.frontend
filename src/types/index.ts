@@ -35,9 +35,11 @@ export interface RefreshTokenRequest {
 export interface User {
   id: string;
   email: string;
+  username: string;
   broinsBalance: number;
   avatarUrl?: string;
   createdAt: string;
+  isAdmin?: boolean;
 }
 
 export interface StreakResponse {
@@ -45,6 +47,7 @@ export interface StreakResponse {
   longestStreak: number;
   lastActivityDate?: string;
   isActiveToday: boolean;
+  dailyBonusClaimed: boolean;
   streakBonusAwarded?: boolean;
   streakBonusAmount?: number;
   daysUntilNextBonus?: number;
@@ -53,6 +56,8 @@ export interface StreakResponse {
 export interface LevelResponse {
   level: number;
   experience: number;
+  experienceInCurrentLevel: number;
+  experienceRequiredForLevel: number;
   experienceToNextLevel: number;
   totalExperienceForNextLevel: number;
   progressPercent: number;
@@ -141,6 +146,16 @@ export interface CreatePdfUploadRequest {
   title?: string;
 }
 
+export interface CreateUrlUploadRequest {
+  url: string;
+  title?: string;
+}
+
+export interface CreateVoiceUploadRequest {
+  audioFile: File;
+  title?: string;
+}
+
 export interface UploadChunk {
   id: string;
   chunkIndex: number;
@@ -176,6 +191,10 @@ export interface Upload {
   sourceType?: 'Text' | 'Pdf';
   originalFileName?: string;
   pageCount?: number;
+  // Practice stats (inline from list API to avoid N+1 queries)
+  flashcardsAttempted?: number;
+  flashcardsCompleted?: number;
+  accuracy?: number;
 }
 
 // Lightweight upload summary (doesn't include all chunks/flashcards)
@@ -307,7 +326,8 @@ export interface PracticeStats {
   correctAttempts: number;
   accuracy: number;
   flashcardsAttempted: number;
-  totalFlashcards: number;
+  flashcardsTotal: number;
+  flashcardsCompleted: number;
 }
 
 // API Response Types
@@ -716,3 +736,92 @@ export interface QuickAction {
 
 // Dashboard Filter Type
 export type DashboardFilter = 'all' | 'in_progress' | 'completed';
+
+// ============================================
+// Admin Analytics Types
+// ============================================
+
+export interface UserStats {
+  total: number;
+  today: number;
+  thisWeek: number;
+  thisMonth: number;
+}
+
+export interface RevenueStats {
+  totalUSD: number;
+  thisMonthUSD: number;
+  totalTransactions: number;
+}
+
+export interface ContentStats {
+  totalUploads: number;
+  totalPdfs: number;
+  totalFlashcards: number;
+}
+
+export interface EconomyStats {
+  totalBroinsInCirculation: number;
+  totalBroinsSpent: number;
+  totalBroinsPurchased: number;
+}
+
+export interface AnalyticsOverviewResponse {
+  users: UserStats;
+  revenue: RevenueStats;
+  content: ContentStats;
+  economy: EconomyStats;
+}
+
+export interface UserGrowthDataPoint {
+  date: string;
+  newUsers: number;
+  totalUsers: number;
+}
+
+export interface UserGrowthResponse {
+  period: string;
+  data: UserGrowthDataPoint[];
+}
+
+export interface RevenueTrendDataPoint {
+  date: string;
+  revenueUSD: number;
+  transactions: number;
+}
+
+export interface RevenueTrendResponse {
+  period: string;
+  data: RevenueTrendDataPoint[];
+}
+
+export interface TopPageItem {
+  path: string;
+  viewCount: number;
+  uniqueUsers: number;
+}
+
+export interface TopPagesResponse {
+  pages: TopPageItem[];
+}
+
+export interface TransactionTypeStats {
+  type: string;
+  count: number;
+  totalBroins: number;
+}
+
+export interface RecentPurchaseItem {
+  userId: string;
+  username: string;
+  amountUSD: number;
+  broins: number;
+  date: string;
+}
+
+export interface TransactionBreakdownResponse {
+  byType: TransactionTypeStats[];
+  recentPurchases: RecentPurchaseItem[];
+}
+
+export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y';

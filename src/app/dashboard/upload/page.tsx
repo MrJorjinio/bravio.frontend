@@ -21,13 +21,15 @@ import {
   Upload,
   File,
   Crown,
-  AlertTriangle
+  AlertTriangle,
+  Link2,
+  Mic
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './upload.module.css';
 
 type UploadState = 'idle' | 'spending' | 'processing' | 'chunking' | 'transitioning' | 'success';
-type UploadMode = 'text' | 'pdf';
+type UploadMode = 'text' | 'pdf' | 'url' | 'voice';
 
 interface ChunkStatus {
   index: number;
@@ -48,6 +50,14 @@ export default function UploadPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // URL upload state
+  const [urlInput, setUrlInput] = useState('');
+
+  // Voice upload state
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [isAudioDragging, setIsAudioDragging] = useState(false);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   // Subscription/tier state
   const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
@@ -76,7 +86,14 @@ export default function UploadPage() {
   const maxChars = tierLimits.textMaxChars;
   const maxPdfPages = tierLimits.pdfMaxPages;
   const isOverCharLimit = charCount > maxChars;
-  const isValidLength = uploadMode === 'text' ? charCount >= 200 && !isOverCharLimit : pdfFile !== null;
+
+  // Validation for each mode
+  const isValidUrl = urlInput.trim().length > 0 && (urlInput.startsWith('http://') || urlInput.startsWith('https://'));
+  const isValidLength =
+    uploadMode === 'text' ? charCount >= 200 && !isOverCharLimit :
+    uploadMode === 'pdf' ? pdfFile !== null :
+    uploadMode === 'url' ? isValidUrl :
+    uploadMode === 'voice' ? audioFile !== null : false;
   const chunkSize = 4000;
   const estimatedChunks = Math.ceil(charCount / (chunkSize - 350)); // Account for overlap
 
@@ -123,6 +140,50 @@ export default function UploadPage() {
     setPdfFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Audio file handlers
+  const handleAudioSelect = (file: File) => {
+    const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/webm', 'audio/ogg', 'audio/m4a', 'audio/mp4'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|webm|ogg|m4a)$/i)) {
+      setError('Please select a valid audio file (MP3, WAV, WebM, OGG, M4A)');
+      return;
+    }
+    setAudioFile(file);
+    setError('');
+  };
+
+  const handleAudioDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsAudioDragging(true);
+  };
+
+  const handleAudioDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsAudioDragging(false);
+  };
+
+  const handleAudioDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsAudioDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleAudioSelect(file);
+    }
+  };
+
+  const handleAudioInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleAudioSelect(file);
+    }
+  };
+
+  const handleRemoveAudio = () => {
+    setAudioFile(null);
+    if (audioInputRef.current) {
+      audioInputRef.current.value = '';
     }
   };
 
@@ -242,7 +303,7 @@ export default function UploadPage() {
         setError(errorMessage);
         setUploadState('idle');
       }
-    } else {
+    } else if (uploadMode === 'pdf') {
       // PDF upload
       if (!pdfFile) {
         setError('Please select a PDF file');
@@ -299,6 +360,118 @@ export default function UploadPage() {
         }
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to process PDF. Please try again.';
+        setError(errorMessage);
+        setUploadState('idle');
+      }
+    } else if (uploadMode === 'url') {
+      // URL upload
+      if (!isValidUrl) {
+        setError('Please enter a valid URL (starting with http:// or https://)');
+        return;
+      }
+
+      setUploadState('spending');
+      const startTime = Date.now();
+
+      try {
+        const result = await uploadService.createUrlUpload({
+          url: urlInput.trim(),
+          title: title || undefined
+        });
+        setUploadedId(result.id);
+
+        // Check if URL content will be chunked based on response
+        const isChunked = result.isChunked && (result.totalChunks || 0) > 1;
+
+        if (isChunked) {
+          const chunks = result.totalChunks || 1;
+          setTotalChunks(chunks);
+          setCompletedChunks(0);
+          setTotalFlashcards(0);
+          setChunkStatuses(
+            Array.from({ length: chunks }, (_, i) => ({
+              index: i,
+              status: i === 0 ? 'processing' : 'pending'
+            }))
+          );
+
+          const elapsed = Date.now() - startTime;
+          const minSpendingTime = 3000;
+          const remainingTime = Math.max(0, minSpendingTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('chunking');
+          }, remainingTime);
+        } else {
+          const elapsed = Date.now() - startTime;
+          const minDisplayTime = 2000;
+          const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('transitioning');
+            setTimeout(() => {
+              setUploadState('success');
+            }, 400);
+          }, remainingTime);
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to extract content from URL. Please try again.';
+        setError(errorMessage);
+        setUploadState('idle');
+      }
+    } else if (uploadMode === 'voice') {
+      // Voice upload
+      if (!audioFile) {
+        setError('Please select an audio file');
+        return;
+      }
+
+      setUploadState('spending');
+      const startTime = Date.now();
+
+      try {
+        const result = await uploadService.createVoiceUpload({
+          audioFile: audioFile,
+          title: title || undefined
+        });
+        setUploadedId(result.id);
+
+        // Check if transcribed content will be chunked based on response
+        const isChunked = result.isChunked && (result.totalChunks || 0) > 1;
+
+        if (isChunked) {
+          const chunks = result.totalChunks || 1;
+          setTotalChunks(chunks);
+          setCompletedChunks(0);
+          setTotalFlashcards(0);
+          setChunkStatuses(
+            Array.from({ length: chunks }, (_, i) => ({
+              index: i,
+              status: i === 0 ? 'processing' : 'pending'
+            }))
+          );
+
+          const elapsed = Date.now() - startTime;
+          const minSpendingTime = 3000;
+          const remainingTime = Math.max(0, minSpendingTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('chunking');
+          }, remainingTime);
+        } else {
+          const elapsed = Date.now() - startTime;
+          const minDisplayTime = 2000;
+          const remainingTime = Math.max(0, minDisplayTime - elapsed);
+
+          setTimeout(() => {
+            setUploadState('transitioning');
+            setTimeout(() => {
+              setUploadState('success');
+            }, 400);
+          }, remainingTime);
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to transcribe audio. Please try again.';
         setError(errorMessage);
         setUploadState('idle');
       }
@@ -522,7 +695,7 @@ export default function UploadPage() {
                 onClick={() => setUploadMode('text')}
               >
                 <Type size={18} />
-                Paste Text
+                Text
               </button>
               <button
                 type="button"
@@ -530,7 +703,23 @@ export default function UploadPage() {
                 onClick={() => setUploadMode('pdf')}
               >
                 <FileText size={18} />
-                Upload PDF
+                PDF
+              </button>
+              <button
+                type="button"
+                className={`${styles.uploadTab} ${uploadMode === 'url' ? styles.uploadTabActive : ''}`}
+                onClick={() => setUploadMode('url')}
+              >
+                <Link2 size={18} />
+                URL
+              </button>
+              <button
+                type="button"
+                className={`${styles.uploadTab} ${uploadMode === 'voice' ? styles.uploadTabActive : ''}`}
+                onClick={() => setUploadMode('voice')}
+              >
+                <Mic size={18} />
+                Voice
               </button>
             </div>
 
@@ -553,7 +742,8 @@ export default function UploadPage() {
                 </div>
               </div>
 
-              {uploadMode === 'text' ? (
+              {/* Text Mode */}
+              {uploadMode === 'text' && (
                 <div className={styles.formGroup}>
                   <div className={styles.labelRow}>
                     <label className={styles.label}>Study Material</label>
@@ -612,7 +802,10 @@ export default function UploadPage() {
                     </div>
                   )}
                 </div>
-              ) : (
+              )}
+
+              {/* PDF Mode */}
+              {uploadMode === 'pdf' && (
                 <div className={styles.formGroup}>
                   <div className={styles.labelRow}>
                     <label className={styles.label}>PDF Document</label>
@@ -673,13 +866,97 @@ export default function UploadPage() {
                 </div>
               )}
 
+              {/* URL Mode */}
+              {uploadMode === 'url' && (
+                <div className={styles.formGroup}>
+                  <div className={styles.labelRow}>
+                    <label className={styles.label}>Web Page URL</label>
+                    <span className={styles.charBadge}>
+                      Article, blog, or documentation
+                    </span>
+                  </div>
+                  <div className={styles.inputWrapper}>
+                    <Link2 size={20} className={styles.inputIcon} />
+                    <input
+                      type="url"
+                      className={styles.input}
+                      placeholder="https://example.com/article"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                    />
+                  </div>
+                  <p className={styles.dropZoneHint} style={{ marginTop: '0.5rem' }}>
+                    We'll extract the main content from the page and generate learning materials
+                  </p>
+                </div>
+              )}
+
+              {/* Voice Mode */}
+              {uploadMode === 'voice' && (
+                <div className={styles.formGroup}>
+                  <div className={styles.labelRow}>
+                    <label className={styles.label}>Audio Recording</label>
+                    <span className={styles.charBadge}>
+                      MP3, WAV, WebM, OGG, M4A
+                    </span>
+                  </div>
+
+                  {!audioFile ? (
+                    <div
+                      className={`${styles.dropZone} ${isAudioDragging ? styles.dropZoneDragging : ''}`}
+                      onDragOver={handleAudioDragOver}
+                      onDragLeave={handleAudioDragLeave}
+                      onDrop={handleAudioDrop}
+                      onClick={() => audioInputRef.current?.click()}
+                    >
+                      <input
+                        ref={audioInputRef}
+                        type="file"
+                        accept="audio/*,.mp3,.wav,.webm,.ogg,.m4a"
+                        onChange={handleAudioInputChange}
+                        className={styles.fileInput}
+                      />
+                      <div className={styles.dropZoneIcon}>
+                        <Mic size={40} />
+                      </div>
+                      <p className={styles.dropZoneText}>
+                        Drag & drop your audio file here, or <span className={styles.dropZoneLink}>browse</span>
+                      </p>
+                      <p className={styles.dropZoneHint}>
+                        Lecture recordings, voice notes, or podcasts (up to 50MB)
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={styles.filePreview}>
+                      <div className={styles.filePreviewIcon}>
+                        <Mic size={32} />
+                      </div>
+                      <div className={styles.filePreviewInfo}>
+                        <p className={styles.filePreviewName}>{audioFile.name}</p>
+                        <p className={styles.filePreviewSize}>{formatFileSize(audioFile.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.filePreviewRemove}
+                        onClick={handleRemoveAudio}
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <button
                 type="submit"
                 className={styles.submitBtn}
                 disabled={uploadState !== 'idle' || !isValidLength}
               >
                 <Sparkles size={18} />
-                {uploadMode === 'text' ? 'Generate Summary & Flashcards' : 'Process PDF & Generate Flashcards'}
+                {uploadMode === 'text' && 'Generate Summary & Flashcards'}
+                {uploadMode === 'pdf' && 'Process PDF & Generate Flashcards'}
+                {uploadMode === 'url' && 'Extract & Generate Flashcards'}
+                {uploadMode === 'voice' && 'Transcribe & Generate Flashcards'}
               </button>
             </form>
           </div>

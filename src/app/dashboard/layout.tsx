@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { walletService, subscriptionService } from '@/services';
+import { usePageTracking } from '@/hooks/usePageTracking';
 import type { SubscriptionStatusResponse } from '@/types';
-import { LayoutGrid, UploadCloud, Folder, Wallet, Coins, Gift, Crown, Award, Trophy, Settings, User } from 'lucide-react';
+import { LayoutGrid, UploadCloud, Folder, Wallet, Coins, Gift, Crown, Award, Trophy, Settings, User, BarChart3 } from 'lucide-react';
 import styles from './layout.module.css';
 
 interface DashboardLayoutProps {
@@ -19,6 +20,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [balance, setBalance] = useState(0);
   const [subscription, setSubscription] = useState<SubscriptionStatusResponse | null>(null);
+
+  // Track page views for analytics
+  usePageTracking();
 
   const fetchBalance = useCallback(async () => {
     try {
@@ -173,6 +177,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Crown className={styles.navIcon} />
             <span>Subscription</span>
           </Link>
+
+          {user?.isAdmin === true && (
+            <>
+              <p className={styles.navLabel}>Admin</p>
+              <Link
+                href="/dashboard/admin"
+                className={`${styles.navItem} ${styles.adminItem} ${isActive('/dashboard/admin') ? styles.active : ''}`}
+              >
+                <BarChart3 className={styles.navIcon} />
+                <span>Analytics</span>
+              </Link>
+            </>
+          )}
         </nav>
 
       </aside>

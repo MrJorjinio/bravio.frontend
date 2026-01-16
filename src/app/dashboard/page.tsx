@@ -23,18 +23,18 @@ export default function DashboardPage() {
   const [showBonusModal, setShowBonusModal] = useState(false);
   const [bonusMessage, setBonusMessage] = useState('');
   const [dailyBonusClaimed, setDailyBonusClaimed] = useState(false);
-  const [practiceStatsMap, setPracticeStatsMap] = useState<Map<string, { attempted: number; total: number }>>(new Map());
-
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
+      // Load only 3 completed uploads directly from API (optimized)
+      // Practice stats are included inline in upload response (no separate API calls needed)
       const [
         uploadsRes,
         streakRes,
         levelRes,
         weeklyActivityRes
       ] = await Promise.all([
-        uploadService.getUploads(1, 10),
+        uploadService.getUploads(1, 3, 'completed'),
         userService.getStreak().catch(() => null),
         userService.getLevel().catch(() => null),
         userService.getWeeklyActivity().catch(() => null)
@@ -45,33 +45,8 @@ export default function DashboardPage() {
       setLevel(levelRes);
       setWeeklyActivity(weeklyActivityRes);
 
-      // Check if daily bonus already claimed (streak response has info)
-      setDailyBonusClaimed(streakRes?.isActiveToday || false);
-
-      // Build practice stats map for uploads
-      const statsMap = new Map<string, { attempted: number; total: number }>();
-      for (const upload of uploadsRes.uploads || []) {
-        if (upload.status.toLowerCase() === 'completed') {
-          try {
-            const practiceStats = await uploadService.getPracticeStats(upload.id);
-            // Debug: Log practice stats to identify issues
-            console.log(`[Dashboard] Practice stats for upload ${upload.id}:`, {
-              apiResponse: practiceStats,
-              uploadFlashcardCount: upload.flashcardCount
-            });
-            // Use upload.flashcardCount as fallback if API returns 0 for totalFlashcards
-            const total = practiceStats.totalFlashcards || upload.flashcardCount || 0;
-            statsMap.set(upload.id, {
-              attempted: practiceStats.flashcardsAttempted || 0,
-              total
-            });
-          } catch (err) {
-            console.error(`[Dashboard] Failed to get practice stats for upload ${upload.id}:`, err);
-            statsMap.set(upload.id, { attempted: 0, total: upload.flashcardCount || 0 });
-          }
-        }
-      }
-      setPracticeStatsMap(statsMap);
+      // Check if daily bonus already claimed
+      setDailyBonusClaimed(streakRes?.dailyBonusClaimed || false);
     } catch (err) {
       console.error('Failed to fetch data:', err);
     } finally {
@@ -119,12 +94,12 @@ export default function DashboardPage() {
   }, [fetchData]);
 
   const getUserName = () => {
-    if (!user?.email) return 'there';
-    return user.email.split('@')[0];
+    if (!user?.username) return 'there';
+    return user.username;
   };
 
-  // Get last practiced upload for quick actions
-  const lastPracticedUpload = uploads.find(u => u.status.toLowerCase() === 'completed');
+  // Get first upload for quick actions (all uploads are already completed)
+  const lastPracticedUpload = uploads[0];
 
   // Daily bonus amount based on tier (simplified - would come from user data)
   const dailyBonusAmount = 10;
@@ -143,9 +118,9 @@ export default function DashboardPage() {
       ) : level ? (
         <CompactHeader
           level={level.level}
-          experience={level.experience}
+          experienceInCurrentLevel={level.experienceInCurrentLevel}
+          experienceRequiredForLevel={level.experienceRequiredForLevel}
           experienceToNextLevel={level.experienceToNextLevel}
-          totalExperienceForNextLevel={level.totalExperienceForNextLevel}
           progressPercent={level.progressPercent}
           dailyBonusClaimed={dailyBonusClaimed}
           dailyBonusAmount={dailyBonusAmount}
@@ -171,7 +146,6 @@ export default function DashboardPage() {
       {/* Continue Learning */}
       <ContinueLearning
         uploads={uploads}
-        practiceStats={practiceStatsMap}
         isLoading={isLoading}
       />
 

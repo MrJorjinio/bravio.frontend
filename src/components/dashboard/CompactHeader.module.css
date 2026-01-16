@@ -1,41 +1,51 @@
 .compactHeader {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1.25rem;
-  background: rgba(20, 20, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  margin-bottom: 1.5rem;
+  gap: 2rem;
+  padding: 1.25rem 1.75rem;
+  background: rgba(20, 20, 35, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
 }
 
 /* Level Badge */
 .levelBadge {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.1));
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  gap: 0.6rem;
+  padding: 0.6rem 1.25rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.08));
+  border: 1px solid rgba(245, 158, 11, 0.25);
   border-radius: 100px;
   flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.levelBadge:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.12));
 }
 
 .levelIcon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f59e0b, #fbbf24);
   border-radius: 50%;
   color: #000;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 .levelText {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #fbbf24;
+  letter-spacing: 0.01em;
 }
 
 /* XP Section */
@@ -48,47 +58,52 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .xpLabel {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.45);
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .xpValues {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .xpBarWrapper {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .xpBar {
   flex: 1;
   width: 100%;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 100px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .xpFill {
   height: 100%;
-  min-height: 8px;
+  min-height: 10px;
   background: linear-gradient(90deg, #f59e0b, #fbbf24);
   border-radius: inherit;
-  transition: width 0.5s ease;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
 }
 
 .xpRemaining {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -97,34 +112,37 @@
 .dailyBonusBtn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  border-radius: 12px;
+  gap: 0.6rem;
+  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 14px;
   color: #4ade80;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(34, 197, 94, 0.1);
 }
 
 .dailyBonusBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.2));
-  border-color: rgba(34, 197, 94, 0.6);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(34, 197, 94, 0.15));
+  border-color: rgba(34, 197, 94, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2);
 }
 
 .dailyBonusBtn:disabled {
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .dailyBonusBtn.claimed {
-  background: rgba(34, 197, 94, 0.15);
-  border-color: rgba(34, 197, 94, 0.3);
-  color: rgba(74, 222, 128, 0.7);
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.2);
+  color: rgba(74, 222, 128, 0.6);
+  box-shadow: none;
 }
 
 .spinner {
@@ -218,6 +236,10 @@
     min-height: 10px;
   }
 
+  .xpFill {
+    min-height: 10px;
+  }
+
   .xpRemaining {
     text-align: center;
     font-size: 0.7rem;
@@ -281,6 +303,11 @@
 
   .xpBar {
     height: 8px;
+    min-height: 8px;
+  }
+
+  .xpFill {
+    min-height: 8px;
   }
 
   .xpRemaining {

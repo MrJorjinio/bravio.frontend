@@ -6,9 +6,9 @@ import styles from './CompactHeader.module.css';
 
 interface CompactHeaderProps {
   level: number;
-  experience: number;
+  experienceInCurrentLevel: number;
+  experienceRequiredForLevel: number;
   experienceToNextLevel: number;
-  totalExperienceForNextLevel: number;
   progressPercent: number;
   dailyBonusClaimed: boolean;
   dailyBonusAmount: number;
@@ -17,9 +17,9 @@ interface CompactHeaderProps {
 
 export default function CompactHeader({
   level,
-  experience,
+  experienceInCurrentLevel,
+  experienceRequiredForLevel,
   experienceToNextLevel,
-  totalExperienceForNextLevel,
   progressPercent,
   dailyBonusClaimed,
   dailyBonusAmount,
@@ -52,7 +52,7 @@ export default function CompactHeader({
         <div className={styles.xpInfo}>
           <span className={styles.xpLabel}>XP Progress</span>
           <span className={styles.xpValues}>
-            {experience.toLocaleString()} / {totalExperienceForNextLevel.toLocaleString()}
+            {experienceInCurrentLevel.toLocaleString()} / {experienceRequiredForLevel.toLocaleString()}
           </span>
         </div>
         <div className={styles.xpBarWrapper}>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { uploadService, userService } from '@/services';
-import type { Flashcard, UploadSummary, PracticeStats, StreakResponse, LevelResponse } from '@/types';
+import type { Flashcard, UploadSummary, PracticeStats } from '@/types';
 import {
   X,
   CheckCircle2,
@@ -15,11 +15,8 @@ import {
   Zap,
   Check,
   XIcon,
-  Star,
-  Sparkles,
-  Trophy,
-  Flame,
-  TrendingUp
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import styles from './practice.module.css';
@@ -47,10 +44,7 @@ export default function PracticePage() {
   const [sessionAttemptedIds, setSessionAttemptedIds] = useState<Set<string>>(new Set());
   const [feedbackType, setFeedbackType] = useState<'difficult' | 'good' | 'easy' | null>(null);
   const [xpGained, setXpGained] = useState<number | null>(null);
-  const [levelUp, setLevelUp] = useState<{ newLevel: number; broinsAwarded: number } | null>(null);
-  const [sessionXp, setSessionXp] = useState(0);
-  const [streak, setStreak] = useState<StreakResponse | null>(null);
-  const [level, setLevel] = useState<LevelResponse | null>(null);
+  const [failedCards, setFailedCards] = useState<Flashcard[]>([]);
   const [loadedFlashcards, setLoadedFlashcards] = useState<Flashcard[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreCards, setHasMoreCards] = useState(false);
@@ -199,19 +193,15 @@ export default function PracticePage() {
         difficulty
       });
 
-      // Show XP gain and track session total
+      // Show XP gain
       if (result.xpGained > 0) {
         setXpGained(result.xpGained);
-        setSessionXp(prev => prev + result.xpGained);
         setTimeout(() => setXpGained(null), 2000);
       }
 
-      // Show level up notification
-      if (result.leveledUp && result.newLevel) {
-        setLevelUp({
-          newLevel: result.newLevel,
-          broinsAwarded: result.broinsAwarded || 0
-        });
+      // Track failed cards (difficulty 1 = Difficult)
+      if (difficulty === 1 && currentCard) {
+        setFailedCards(prev => [...prev, currentCard]);
       }
 
       // Track this card as attempted in current session
@@ -228,17 +218,6 @@ export default function PracticePage() {
 
       // Check if we've gone through all cards in this session
       if (newAttemptedIds.size >= totalCards) {
-        // Fetch streak and level data for completion screen
-        try {
-          const [streakData, levelData] = await Promise.all([
-            userService.getStreak(),
-            userService.getLevel()
-          ]);
-          setStreak(streakData);
-          setLevel(levelData);
-        } catch (e) {
-          console.error('Failed to fetch completion data:', e);
-        }
         // Dispatch event to refresh dashboard stats
         window.dispatchEvent(new CustomEvent('practiceComplete'));
         setCompleted(true);
@@ -270,17 +249,6 @@ export default function PracticePage() {
           }
         }
 
-        // Fetch streak and level data for completion screen
-        try {
-          const [streakData, levelData] = await Promise.all([
-            userService.getStreak().catch(() => null),
-            userService.getLevel().catch(() => null)
-          ]);
-          setStreak(streakData);
-          setLevel(levelData);
-        } catch (e) {
-          console.error('Failed to fetch completion data:', e);
-        }
         // Dispatch event to refresh dashboard stats
         window.dispatchEvent(new CustomEvent('practiceComplete'));
         setCompleted(true);
@@ -305,9 +273,7 @@ export default function PracticePage() {
     setIsFlipped(false);
     setShowHint(false);
     setSessionAttemptedIds(new Set()); // Reset session tracking
-    setSessionXp(0); // Reset session XP
-    setStreak(null);
-    setLevel(null);
+    setFailedCards([]); // Reset failed cards
     setLoadedFlashcards([]); // Reset loaded flashcards
     setCurrentPage(1);
     setHasMoreCards(false);
@@ -331,81 +297,65 @@ export default function PracticePage() {
 
   if (completed) {
     const accuracy = Math.round(stats?.accuracy || 0);
-    const getMessage = () => {
-      if (accuracy >= 80) return 'Smashed it!';
-      if (accuracy >= 60) return 'Great work!';
-      if (accuracy >= 40) return 'Keep going!';
-      return 'Nice effort!';
-    };
 
     return (
       <div className={styles.container}>
         <div className={styles.completedCard}>
-          {/* Trophy Icon with Glow */}
-          <div className={styles.trophyWrapper}>
-            <div className={styles.trophyGlow}></div>
-            <div className={styles.trophyCircle}>
-              <Trophy size={48} />
+          {/* Accuracy Circle */}
+          <div className={styles.accuracyCircle}>
+            <svg className={styles.accuracyRing} viewBox="0 0 120 120">
+              <circle
+                className={styles.accuracyRingBg}
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                strokeWidth="8"
+              />
+              <circle
+                className={styles.accuracyRingFill}
+                cx="60"
+                cy="60"
+                r="54"
+                fill="none"
+                strokeWidth="8"
+                strokeDasharray={`${accuracy * 3.39} 339`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <div className={styles.accuracyValue}>
+              <span className={styles.accuracyNumber}>{accuracy}</span>
+              <span className={styles.accuracyPercent}>%</span>
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className={styles.completedTitle}>{getMessage()}</h1>
+          <h1 className={styles.completedTitle}>Session Complete</h1>
           <p className={styles.sessionName}>
             {chunkIndex !== null
               ? `Part ${chunkIndex + 1} - ${upload?.title || 'Flashcards'}`
               : practiceMode === 'key'
                 ? `Key Cards - ${upload?.title || 'Flashcards'}`
-                : `Session "${upload?.title || 'Flashcards'}"`
+                : upload?.title || 'Flashcards'
             }
           </p>
 
-          {/* Stats Row */}
-          <div className={styles.statsRow}>
-            <div className={styles.statBox}>
-              <div className={styles.statBoxIcon}>
-                <Flame size={24} className={styles.flameIcon} />
+          {/* Failed Cards Section */}
+          {failedCards.length > 0 && (
+            <div className={styles.failedSection}>
+              <div className={styles.failedHeader}>
+                <AlertCircle size={18} />
+                <span>Review These ({failedCards.length})</span>
               </div>
-              <span className={styles.statBoxValue}>{streak?.currentStreak || 0}</span>
-              <span className={styles.statBoxLabel}>DAY STREAK</span>
-            </div>
-            <div className={styles.statBox}>
-              <div className={styles.statBoxIcon}>
-                <Zap size={24} className={styles.zapIcon} />
-              </div>
-              <span className={styles.statBoxValue}>+{sessionXp}</span>
-              <span className={styles.statBoxLabel}>XP GAINED</span>
-            </div>
-          </div>
-
-          {/* Performance Card */}
-          <div className={styles.performanceCard}>
-            <div className={styles.performanceHeader}>
-              <span className={styles.performanceLabel}>PERFORMANCE</span>
-              <div className={styles.performanceTrend}>
-                <TrendingUp size={14} />
-                <span>+{Math.min(accuracy, 15)}%</span>
-                <span className={styles.trendSubtext}>VS LAST WEEK</span>
+              <div className={styles.failedList}>
+                {failedCards.map((card, index) => (
+                  <div key={card.id} className={styles.failedCard}>
+                    <span className={styles.failedIndex}>{index + 1}</span>
+                    <p className={styles.failedQuestion}>{card.front}</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <h2 className={styles.performanceValue}>{accuracy}%</h2>
-
-            {/* Level Progress */}
-            {level && (
-              <div className={styles.levelProgress}>
-                <div className={styles.levelLabels}>
-                  <span><Star size={14} /> LEVEL {level.level}</span>
-                  <span>LEVEL {level.level + 1}</span>
-                </div>
-                <div className={styles.levelBar}>
-                  <div
-                    className={styles.levelBarFill}
-                    style={{ width: `${level.progressPercent}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Actions */}
           <div className={styles.completedActions}>
@@ -421,10 +371,7 @@ export default function PracticePage() {
               className={styles.backBtn}
             >
               <ArrowLeft size={18} />
-              {chunkIndex !== null ? `Back to Part ${chunkIndex + 1}` : 'Back to Content'}
-            </Link>
-            <Link href="/dashboard" className={styles.dashboardBtn}>
-              Back to Dashboard
+              Back to Content
             </Link>
           </div>
         </div>
@@ -624,60 +571,6 @@ export default function PracticePage() {
           </div>
         )}
 
-        {/* Level Up Modal - Dopamine Edition */}
-        {levelUp && (
-          <div className={styles.levelUpOverlay} onClick={() => setLevelUp(null)}>
-            {/* Confetti particles */}
-            <div className={styles.confettiContainer}>
-              {[...Array(20)].map((_, i) => (
-                <div key={i} className={`${styles.confetti} ${styles[`confetti${i % 5}`]}`} />
-              ))}
-            </div>
-
-            <div className={styles.levelUpModal} onClick={(e) => e.stopPropagation()}>
-              {/* Glow rings */}
-              <div className={styles.glowRings}>
-                <div className={styles.glowRing1}></div>
-                <div className={styles.glowRing2}></div>
-                <div className={styles.glowRing3}></div>
-              </div>
-
-              {/* Money Animation with Badge */}
-              <div className={styles.levelUpAnimation}>
-                <DotLottieReact
-                  src="/animations/making-money.lottie"
-                  autoplay
-                  loop
-                  className={styles.moneyLottie}
-                />
-                {/* Level Badge - Inside animation container */}
-                <div className={styles.levelBadge}>
-                  <span className={styles.levelBadgeNumber}>{levelUp.newLevel}</span>
-                </div>
-              </div>
-
-              <h2 className={styles.levelUpTitle}>
-                <span className={styles.levelUpTitleGlow}>LEVEL UP!</span>
-              </h2>
-              <p className={styles.levelUpLevel}>
-                You&apos;ve ascended to <span className={styles.levelHighlight}>Level {levelUp.newLevel}</span>
-              </p>
-
-              {levelUp.broinsAwarded > 0 && (
-                <div className={styles.levelUpReward}>
-                  <div className={styles.rewardGlow}></div>
-                  <Sparkles size={20} className={styles.rewardIcon} />
-                  <span>+{levelUp.broinsAwarded} Broins</span>
-                </div>
-              )}
-
-              <button className={styles.levelUpBtn} onClick={() => setLevelUp(null)}>
-                <span className={styles.btnShine}></span>
-                Claim Reward
-              </button>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

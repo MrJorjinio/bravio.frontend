@@ -13,9 +13,9 @@
   gap: 8px;
   color: #64748b;
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   transition: all 0.2s ease;
 }
 
@@ -48,7 +48,7 @@
 .formColumn {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
 .header {
@@ -56,16 +56,16 @@
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: #f1f5f9;
-  letter-spacing: -0.025em;
-  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
 .subtitle {
   color: #94a3b8;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 /* Form Card */
@@ -73,11 +73,11 @@
   background: rgba(30, 41, 59, 0.4);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 32px;
-  padding: 32px;
+  border-radius: 24px;
+  padding: 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
 }
 
 .cardGlow {
@@ -95,10 +95,10 @@
 /* Upload Tabs */
 .uploadTabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 6px;
+  margin-bottom: 18px;
   background: rgba(15, 23, 42, 0.5);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 4px;
 }
 
@@ -107,13 +107,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 6px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-radius: 8px;
   color: #64748b;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -138,13 +138,13 @@
 .dropZone {
   border: 2px dashed rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  padding: 48px 32px;
+  padding: 32px 24px;
   text-align: center;
   cursor: pointer;
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
   background: rgba(15, 23, 42, 0.4);
   /* Match textarea wrapper height for consistent layout */
-  min-height: 300px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -204,7 +204,7 @@
   border: 1px solid rgba(245, 158, 11, 0.2);
   border-radius: 16px;
   /* Match textarea wrapper height for consistent layout */
-  min-height: 300px;
+  min-height: 200px;
 }
 
 .filePreviewIcon {
@@ -261,7 +261,7 @@
 
 /* Form Group */
 .formGroup {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .label {
@@ -301,10 +301,10 @@
 .inputWrapper {
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  padding: 4px 16px;
+  padding: 2px 14px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
@@ -325,11 +325,11 @@
 
 .input {
   width: 100%;
-  padding: 16px;
+  padding: 12px;
   background: transparent;
   border: none;
   color: #f1f5f9;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 500;
   outline: none;
 }
@@ -343,8 +343,8 @@
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  padding: 16px;
-  min-height: 300px;
+  padding: 14px;
+  min-height: 200px;
   position: relative;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
@@ -357,12 +357,12 @@
 
 .textarea {
   width: 100%;
-  height: 240px;
+  height: 160px;
   background: transparent;
   border: none;
   color: #e2e8f0;
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 0.95rem;
+  line-height: 1.6;
   resize: none;
   outline: none;
 }
@@ -488,20 +488,20 @@
 /* Submit Button */
 .submitBtn {
   width: 100%;
-  padding: 20px 24px;
+  padding: 14px 20px;
   background-size: 200% auto;
   background-image: linear-gradient(to right, #f59e0b 0%, #d97706 51%, #f59e0b 100%);
   border: none;
-  border-radius: 16px;
+  border-radius: 12px;
   color: #020617;
-  font-size: 1.125rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  box-shadow: 0 20px 40px -12px rgba(245, 158, 11, 0.2);
+  gap: 10px;
+  box-shadow: 0 12px 28px -8px rgba(245, 158, 11, 0.25);
   transition: all 0.5s ease;
 }
 
@@ -1172,6 +1172,55 @@
     font-size: 0.9375rem;
     gap: 10px;
   }
+
+  /* 4 tabs - make 2x2 grid on tablet */
+  .uploadTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+
+  .uploadTab {
+    padding: 12px 10px;
+    font-size: 0.8125rem;
+  }
+
+  /* Processing/Success cards */
+  .processingCard,
+  .chunkProgressCard {
+    padding: 32px 24px;
+    border-radius: 24px;
+  }
+
+  .successCard {
+    padding: 32px 24px;
+    border-radius: 24px;
+    margin: 40px auto;
+  }
+
+  .processingTitle,
+  .successTitle {
+    font-size: 1.5rem;
+  }
+
+  .chunkProgressTitle {
+    font-size: 1.25rem;
+  }
+
+  .moneyLottie {
+    width: 180px;
+    height: 180px;
+  }
+
+  .rocketLottie {
+    width: 200px;
+    height: 200px;
+  }
+
+  .processingSpinner {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1200,21 +1249,74 @@
     margin-bottom: 20px;
   }
 
+  /* Upload tabs - 2x2 grid with smaller padding */
+  .uploadTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .uploadTab {
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    gap: 4px;
+    border-radius: 6px;
+  }
+
+  .uploadTab svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .textareaWrapper {
-    min-height: 220px;
+    min-height: 200px;
+    padding: 14px;
+    border-radius: 12px;
   }
 
   .dropZone {
-    min-height: 220px;
-    padding: 32px 20px;
+    min-height: 180px;
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .dropZoneIcon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dropZoneText {
+    font-size: 0.875rem;
+  }
+
+  .dropZoneHint {
+    font-size: 0.75rem;
   }
 
   .filePreview {
-    min-height: 220px;
+    min-height: 120px;
+    padding: 16px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .filePreviewIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .filePreviewIcon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .filePreviewName {
+    font-size: 0.875rem;
   }
 
   .textarea {
-    height: 180px;
+    height: 160px;
     font-size: 0.9375rem;
   }
 
@@ -1250,26 +1352,205 @@
     border-radius: 12px;
   }
 
-  .textareaWrapper {
-    padding: 14px;
-    border-radius: 12px;
+  /* Label row - stack on very small screens */
+  .labelRow {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .charBadge {
+    font-size: 0.6875rem;
+    padding: 3px 6px;
+  }
+
+  /* Processing/Success states */
+  .processingCard,
+  .chunkProgressCard {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+
+  .successCard {
+    padding: 28px 20px;
+    border-radius: 20px;
+    margin: 24px auto;
+  }
+
+  .processingTitle {
+    font-size: 1.25rem;
+  }
+
+  .successTitle {
+    font-size: 1.375rem;
+  }
+
+  .chunkProgressTitle {
+    font-size: 1.125rem;
+  }
+
+  .processingText,
+  .successText,
+  .chunkProgressSubtext {
+    font-size: 0.875rem;
+  }
+
+  .moneyLottie {
+    width: 160px;
+    height: 160px;
+  }
+
+  .rocketLottie {
+    width: 180px;
+    height: 180px;
+  }
+
+  .processingSpinner {
+    width: 80px;
+    height: 80px;
+  }
+
+  .chunkProgressStats {
+    gap: 16px;
+  }
+
+  .chunkProgressStatValue {
+    font-size: 1.25rem;
+  }
+
+  .chunkProgressStatLabel {
+    font-size: 0.6875rem;
+  }
+
+  .chunkList {
+    max-height: 160px;
+  }
+
+  .chunkItem {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .chunkItemTitle {
+    font-size: 0.8125rem;
+  }
+
+  .chunkItemMeta {
+    font-size: 0.6875rem;
+  }
+
+  .successBtn {
+    padding: 12px 20px;
+    font-size: 0.875rem;
+  }
+
+  /* Tier warnings */
+  .tierWarning {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    gap: 8px;
+  }
+
+  .tierHint {
+    padding: 8px 12px;
+    font-size: 0.6875rem;
   }
 }
 
 @media (max-width: 360px) {
+  .container {
+    padding: 12px 10px;
+  }
+
+  .formCard {
+    padding: 16px 12px;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.8125rem;
+  }
+
   .submitBtn {
     padding: 12px 14px;
     font-size: 0.8125rem;
   }
 
+  /* Tabs even more compact */
+  .uploadTabs {
+    gap: 3px;
+    padding: 2px;
+  }
+
   .uploadTab {
-    padding: 10px 12px;
-    font-size: 0.75rem;
-    gap: 6px;
+    padding: 8px 6px;
+    font-size: 0.6875rem;
+    gap: 3px;
   }
 
   .uploadTab svg {
     width: 14px;
     height: 14px;
+  }
+
+  .dropZone {
+    min-height: 160px;
+    padding: 20px 12px;
+  }
+
+  .textarea {
+    height: 140px;
+  }
+
+  .label {
+    font-size: 0.6875rem;
+  }
+
+  .input {
+    padding: 12px 10px;
+    font-size: 0.875rem;
+  }
+
+  /* Processing states */
+  .processingCard,
+  .chunkProgressCard,
+  .successCard {
+    padding: 24px 16px;
+    border-radius: 16px;
+  }
+
+  .processingTitle,
+  .successTitle {
+    font-size: 1.125rem;
+  }
+
+  .chunkProgressTitle {
+    font-size: 1rem;
+  }
+
+  .moneyLottie {
+    width: 140px;
+    height: 140px;
+  }
+
+  .rocketLottie {
+    width: 160px;
+    height: 160px;
+  }
+
+  .processingSpinner {
+    width: 64px;
+    height: 64px;
+  }
+
+  .chunkProgressBar {
+    height: 8px;
+  }
+
+  .chunkList {
+    max-height: 140px;
   }
 }

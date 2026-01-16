@@ -111,6 +111,15 @@
   position: relative;
 }
 
+/* Admin Item */
+.adminItem {
+  position: relative;
+}
+
+.adminItem.active {
+  color: #ef4444;
+}
+
 .proBadge {
   margin-left: auto;
   padding: 3px 8px;

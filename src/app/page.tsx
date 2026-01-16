@@ -13,7 +13,6 @@ import {
   Target,
   Brain,
   Coins,
-  Star,
   Gift
 } from 'lucide-react';
 import styles from './landing.module.css';
@@ -83,7 +82,6 @@ export default function LandingPage() {
           <ul className={styles.navLinks}>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#features">Features</a></li>
-            <li><a href="#testimonials">Reviews</a></li>
           </ul>
 
           <Link href="/register" className={styles.navCta}>Get Started Free</Link>
@@ -100,7 +98,6 @@ export default function LandingPage() {
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.active : ''}`}>
         <a href="#how-it-works" onClick={closeMobileMenu}>How It Works</a>
         <a href="#features" onClick={closeMobileMenu}>Features</a>
-        <a href="#testimonials" onClick={closeMobileMenu}>Reviews</a>
         <Link href="/register" className={styles.navCta}>Get Started Free</Link>
       </div>
 
@@ -267,70 +264,6 @@ export default function LandingPage() {
               </div>
               <h3>Affordable Pay-As-You-Go</h3>
               <p>Start with 150 free Broins and only pay for what you use. Content costs scale with text length, keeping pricing transparent and fair.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className={styles.testimonials} id="testimonials">
-        <div className={styles.container}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>Student Reviews</span>
-            <h2 className={styles.sectionTitle}>Loved by Learners Everywhere</h2>
-            <p className={styles.sectionSubtitle}>Join thousands of students who are already learning smarter with Bravio.</p>
-          </div>
-          <div className={styles.testimonialsGrid}>
-            <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-              </div>
-              <p className={styles.testimonialText}>&ldquo;I used to spend hours reading dense research papers. Now I paste them into Bravio and get a clear summary with the key points highlighted. Game changer!&rdquo;</p>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>SK</div>
-                <div className={styles.testimonialInfo}>
-                  <h5>Sarah K.</h5>
-                  <p>Medical Student</p>
-                </div>
-              </div>
-            </div>
-            <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-              </div>
-              <p className={styles.testimonialText}>&ldquo;The summaries help me understand concepts quickly, and the flashcards help me remember them. It&apos;s like having a study buddy that does the hard work for you.&rdquo;</p>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>MJ</div>
-                <div className={styles.testimonialInfo}>
-                  <h5>Marcus J.</h5>
-                  <p>Law Student</p>
-                </div>
-              </div>
-            </div>
-            <div className={`${styles.testimonialCard} ${styles.revealOnScroll}`}>
-              <div className={styles.testimonialStars}>
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-                <Star size={16} fill="#f59e0b" />
-              </div>
-              <p className={styles.testimonialText}>&ldquo;Complex engineering concepts broken down into digestible key points? Yes please! Bravio makes studying so much more efficient.&rdquo;</p>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>EL</div>
-                <div className={styles.testimonialInfo}>
-                  <h5>Emma L.</h5>
-                  <p>Engineering Student</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>

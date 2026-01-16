@@ -3,6 +3,8 @@ import axios from 'axios';
 import type {
   CreateUploadRequest,
   CreatePdfUploadRequest,
+  CreateUrlUploadRequest,
+  CreateVoiceUploadRequest,
   Upload,
   UploadSummary,
   UploadsResponse,
@@ -35,6 +37,31 @@ export const uploadService = {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
     const response = await axios.post<Upload>(`${baseUrl}/uploads/pdf`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        // Don't set Content-Type - let browser set multipart/form-data with boundary
+      },
+    });
+    return response.data;
+  },
+
+  async createUrlUpload(data: CreateUrlUploadRequest): Promise<Upload> {
+    const response = await api.post<Upload>('/uploads/url', data);
+    return response.data;
+  },
+
+  async createVoiceUpload(data: CreateVoiceUploadRequest): Promise<Upload> {
+    const formData = new FormData();
+    formData.append('audioFile', data.audioFile);
+    if (data.title) {
+      formData.append('title', data.title);
+    }
+
+    // Use raw axios for file upload to avoid default Content-Type: application/json header
+    const { accessToken } = getTokens();
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+    const response = await axios.post<Upload>(`${baseUrl}/uploads/voice`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         // Don't set Content-Type - let browser set multipart/form-data with boundary

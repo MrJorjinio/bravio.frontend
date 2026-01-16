@@ -1,6 +1,6 @@
-/* Dashboard Home - Redesigned */
+/* Dashboard Home - Premium Redesign */
 .container {
-  padding: 24px 32px;
+  padding: 32px 48px;
   max-width: 1400px;
   margin: 0 auto;
   overflow-x: hidden;
@@ -8,14 +8,15 @@
 
 /* Compact Welcome Section */
 .welcomeSection {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .welcomeTitle {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #f1f5f9;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .gradientName {
@@ -27,7 +28,8 @@
 
 .welcomeSubtext {
   color: #94a3b8;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
 }
 
 /* Bonus Modal */
@@ -163,15 +165,15 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container {
-    padding: 16px;
+    padding: 24px 20px;
   }
 
   .welcomeSection {
-    margin-bottom: 1.25rem;
+    margin-bottom: 2rem;
   }
 
   .welcomeTitle {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
   }
 
   .bonusModal {
@@ -225,19 +227,19 @@
 
 @media (max-width: 480px) {
   .container {
-    padding: 12px;
+    padding: 20px 16px;
   }
 
   .welcomeSection {
-    margin-bottom: 1rem;
+    margin-bottom: 1.75rem;
   }
 
   .welcomeTitle {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
 
   .welcomeSubtext {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   .bonusModal {
@@ -293,15 +295,15 @@
 
 @media (max-width: 360px) {
   .container {
-    padding: 10px;
+    padding: 16px 14px;
   }
 
   .welcomeTitle {
-    font-size: 1rem;
+    font-size: 1.15rem;
   }
 
   .welcomeSubtext {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
 
   .bonusModal {

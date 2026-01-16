@@ -530,10 +530,17 @@ export default function ContentDetailPage() {
                       <span className={styles.statLabel}>Total Words</span>
                       <span className={styles.statValue}>{getWordCount(upload.summary)}</span>
                     </div>
-                    <div className={styles.stat}>
-                      <span className={styles.statLabel}>Key Concepts</span>
-                      <span className={styles.statValue}>{upload.keyPoints?.length || 0}</span>
-                    </div>
+                    {upload.isChunked ? (
+                      <div className={styles.stat}>
+                        <span className={styles.statLabel}>Parts</span>
+                        <span className={styles.statValue}>{upload.totalChunks}</span>
+                      </div>
+                    ) : (upload.keyPoints?.length ?? 0) > 0 && (
+                      <div className={styles.stat}>
+                        <span className={styles.statLabel}>Key Concepts</span>
+                        <span className={styles.statValue}>{upload.keyPoints?.length}</span>
+                      </div>
+                    )}
                     <div className={styles.stat}>
                       <span className={styles.statLabel}>Reading Time</span>
                       <span className={styles.statValue}>{getReadingTime(upload.summary)}</span>
@@ -668,7 +675,7 @@ export default function ContentDetailPage() {
             </div>
             <h2 className={styles.modalTitle}>Delete Content?</h2>
             <p className={styles.modalText}>
-              Are you sure you want to delete <strong>"{upload.title}"</strong>?
+              Are you sure you want to delete <strong>&quot;{upload.title}&quot;</strong>?
               This will permanently remove all flashcards and progress. This action cannot be undone.
             </p>
             <div className={styles.modalActions}>
@@ -700,6 +707,7 @@ export default function ContentDetailPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

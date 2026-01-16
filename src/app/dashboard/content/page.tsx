@@ -32,32 +32,15 @@ export default function ContentPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [practiceStatsMap, setPracticeStatsMap] = useState<Map<string, { attempted: number; total: number }>>(new Map());
 
   const fetchUploads = useCallback(async () => {
     try {
       setIsLoading(true);
       const status = filter === 'all' ? undefined : filter;
+      // Practice stats are included inline in upload list response (no separate API calls needed)
       const res = await uploadService.getUploads(currentPage, ITEMS_PER_PAGE, status);
       setUploads(res.uploads || []);
       setTotalCount(res.totalCount || 0);
-
-      // Build practice stats map for completed uploads
-      const statsMap = new Map<string, { attempted: number; total: number }>();
-      for (const upload of res.uploads || []) {
-        if (upload.status.toLowerCase() === 'completed') {
-          try {
-            const practiceStats = await uploadService.getPracticeStats(upload.id);
-            statsMap.set(upload.id, {
-              attempted: practiceStats.flashcardsAttempted,
-              total: practiceStats.totalFlashcards
-            });
-          } catch {
-            statsMap.set(upload.id, { attempted: 0, total: upload.flashcardCount || 0 });
-          }
-        }
-      }
-      setPracticeStatsMap(statsMap);
     } catch (err) {
       console.error('Failed to fetch uploads:', err);
     } finally {
@@ -69,17 +52,19 @@ export default function ContentPage() {
     fetchUploads();
   }, [fetchUploads]);
 
-  const getProgress = (uploadId: string) => {
-    const stats = practiceStatsMap.get(uploadId);
-    if (!stats || !stats.total || stats.total === 0) return 0;
-    const percent = Math.round((stats.attempted / stats.total) * 100);
+  // Get mastered percentage (using inline stats from upload list API)
+  const getMasteredPercent = (upload: Upload) => {
+    const total = upload.flashcardCount || 0;
+    const completed = upload.flashcardsCompleted || 0;
+    if (total === 0) return 0;
+    const percent = Math.round((completed / total) * 100);
     return isNaN(percent) ? 0 : percent;
   };
 
-  const isComplete = (uploadId: string) => {
-    const stats = practiceStatsMap.get(uploadId);
-    if (!stats) return false;
-    return stats.attempted >= stats.total && stats.total > 0;
+  const isComplete = (upload: Upload) => {
+    const total = upload.flashcardCount || 0;
+    const completed = upload.flashcardsCompleted || 0;
+    return completed >= total && total > 0;
   };
 
   const handleDeleteClick = (uploadId: string) => {
@@ -218,8 +203,8 @@ export default function ContentPage() {
       ) : (
         <div className={styles.contentGrid}>
           {uploads.map((upload) => {
-            const progress = getProgress(upload.id);
-            const complete = isComplete(upload.id);
+            const masteredPercent = getMasteredPercent(upload);
+            const complete = isComplete(upload);
             const isCompleted = upload.status.toLowerCase() === 'completed';
 
             return (
@@ -231,7 +216,6 @@ export default function ContentPage() {
                       <Layers size={18} />
                     </div>
                     <div className={styles.headerRight}>
-                      {complete && <span className={styles.completeBadge}>Complete</span>}
                       <div className={`${styles.statusBadge} ${getStatusClass(upload.status)}`}>
                         {isCompleted && <CheckCircle2 size={12} />}
                         {upload.status}
@@ -274,10 +258,10 @@ export default function ContentPage() {
                       <div className={styles.progressBar}>
                         <div
                           className={`${styles.progressFill} ${complete ? styles.complete : ''}`}
-                          style={{ width: `${progress}%` }}
+                          style={{ width: `${masteredPercent}%` }}
                         ></div>
                       </div>
-                      <span className={styles.progressText}>{progress}% mastered</span>
+                      <span className={styles.progressText}>{masteredPercent}% mastered</span>
                     </div>
                   )}
 
@@ -286,11 +270,6 @@ export default function ContentPage() {
                       <Eye size={16} />
                       View Details
                     </Link>
-                    {isCompleted && (
-                      <Link href={`/practice/${upload.id}`} className={styles.practiceBtn}>
-                        Practice
-                      </Link>
-                    )}
                   </div>
                 </div>
               </div>

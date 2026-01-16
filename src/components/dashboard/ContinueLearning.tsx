@@ -7,28 +7,26 @@ import styles from './ContinueLearning.module.css';
 
 interface ContinueLearningProps {
   uploads: Upload[];
-  practiceStats: Map<string, { attempted: number; total: number }>;
   isLoading?: boolean;
 }
 
-export default function ContinueLearning({ uploads, practiceStats, isLoading }: ContinueLearningProps) {
-  const getProgress = (uploadId: string) => {
-    const stats = practiceStats.get(uploadId);
-    if (!stats || !stats.total || stats.total === 0) return 0;
-    const percent = Math.round((stats.attempted / stats.total) * 100);
+export default function ContinueLearning({ uploads, isLoading }: ContinueLearningProps) {
+  // Get mastered percentage (using inline stats from upload list API)
+  const getMasteredPercent = (upload: Upload) => {
+    const total = upload.flashcardCount || 0;
+    const completed = upload.flashcardsCompleted || 0;
+    if (total === 0) return 0;
+    const percent = Math.round((completed / total) * 100);
     return isNaN(percent) ? 0 : percent;
   };
 
-  const isComplete = (uploadId: string) => {
-    const stats = practiceStats.get(uploadId);
-    if (!stats) return false;
-    return stats.attempted >= stats.total && stats.total > 0;
+  const isComplete = (upload: Upload) => {
+    const total = upload.flashcardCount || 0;
+    const completed = upload.flashcardsCompleted || 0;
+    return completed >= total && total > 0;
   };
 
-  // Only show completed uploads
-  const completedUploads = uploads.filter(upload =>
-    upload.status.toLowerCase() === 'completed'
-  );
+  // Uploads are already filtered by status=completed from API
 
   if (isLoading) {
     return (
@@ -53,7 +51,7 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>Continue Learning</h2>
-        {completedUploads.length > 3 && (
+        {uploads.length >= 3 && (
           <Link href="/dashboard/content" className={styles.viewAllBtn}>
             View All
             <ChevronRight size={16} />
@@ -61,7 +59,7 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
         )}
       </div>
 
-      {completedUploads.length === 0 ? (
+      {uploads.length === 0 ? (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>
             <UploadCloud size={48} />
@@ -77,12 +75,12 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
         </div>
       ) : (
         <div className={styles.deckGrid}>
-          {completedUploads.slice(0, 3).map(upload => (
+          {uploads.slice(0, 3).map(upload => (
             <DeckCard
               key={upload.id}
               upload={upload}
-              progress={getProgress(upload.id)}
-              isComplete={isComplete(upload.id)}
+              masteredPercent={getMasteredPercent(upload)}
+              isComplete={isComplete(upload)}
             />
           ))}
         </div>
@@ -93,11 +91,11 @@ export default function ContinueLearning({ uploads, practiceStats, isLoading }: 
 
 interface DeckCardProps {
   upload: Upload;
-  progress: number;
+  masteredPercent: number;
   isComplete: boolean;
 }
 
-function DeckCard({ upload, progress, isComplete }: DeckCardProps) {
+function DeckCard({ upload, masteredPercent, isComplete }: DeckCardProps) {
   return (
     <div className={styles.deckCard}>
       <div className={styles.cardGlow}></div>
@@ -106,7 +104,6 @@ function DeckCard({ upload, progress, isComplete }: DeckCardProps) {
           <div className={styles.deckIcon}>
             <Layers size={18} />
           </div>
-          {isComplete && <span className={styles.completeBadge}>Complete</span>}
         </div>
 
         <h3 className={styles.deckTitle}>{upload.title || 'Untitled'}</h3>
@@ -120,7 +117,7 @@ function DeckCard({ upload, progress, isComplete }: DeckCardProps) {
             <Layers size={14} />
             {upload.flashcardCount} cards
           </span>
-          {upload.keyPointsCount && upload.keyPointsCount > 0 && (
+          {(upload.keyPointsCount ?? 0) > 0 && (
             <span className={styles.metaItem}>
               <Target size={14} />
               {upload.keyPointsCount} points
@@ -136,10 +133,10 @@ function DeckCard({ upload, progress, isComplete }: DeckCardProps) {
           <div className={styles.progressBar}>
             <div
               className={`${styles.progressFill} ${isComplete ? styles.complete : ''}`}
-              style={{ width: `${progress}%` }}
+              style={{ width: `${masteredPercent}%` }}
             ></div>
           </div>
-          <span className={styles.progressText}>{progress}% mastered</span>
+          <span className={styles.progressText}>{masteredPercent}% mastered</span>
         </div>
 
         <Link href={`/dashboard/content/${upload.id}`} className={styles.viewBtn}>
