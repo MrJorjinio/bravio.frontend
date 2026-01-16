@@ -746,18 +746,33 @@ export interface UserStats {
   today: number;
   thisWeek: number;
   thisMonth: number;
+  lastWeek: number;
+  lastMonth: number;
+  weekOverWeekChange: number;
+  monthOverMonthChange: number;
+  weekOverWeekIsNew?: boolean;
+  monthOverMonthIsNew?: boolean;
 }
 
 export interface RevenueStats {
   totalUSD: number;
   thisMonthUSD: number;
+  lastMonthUSD: number;
   totalTransactions: number;
+  transactionsThisMonth: number;
+  transactionsLastMonth: number;
+  monthOverMonthChange: number;
+  monthOverMonthIsNew?: boolean;
 }
 
 export interface ContentStats {
   totalUploads: number;
   totalPdfs: number;
   totalFlashcards: number;
+  uploadsThisWeek: number;
+  uploadsLastWeek: number;
+  weekOverWeekChange: number;
+  weekOverWeekIsNew?: boolean;
 }
 
 export interface EconomyStats {
@@ -799,6 +814,9 @@ export interface TopPageItem {
   path: string;
   viewCount: number;
   uniqueUsers: number;
+  previousViewCount: number;
+  changePercent: number;
+  isNew?: boolean;
 }
 
 export interface TopPagesResponse {
@@ -824,4 +842,44 @@ export interface TransactionBreakdownResponse {
   recentPurchases: RecentPurchaseItem[];
 }
 
+// Upload Sources Breakdown
+export interface UploadSourcesResponse {
+  textUploads: number;
+  pdfUploads: number;
+  urlUploads: number;
+  voiceUploads: number;
+  textPercent: number;
+  pdfPercent: number;
+  urlPercent: number;
+  voicePercent: number;
+}
+
+// Detailed Performance Metrics
+export interface DetailedMetricsResponse {
+  period: string;
+  metrics: MetricRow[];
+}
+
+export interface MetricRow {
+  name: string;
+  current: string;
+  previous: string;
+  changePercent: number;
+  status: 'Excellent' | 'Good' | 'Fair' | 'Poor';
+}
+
 export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y';
+export type MetricsPeriod = 'daily' | 'weekly' | 'monthly';
+
+// Broin Earnings Breakdown
+export interface BroinEarningSource {
+  source: string;
+  displayName: string;
+  totalBroins: number;
+  percent: number;
+}
+
+export interface BroinEarningsResponse {
+  sources: BroinEarningSource[];
+  totalBroins: number;
+}

@@ -512,3 +512,125 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Admin Mode Styles */
+.adminMode {
+  background: #0a0a0a;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.05) 0, transparent 50%);
+}
+
+.adminMode .sidebar {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%);
+  border-right-color: rgba(139, 92, 246, 0.15);
+}
+
+.adminMode .logoIcon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.adminMode .navItem.active {
+  color: #a78bfa;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.adminMode .navItem:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.adminMode .balanceCard {
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.adminMode .balanceCard::before {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+}
+
+.adminMode .balanceLabel {
+  color: #a78bfa;
+}
+
+.adminMode .balanceIcon {
+  color: #8b5cf6;
+}
+
+.adminMode .logoutBtn:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+}
+
+.adminMode .mobileBalance {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: #a78bfa;
+}
+
+.adminMode .bottomNavItem.active {
+  color: #a78bfa;
+}
+
+.adminMode .mobileLogoIcon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #fff;
+}
+
+/* Admin Label in Sidebar Header */
+.adminLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.adminBadge {
+  padding: 2px 8px;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: 0.05em;
+}
+
+/* User Info in Sidebar Footer (Admin mode) */
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.userRole {
+  font-size: 0.75rem;
+  color: #a78bfa;
+}

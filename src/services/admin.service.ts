@@ -5,7 +5,11 @@ import type {
   RevenueTrendResponse,
   TransactionBreakdownResponse,
   TopPagesResponse,
-  AnalyticsPeriod
+  UploadSourcesResponse,
+  BroinEarningsResponse,
+  DetailedMetricsResponse,
+  AnalyticsPeriod,
+  MetricsPeriod
 } from '@/types';
 
 export const adminService = {
@@ -35,9 +39,30 @@ export const adminService = {
     return response.data;
   },
 
-  async getTopPages(limit: number = 10): Promise<TopPagesResponse> {
+  async getTopPages(limit: number = 10, period: AnalyticsPeriod = '30d'): Promise<TopPagesResponse> {
     const response = await api.get<TopPagesResponse>('/admin/analytics/pages/top', {
-      params: { limit }
+      params: { limit, period }
+    });
+    return response.data;
+  },
+
+  async getUploadSources(period: AnalyticsPeriod = '30d'): Promise<UploadSourcesResponse> {
+    const response = await api.get<UploadSourcesResponse>('/admin/analytics/uploads/sources', {
+      params: { period }
+    });
+    return response.data;
+  },
+
+  async getBroinEarnings(period: AnalyticsPeriod = '30d'): Promise<BroinEarningsResponse> {
+    const response = await api.get<BroinEarningsResponse>('/admin/analytics/broins/earnings', {
+      params: { period }
+    });
+    return response.data;
+  },
+
+  async getDetailedMetrics(period: MetricsPeriod = 'weekly'): Promise<DetailedMetricsResponse> {
+    const response = await api.get<DetailedMetricsResponse>('/admin/analytics/metrics/detailed', {
+      params: { period }
     });
     return response.data;
   },
